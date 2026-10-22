@@ -55,13 +55,13 @@ class Game {
         this.player = new Player(classKey);
         this.ui.showScreen('introScreen');
 
-        // 1. Efecto inicial mientras la IA procesa
-        this.ui.typewriterIntro(`CONSULTANDO LOS ORÁCULOS DEL DESTINO PARA EL ${this.player.className.toUpperCase()}...`);
+        // 1. Mensaje de espera
+        this.ui.typewriterIntro(`CONSULTANDO LOS ORÁCULOS DEL DESTINO...`);
 
-        // 2. Obtener historia dinámica de Groq mediante el backend seguro
+        // 2. Obtener el texto dinámico (Groq o Fallback local)
         const story = await this.groq.generateCharacterLore(this.player.className);
 
-        // 3. Mostrar la historia generada
+        // 3. Escribir la historia final limpia
         this.ui.typewriterIntro(story.toUpperCase());
     }
 

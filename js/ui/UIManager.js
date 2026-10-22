@@ -1,4 +1,34 @@
 export class UIManager {
+
+    constructor() {
+        this.typewriterTimer = null; // Guardamos el timer aquí
+    }
+
+    typewriterIntro(text, callback) {
+        const box = document.getElementById('introText');
+
+        // 1. LIMPIAR CUALQUIER ANIMACIÓN ANTERIOR EN CURSO
+        if (this.typewriterTimer) {
+            clearInterval(this.typewriterTimer);
+            this.typewriterTimer = null;
+        }
+
+        box.textContent = '';
+        let i = 0;
+
+        // 2. INICIAR LA NUEVA ANIMACIÓN
+        this.typewriterTimer = setInterval(() => {
+            if (i < text.length) {
+                box.textContent += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(this.typewriterTimer);
+                this.typewriterTimer = null;
+                if (callback) callback();
+            }
+        }, 25);
+    }
+
     showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
