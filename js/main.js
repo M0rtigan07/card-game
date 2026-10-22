@@ -143,10 +143,10 @@ class Game {
     drawTcgHand() {
         // Mazo con ilustraciones Pixel Art asignadas
         const availableCards = [
-            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, img: 'img/guerrero.png', desc: 'Inflige 15 de daño físico' },
-            { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, img: 'img/guerrero.png', desc: 'Gana 10 de guardia' },
-            { id: 'fireball', name: 'Bola Fuego', cost: 2, type: 'atk', val: 25, img: 'img/maga.png', desc: '25 daño mágico' },
-            { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, img: 'img/picaro.png', desc: 'Restaura 20 HP' }
+            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, img: 'img/estocada.png', desc: 'Inflige 15 de daño físico' },
+            { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, img: 'img/escudo.png', desc: 'Gana 10 de guardia' },
+            { id: 'fireball', name: 'Bola Fuego', cost: 2, type: 'atk', val: 25, img: 'img/bolaFuego.png', desc: '25 daño mágico' },
+            { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, img: 'img/pocion.png', desc: 'Restaura 20 HP' }
         ];
 
         this.playerHand = [
