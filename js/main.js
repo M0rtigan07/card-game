@@ -122,20 +122,20 @@ class Game {
     }
 
     // Método para iniciar combate TCG cuando la historia o decisión encuentra un enemigo
-  
 
-  
+
+
 
     renderHand() {
         const handContainer = document.getElementById('playerHand');
         if (!handContainer) return;
-        
+
         handContainer.innerHTML = '';
 
         this.playerHand.forEach((card, index) => {
             const cardEl = document.createElement('div');
             cardEl.className = 'tcg-card';
-            
+
             // Ligera inclinación para efecto abanico
             const rotation = (index - (this.playerHand.length - 1) / 2) * 4;
             cardEl.style.transform = `rotate(${rotation}deg)`;
@@ -146,40 +146,79 @@ class Game {
                 <span class="title">${card.name}</span>
                 <span class="desc">${card.desc}</span>
             `;
-            
+
             cardEl.addEventListener('click', () => this.playTcgCard(card, index));
             handContainer.appendChild(cardEl);
         });
     }
 
     // INICIAR COMBATE TCG
+    // INICIAR COMBATE TCG CON SPRITES DE ENEMIGOS ADAPTADOS A LA HISTORIA
     startTcgCombat(enemyData) {
         const levelMultiplier = this.dungeonLevel;
-        
-        // Atributos del enemigo según la planta
-        this.currentEnemy = enemyData || {
-            name: `Aparecido de Planta ${this.dungeonLevel}`,
-            hp: 40 + (levelMultiplier * 18),
-            maxHp: 40 + (levelMultiplier * 18),
-            atk: 8 + (levelMultiplier * 3),
-            shield: 0,
-            img: 'img/maga.png'
+
+        // Base de datos de sprites de enemigos en pixel art según el tipo de encuentro
+        const enemySprites = {
+            'mage': 'img/maga.png',
+            'rogue': 'img/picaro.png',
+            'warrior': 'img/guerrero.png',
+            'gargoyle': 'img/gargola.png', // O una imagen por defecto retro
+            'default': 'img/guerrero.png'
         };
 
-        this.playerShield = 0; // Escudo del jugador por turno
+        // Seleccionar sprite y nombre según el contexto o datos pasados
+        let enemyImg = enemyData?.img || enemySprites['default'];
+        let enemyName = enemyData?.name || `Enemigo de Planta ${this.dungeonLevel}`;
 
-        // Activar elementos visuales VS en la escena
-        document.getElementById('enemyPortraitContainer').style.display = 'flex';
-        document.getElementById('vsBadge').style.display = 'inline';
-        document.getElementById('enemyStatus').style.display = 'block';
-        document.getElementById('enemySceneImage').src = this.currentEnemy.img;
-        document.getElementById('enemyPortraitName').textContent = this.currentEnemy.name;
+        // Detectar palabras clave en la descripción para asignar el sprite visual correcto
+        const descLower = (enemyData?.description || "").toLowerCase();
+        if (descLower.includes('gárgola') || descLower.includes('estatua')) {
+            enemyImg = 'img/gargola.png';
+            enemyName = 'Estatua de Gárgola';
+        } else if (descLower.includes('hechicero') || descLower.includes('nigromante') || descLower.includes('archimago')) {
+            enemyImg = 'img/hechicero.png';
+            enemyName = 'Hechicero Oscuro';
+        } else if (descLower.includes('orco') || descLower.includes('veterano') || descLower.includes('caballero')) {
+            enemyImg = 'img/guerrero.png';
+            enemyName = 'Guerrero Corrupto';
+        }
 
-        // Mostrar tablero TCG
-        document.getElementById('actionChoices').style.display = 'none';
-        document.getElementById('tcgCombatView').style.display = 'flex';
+        // Atributos robustos del enemigo con DEF inicializada a 0
+        this.currentEnemy = {
+            name: enemyName,
+            hp: 40 + (levelMultiplier * 18),
+            maxHp: 40 + (levelMultiplier * 18),
+            atk: 10 + (levelMultiplier * 2),
+            shield: 0, // Soluciona el problema de "DEF: UNDEFINED"
+            img: enemyImg
+        };
 
-        // Escuchar botón de Fin de Turno
+        this.playerShield = 0;
+
+        // Activar elementos visuales VS en la escena principal
+        const enemyPortraitContainer = document.getElementById('enemyPortraitContainer');
+        const vsBadge = document.getElementById('vsBadge');
+        const enemyStatus = document.getElementById('enemyStatus');
+        const enemySceneImg = document.getElementById('enemySceneImage');
+        const enemyPortraitName = document.getElementById('enemyPortraitName');
+
+        if (enemyPortraitContainer) enemyPortraitContainer.style.display = 'flex';
+        if (vsBadge) vsBadge.style.display = 'inline';
+        if (enemyStatus) enemyStatus.style.display = 'block';
+        if (enemySceneImg) {
+            enemySceneImg.src = this.currentEnemy.img;
+            // Fallback por si la imagen específica no existe en la carpeta img/
+            enemySceneImg.onerror = () => { enemySceneImg.src = 'img/guerrero.png'; };
+        }
+        if (enemyPortraitName) enemyPortraitName.textContent = this.currentEnemy.name;
+
+        // Mostrar tablero TCG y ocultar opciones de rol
+        const actionChoices = document.getElementById('actionChoices');
+        const tcgCombatView = document.getElementById('tcgCombatView');
+        if (actionChoices) actionChoices.style.display = 'none';
+        if (tcgCombatView) tcgCombatView.style.display = 'flex';
+
+        // Vincular botón de Fin de Turno
         const endTurnBtn = document.getElementById('endTurnTcgBtn');
         if (endTurnBtn) {
             endTurnBtn.onclick = () => this.executeEnemyTurn();
@@ -197,13 +236,13 @@ class Game {
 
         const decks = {
             'warrior': [
-                { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', val: 15 + (lvl * 5), img: 'img/guerrero.png', desc: `Inflige ${15 + (lvl * 5)} daño físico` },
-                { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', val: 12 + (lvl * 4), img: 'img/guerrero.png', desc: `Gana ${12 + (lvl * 4)} guardia` },
+                { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', val: 15 + (lvl * 5), img: 'img/estocada.png', desc: `Inflige ${15 + (lvl * 5)} daño físico` },
+                { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', val: 12 + (lvl * 4), img: 'img/escudo.png', desc: `Gana ${12 + (lvl * 4)} guardia` },
                 { id: 'whirlwind', name: 'Torbellino', cost: 2, type: 'atk', val: 28 + (lvl * 8), img: 'img/guerrero.png', desc: `Inflige ${28 + (lvl * 8)} daño pesado` },
-                { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', val: 18 + (lvl * 3), img: 'img/guerrero.png', desc: `Recupera ${18 + (lvl * 3)} HP` }
+                { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', val: 18 + (lvl * 3), img: 'img/pocion.png', desc: `Recupera ${18 + (lvl * 3)} HP` }
             ],
             'mage': [
-                { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', val: 25 + (lvl * 7), img: 'img/maga.png', desc: `Inflige ${25 + (lvl * 7)} daño arcano` },
+                { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', val: 25 + (lvl * 7), img: 'img/bolaFuego.png', desc: `Inflige ${25 + (lvl * 7)} daño arcano` },
                 { id: 'ice_barrier', name: 'Barrera de Hielo', cost: 1, type: 'def', val: 15 + (lvl * 5), img: 'img/maga.png', desc: `Gana ${15 + (lvl * 5)} guardia` },
                 { id: 'arcane_missile', name: 'Proyectiles', cost: 1, type: 'atk', val: 16 + (lvl * 4), img: 'img/maga.png', desc: `Inflige ${16 + (lvl * 4)} daño rápido` },
                 { id: 'mana_heal', name: 'Canalización', cost: 1, type: 'heal', val: 22 + (lvl * 4), img: 'img/maga.png', desc: `Sana ${22 + (lvl * 4)} HP` }
@@ -305,7 +344,7 @@ class Game {
         // Recompensas RPG
         this.player.addGold(100 + (this.dungeonLevel * 15));
         const leveledUp = this.player.addXp(60);
-        
+
         if (leveledUp) {
             this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
@@ -315,7 +354,7 @@ class Game {
         document.getElementById('vsBadge').style.display = 'none';
         document.getElementById('enemyStatus').style.display = 'none';
         document.getElementById('tcgCombatView').style.display = 'none';
-        
+
         // Volver al modo RPG
         document.getElementById('actionChoices').style.display = 'flex';
         this.dungeonLevel++;
@@ -333,11 +372,11 @@ class Game {
 
 
 
-   
 
-   
 
-    
+
+
+
 
     async handleExplorationChoice(action) {
         this.audio.play('card');
