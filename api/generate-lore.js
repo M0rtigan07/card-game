@@ -78,7 +78,7 @@ module.exports = async function handler(req, res){
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "llama-3.3-70b-versatile",
+                model: "openai/gpt-oss-120b",
                 messages: [{
                     role: "system",
                     content: "Eres un narrador de D&D. Genera introducciones cortas y épicas (máximo 35 palabras) en español sin markdown."
