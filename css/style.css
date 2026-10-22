@@ -29,7 +29,7 @@ body {
     position: relative;
 }
 
-/* FILTRO VISUAL RETRO 16-BITS (OVERLAY GLOBAL CRT) */
+/* FILTRO VISUAL RETRO 16-BITS (OVERLAY CRT GLOBAL) */
 body::after {
     content: "";
     position: fixed;
@@ -38,13 +38,13 @@ body::after {
     width: 100vw;
     height: 100vh;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
-                radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
+        radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
     background-size: 100% 4px, 100% 100%;
     pointer-events: none;
     z-index: 9999;
 }
 
-/* SISTEMA DE PANTALLAS (OCULTAS POR DEFECTO) */
+/* SISTEMA DE PANTALLAS */
 .screen {
     display: none !important;
     width: 100vw;
@@ -118,14 +118,19 @@ body::after {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* 1. PANTALLA DE TÍTULO */
 #titleScreen {
     background: linear-gradient(rgba(10, 5, 20, 0.25), rgba(10, 5, 20, 0.65)),
-                url('../img/intro.jpg') no-repeat center center / cover;
+        url('../img/intro.jpg') no-repeat center center / cover;
     text-align: center;
     justify-content: flex-end;
     padding-bottom: 70px;
@@ -177,13 +182,26 @@ body::after {
 }
 
 @keyframes blink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
+
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
 }
 
 @keyframes pulseGlow {
-    0% { transform: scale(0.98); }
-    100% { transform: scale(1.02); }
+    0% {
+        transform: scale(0.98);
+    }
+
+    100% {
+        transform: scale(1.02);
+    }
 }
 
 /* 2. SELECCIÓN DE PERSONAJE */
@@ -266,10 +284,10 @@ body::after {
     text-align: left;
 }
 
-/* 3. PANTALLA DE HISTORIA / LORE CON FONDO PIXEL ART */
+/* 3. PANTALLA DE HISTORIA / LORE */
 #introScreen {
     background: linear-gradient(rgba(10, 5, 20, 0.55), rgba(10, 5, 20, 0.85)),
-                url('../img/dungeon_intro_bg.png') no-repeat center center / cover;
+        url('../img/dungeon_intro_bg.png') no-repeat center center / cover;
     padding: 20px;
 }
 
@@ -338,7 +356,7 @@ body::after {
     text-shadow: 0 0 5px rgba(74, 222, 128, 0.4);
 }
 
-/* 4. TABLERO DE JUEGO PRINCIPAL */
+/* 4. TABLERO DE JUEGO PRINCIPAL Y EXPLORACIÓN */
 .container {
     display: flex;
     justify-content: space-between;
@@ -355,7 +373,8 @@ body::after {
     overflow: hidden;
 }
 
-#leftSidebar, #rightSidebar {
+#leftSidebar,
+#rightSidebar {
     flex: 1.1;
     background: var(--panel-bg);
     padding: 16px;
@@ -367,7 +386,8 @@ body::after {
     overflow-y: auto;
 }
 
-#leftSidebar h2, #rightSidebar h2 {
+#leftSidebar h2,
+#rightSidebar h2 {
     color: var(--gold);
     font-size: 1.1em;
     letter-spacing: 1px;
@@ -440,71 +460,54 @@ h1 {
     color: var(--gold);
 }
 
-#messageDisplay {
-    background: linear-gradient(90deg, #2a1b3d 0%, #1f132e 100%);
-    border-left: 5px solid #a855f7;
-    border-radius: 8px;
-    color: #e9d5ff;
-    font-size: 0.95em;
-    padding: 10px 14px;
-    width: 100%;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#cardDisplay {
-    flex: 1;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin: 10px 0;
-    background: radial-gradient(circle, #1a1025 0%, #0d0814 100%);
-    border-radius: 12px;
-    border: 2px dashed rgba(191, 167, 106, 0.3);
-    min-height: 270px;
-}
-
-.card {
-    width: 190px;
-    height: 265px;
-    background: linear-gradient(135deg, #2a1f3d 0%, #150d22 100%);
+/* PANEL NARRATIVO Y DECISIONES ESTRATÉGICAS */
+.exploration-panel {
+    background: linear-gradient(135deg, rgba(20, 12, 35, 0.95), rgba(10, 5, 20, 0.95));
     border: 2px solid var(--gold);
-    border-radius: 12px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    min-height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+    margin-bottom: 15px;
+}
+
+#explorationText {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05em;
+    color: var(--gold-light);
+    line-height: 1.6;
+}
+
+.choices-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
-    animation: cardAppear 0.4s ease;
-}
-
-@keyframes cardAppear {
-    0% { transform: scale(0.3) translateY(40px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-.card img {
+    gap: 10px;
     width: 100%;
-    height: 140px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid var(--gold-border);
+    margin-bottom: 10px;
 }
 
-.card h3 {
+.choice-btn {
+    width: 100%;
+    text-align: left;
+    padding: 12px 18px;
     font-size: 0.9em;
+    background: linear-gradient(90deg, #1f132e 0%, #2a1b3d 100%);
     color: var(--gold);
+    border: 2px solid var(--gold-border);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
 }
 
-.card p {
-    font-size: 0.75em;
-    color: #d8b4fe;
-    line-height: 1.2;
+.choice-btn:hover {
+    border-color: var(--gold);
+    background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
+    transform: translateX(4px);
 }
 
 .fantasy-btn {

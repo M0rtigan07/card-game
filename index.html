@@ -4,31 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Mazo del Destino - 16-Bit Edition</title>
+    <title>El Mazo del Destino - 16-Bit RPG Edition</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- Configuración PWA e Iconos para Tablet Android -->
     <link rel="icon" type="image/png" href="img/icon-192.png" sizes="192x192">
-
-    <!-- Configuración PWA y para tablets Android -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffd700">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="img/icon-192.png">
-
 </head>
 
 <body>
 
-    <!-- PANTALLA DE CARGA (LOADING SCREEN) -->
+    <!-- 0. PANTALLA DE CARGA (SPLASH SCREEN) -->
     <div id="loadingScreen" class="screen active">
         <div class="loading-box">
             <div class="sega-logo">SEGA RPG SYSTEM</div>
             <div class="loading-spinner"></div>
-            <div class="loading-text" id="loadingText">CARGANDO RECURSOS...</div>
+            <div class="loading-text" id="loadingText">INICIALIZANDO SISTEMA...</div>
             <div class="loading-bar-container">
                 <div class="loading-bar" id="loadingBar"></div>
             </div>
@@ -36,7 +34,7 @@
     </div>
 
     <!-- 1. PANTALLA DE TÍTULO -->
-    <div id="titleScreen" class="screen active">
+    <div id="titleScreen" class="screen">
         <div class="title-content-box">
             <div class="sega-logo">SEGA RPG SYSTEM</div>
             <div class="game-title-retro">El Mazo del Destino</div>
@@ -74,12 +72,10 @@
     <!-- 3. INTRO STORY SCREEN -->
     <div id="introScreen" class="screen">
         <div class="intro-container">
-            <!-- LADO IZQUIERDO: PORTRAIT DEL HÉROE -->
             <div class="intro-hero-portrait">
                 <img id="introHeroImg" src="" alt="Héroe Elegido">
             </div>
 
-            <!-- LADO DERECHO: DIÁLOGO NARRATIVO Y BOTÓN -->
             <div class="intro-narrative-box">
                 <div class="intro-header-title" id="introHeroTitle">DESTINO DEL HÉROE</div>
                 <div class="typewriter-box" id="introText"></div>
@@ -88,9 +84,10 @@
         </div>
     </div>
 
-    <!-- 4. TABLERO DE JUEGO PRINCIPAL -->
+    <!-- 4. TABLERO DE JUEGO Y EXPLORACIÓN RPG -->
     <div id="gameScreen" class="screen">
         <div class="container">
+            <!-- PANEL IZQUIERDO: STATS E INVENTARIO -->
             <div id="leftSidebar">
                 <h2>Atributos</h2>
                 <div class="stat-item"><span id="heroClass">Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>
@@ -111,16 +108,27 @@
                 <ul id="playerInventory"></ul>
             </div>
 
+            <!-- PANEL CENTRAL: EXPLORACIÓN Y DECISIONES ESTRATÉGICAS -->
             <div id="mainContent">
-                <h1>El Mazo del Destino</h1>
-                <div id="messageDisplay">Saca una carta para comenzar la exploración.</div>
-                <div id="cardDisplay"></div>
+                <h1 id="dungeonTitle">Cámara de Exploración</h1>
+
+                <div id="explorationBox" class="exploration-panel">
+                    <p id="explorationText">Consultando los misterios de la mazmorra...</p>
+                </div>
+
+                <div id="actionChoices" class="choices-container">
+                    <!-- Opciones dinámicas de Groq AI -->
+                </div>
+
+                <div id="cardDisplay" style="display:none;"></div>
+
                 <div style="display:flex; gap:10px; margin-bottom: 5px;">
-                    <button id="drawCardBtn" class="fantasy-btn">Sacar Carta</button>
+                    <button id="drawCardBtn" class="fantasy-btn" style="display:none;">Sacar Carta</button>
                     <button id="nextTurnBtn" class="fantasy-btn" style="display:none;">Siguiente Turno</button>
                 </div>
             </div>
 
+            <!-- PANEL DERECHO: CRÓNICA DE EVENTOS -->
             <div id="rightSidebar">
                 <h2>Crónica de Eventos</h2>
                 <ul id="eventList"></ul>
@@ -128,11 +136,11 @@
         </div>
     </div>
 
-    <!-- MODAL DE BATALLA -->
+    <!-- MODAL DE BATALLA TÁCTICA -->
     <div id="battle-modal" class="modal">
         <div class="fantasy-modal">
             <h2 id="battle-title">¡Combate!</h2>
-            <p id="battle-desc">Un enemigo te ataca.</p>
+            <p id="battle-desc">Un enemigo en las sombras te ataca.</p>
             <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
                 <button class="fantasy-btn" id="btnAttack">⚔️ Atacar</button>
                 <button class="fantasy-btn" id="btnDefend">🛡️ Defender</button>
@@ -149,24 +157,22 @@
     <div id="gameover-modal" class="modal">
         <div class="fantasy-modal">
             <h2>¡Fin del Juego!</h2>
-            <p>Tu héroe ha caído en las profundidades de la mazmorra.</p>
+            <p>Tu héroe ha sucumbido en las profundidades de la mazmorra.</p>
             <button class="fantasy-btn" onclick="location.reload()">VOLVER AL INICIO</button>
         </div>
     </div>
 
-    <!-- CARGA MODULAR CON ES6 MODULES -->
+    <!-- CARGA MODULAR -->
     <script type="module" src="js/main.js"></script>
 
+    <!-- REGISTRO PWA SERVICE WORKER -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
-                    console.log('Service Worker no registrado: ', err);
-                });
+                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Registration Failed: ', err));
             });
         }
     </script>
-
 </body>
 
 </html>

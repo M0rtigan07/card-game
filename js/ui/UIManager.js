@@ -72,21 +72,6 @@ export class UIManager {
         list.insertBefore(li, list.firstChild);
     }
 
-    setMessage(msg) {
-        document.getElementById('messageDisplay').textContent = msg;
-    }
-
-    displayCard(card) {
-        const display = document.getElementById('cardDisplay');
-        display.innerHTML = `
-            <div class="card">
-                <img src="${card.image}" alt="${card.name}">
-                <h3>${card.name}</h3>
-                <p>${card.desc}</p>
-            </div>
-        `;
-    }
-
     showGameOver() {
         document.getElementById('gameover-modal').style.display = 'flex';
     }

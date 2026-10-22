@@ -3,7 +3,6 @@ import { Player } from './models/Player.js';
 import { Deck } from './models/Deck.js';
 import { BattleSystem } from './systems/BattleSystem.js';
 import { UIManager } from './ui/UIManager.js';
-import { MAX_CARDS_PER_TURN } from './config.js';
 import { GroqAI } from './systems/GroqAI.js';
 
 class Game {
@@ -17,56 +16,52 @@ class Game {
         this.player = null;
         this.dungeonLevel = 1;
         this.turnCounter = 1;
-        this.drawnThisTurn = 0;
 
         this.initEvents();
     }
 
     initEvents() {
-        // Pantalla 1 -> Pantalla 2
+        // PANTALLA 1 -> PANTALLA 2
         document.getElementById('btnPressStart').addEventListener('click', () => {
             this.audio.play('sega');
             this.ui.showScreen('charScreen');
         });
 
-        // Pantalla 2 -> Pantalla 3
+        // PANTALLA 2 -> PANTALLA 3
         document.querySelectorAll('.char-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const classKey = e.currentTarget.dataset.class;
-                this.selectCharacter(classKey).catch(err => console.error("Error al seleccionar personaje:", err));
+                this.selectCharacter(classKey).catch(err => console.error("Error al seleccionar héroe:", err));
             });
         });
 
-        // Pantalla 3 -> Pantalla 4
+        // PANTALLA 3 -> PANTALLA 4
         document.getElementById('btnEnterDungeon').addEventListener('click', () => {
             this.audio.play('sega');
             this.ui.showScreen('gameScreen');
             this.startMainGame();
         });
 
-        document.getElementById('drawCardBtn').addEventListener('click', () => this.drawCard());
-        document.getElementById('nextTurnBtn').addEventListener('click', () => this.nextTurn());
-
+        // EVENTOS DE BATALLA MODAL
         document.getElementById('btnAttack').addEventListener('click', () => this.battle.executeTurn('attack', this.player));
         document.getElementById('btnDefend').addEventListener('click', () => this.battle.executeTurn('defend', this.player));
         document.getElementById('btnSpell').addEventListener('click', () => this.battle.executeTurn('spell', this.player));
     }
 
     async initGame() {
-        // Aumentamos los tiempos para que la carga sea más pausada y atmosférica
+        // Carga pausada y estilizada
         this.ui.setLoadingProgress(20, "INICIALIZANDO SISTEMA SEGA...");
         await new Promise(r => setTimeout(r, 800));
 
         this.ui.setLoadingProgress(50, "CARGANDO GRÁFICOS 16-BIT...");
         await new Promise(r => setTimeout(r, 1000));
 
-        this.ui.setLoadingProgress(80, "PREPARANDO MAZO DE CARTAS...");
+        this.ui.setLoadingProgress(80, "SINTONIZANDO ORÁCULOS DE GROQ...");
         await new Promise(r => setTimeout(r, 900));
 
         this.ui.setLoadingProgress(100, "¡SISTEMA LISTO!");
         await new Promise(r => setTimeout(r, 700));
 
-        // Transición suave a la pantalla de título
         this.ui.showScreen('titleScreen');
     }
 
@@ -97,88 +92,84 @@ class Game {
         this.ui.typewriterIntro(story.toUpperCase());
     }
 
-    startMainGame() {
-        this.deck.reset();
+    async startMainGame() {
         this.dungeonLevel = 1;
         this.turnCounter = 1;
-        this.drawnThisTurn = 0;
-
         this.ui.updateStats(this.player, this.dungeonLevel);
         this.ui.logEvent(`¡${this.player.className} ha entrado en la Planta ${this.dungeonLevel}!`);
+        await this.loadNextExplorationEvent();
     }
 
-    drawCard() {
-        this.audio.play('card');
-        const { card, isReshuffled } = this.deck.drawCard();
+    async loadNextExplorationEvent() {
+        document.getElementById('explorationText').textContent = "Consultando los misterios de la mazmorra...";
+        
+        try {
+            const response = await fetch("/api/generate-lore", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: 'exploration',
+                    className: this.player.className,
+                    dungeonLevel: this.dungeonLevel
+                })
+            });
+            const eventData = await response.json();
+            
+            document.getElementById('explorationText').textContent = eventData.description;
+            
+            const choicesContainer = document.getElementById('actionChoices');
+            choicesContainer.innerHTML = '';
+            
+            eventData.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.addEventListener('click', () => this.handleExplorationChoice(choice.action));
+                choicesContainer.appendChild(btn);
+            });
+        } catch (err) {
+            document.getElementById('explorationText').textContent = "El camino está despejado. ¿Qué deseas hacer?";
+        }
+    }
 
-        if (isReshuffled) {
-            this.dungeonLevel++;
-            this.ui.logEvent(`🔄 ¡Mazo rebarajado! Has descendido a la Planta ${this.dungeonLevel} de la mazmorra.`);
+    async handleExplorationChoice(action) {
+        this.audio.play('card');
+        
+        if (action === 'investigate') {
+            const roll = Math.random();
+            if (roll > 0.4) {
+                this.player.addGold(150 * this.dungeonLevel);
+                this.player.health = Math.min(this.player.maxHealth, this.player.health + 20);
+                this.ui.logEvent(`✨ ¡Encuentro afortunado! Recuperas +20 HP y +${150 * this.dungeonLevel} Oro.`);
+            } else {
+                this.audio.play('hit');
+                this.player.health -= 20;
+                this.ui.logEvent(`⚠️ ¡Trampa antigua o emboscada! Pierdes 20 HP.`);
+            }
+        } else if (action === 'rest') {
+            this.player.health = Math.min(this.player.maxHealth, this.player.health + 35);
+            this.player.mana = Math.min(this.player.maxMana, this.player.mana + 25);
+            this.ui.logEvent(`⛺ Has descansado plenamente. +35 HP | +25 MP.`);
+        } else {
+            this.player.addGold(80 * this.dungeonLevel);
+            this.ui.logEvent(`🛡️ Avanzas con cautela asegurando el perímetro (+${80 * this.dungeonLevel} Oro).`);
         }
 
-        this.ui.displayCard(card);
-        this.processCardEffect(card);
-        this.drawnThisTurn++;
+        this.ui.updateStats(this.player, this.dungeonLevel);
 
         if (this.player.health <= 0) {
             this.ui.showGameOver();
             return;
         }
 
-        if (this.drawnThisTurn >= MAX_CARDS_PER_TURN) {
-            document.getElementById('drawCardBtn').style.display = 'none';
-            document.getElementById('nextTurnBtn').style.display = 'inline-block';
-            this.ui.setMessage("Límite de cartas alcanzado. Pasa al siguiente turno.");
-        }
-    }
-
-    processCardEffect(card) {
-        this.ui.logEvent(`Carta: [${card.name}] - ${card.desc}`);
-        this.ui.setMessage(card.desc);
-
-        if (card.id === 'gema') this.player.addGold(500);
-        if (card.id === 'ruina') this.player.gold = 0;
-        if (card.id === 'espada') {
-            this.player.bonusDamage += 15;
-            this.player.addItem("Espada Afilada", "+15 Dmg");
-        }
-        if (card.id === 'estrella') {
-            this.player.health = Math.min(this.player.maxHealth, this.player.health + 30);
-            this.player.mana = Math.min(this.player.maxMana, this.player.mana + 20);
-        }
-        if (card.id === 'vacio') {
-            this.audio.play('hit');
-            this.player.health -= 20;
-        }
-        if (card.id === 'sabio') {
-            const leveledUp = this.player.addXp(100);
-            if (leveledUp) this.ui.logEvent(`¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
-        }
-        if (card.id === 'caballero') {
-            this.player.bonusDamage += 10;
-            this.player.addItem("Caballero Aliado", "+10 Dmg");
-        }
-
-        if (card.enemy) {
-            this.battle.startBattle(card.enemy);
-        }
-
-        this.ui.updateStats(this.player, this.dungeonLevel);
-    }
-
-    nextTurn() {
-        this.turnCounter++;
-        this.drawnThisTurn = 0;
-        document.getElementById('drawCardBtn').style.display = 'inline-block';
-        document.getElementById('nextTurnBtn').style.display = 'none';
-        document.getElementById('cardDisplay').innerHTML = '';
-        this.ui.setMessage(`Turno ${this.turnCounter}: Saca tu carta.`);
-        this.ui.logEvent(`--- Turno ${this.turnCounter} ---`);
+        // Subir de planta
+        this.dungeonLevel++;
+        this.ui.logEvent(`🏰 Has descendido a la Planta ${this.dungeonLevel}.`);
+        await this.loadNextExplorationEvent();
     }
 }
 
-
-// Iniciar aplicación de forma segura
+// INICIADOR SEGURO DE LA APLICACIÓN
 window.addEventListener('DOMContentLoaded', async () => {
     window.game = new Game();
     try {
