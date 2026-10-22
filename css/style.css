@@ -581,3 +581,112 @@ h1 {
     font-size: 2em;
     margin-bottom: 12px;
 }
+
+/* VISOR DE ESCENA VISUAL D&D */
+.scene-frame {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    background: radial-gradient(circle, #201035 0%, #08040d 100%);
+    border: 3px solid var(--gold);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+.scene-frame img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+    transition: all 0.4s ease;
+}
+
+/* OVERLAY DADO D20 */
+.d20-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(12, 8, 24, 0.9);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.d20-label {
+    font-size: 0.5em;
+    font-family: 'Press Start 2P', cursive;
+    color: var(--gold-border);
+}
+
+.d20-value {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.2em;
+    color: var(--gold);
+    text-shadow: 0 0 5px var(--gold);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+}
+
+/* PANEL NARRATIVO ESTILO MASTER DE D&D */
+.exploration-panel {
+    background: linear-gradient(135deg, rgba(20, 12, 35, 0.95), rgba(10, 5, 20, 0.95));
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 15px 20px;
+    width: 100%;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+    margin-bottom: 12px;
+}
+
+#explorationText {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05em;
+    color: var(--gold-light);
+    line-height: 1.5;
+}
+
+.choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.choice-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 0.88em;
+    background: linear-gradient(90deg, #1f132e 0%, #2a1b3d 100%);
+    color: var(--gold);
+    border: 2px solid var(--gold-border);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.choice-btn:hover {
+    border-color: var(--gold);
+    background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
+    transform: translateX(4px);
+}

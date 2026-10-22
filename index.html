@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Mazo del Destino - 16-Bit RPG Edition</title>
+    <title>El Mazo del Destino - D&D 16-Bit Edition</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- Configuración PWA e Iconos para Tablet Android -->
     <link rel="icon" type="image/png" href="img/icon-192.png" sizes="192x192">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ffd700">
@@ -21,12 +20,12 @@
 
 <body>
 
-    <!-- 0. PANTALLA DE CARGA (SPLASH SCREEN) -->
+    <!-- PANTALLA DE CARGA -->
     <div id="loadingScreen" class="screen active">
         <div class="loading-box">
             <div class="sega-logo">SEGA RPG SYSTEM</div>
             <div class="loading-spinner"></div>
-            <div class="loading-text" id="loadingText">INICIALIZANDO SISTEMA...</div>
+            <div class="loading-text" id="loadingText">INICIALIZANDO MAZMORRA...</div>
             <div class="loading-bar-container">
                 <div class="loading-bar" id="loadingBar"></div>
             </div>
@@ -84,12 +83,12 @@
         </div>
     </div>
 
-    <!-- 4. TABLERO DE JUEGO Y EXPLORACIÓN RPG -->
+    <!-- 4. TABLERO DE JUEGO Y EXPLORACIÓN D&D -->
     <div id="gameScreen" class="screen">
         <div class="container">
-            <!-- PANEL IZQUIERDO: STATS E INVENTARIO -->
+            <!-- PANEL IZQUIERDO: HOJA DE PERSONAJE -->
             <div id="leftSidebar">
-                <h2>Atributos</h2>
+                <h2>Hoja de Héroe</h2>
                 <div class="stat-item"><span id="heroClass">Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>
                 <div class="stat-item">❤️ Salud <span id="hpVal">100/100</span></div>
                 <div class="stat-item">🔮 Maná <span id="manaVal">50/50</span></div>
@@ -108,68 +107,52 @@
                 <ul id="playerInventory"></ul>
             </div>
 
-            <!-- PANEL CENTRAL: EXPLORACIÓN Y DECISIONES ESTRATÉGICAS -->
+            <!-- PANEL CENTRAL: ESCENA VISUAL D&D + DIÁLOGOS + DADO D20 -->
             <div id="mainContent">
-                <h1 id="dungeonTitle">Cámara de Exploración</h1>
+                <h1 id="dungeonTitle">Cámara de la MazmorRA</h1>
 
-                <div id="explorationBox" class="exploration-panel">
-                    <p id="explorationText">Consultando los misterios de la mazmorra...</p>
+                <!-- VISOR DE ESCENA VISUAL (PNJ / MONSTRUO / ESCENARIO) -->
+                <div class="scene-frame">
+                    <img id="sceneImage" src="img/guerrero.png" alt="Escena de la Mazmorra">
+                    <div class="d20-overlay" id="d20Overlay" style="display:none;">
+                        <span class="d20-label">TIRADA D20</span>
+                        <span class="d20-value" id="d20Val">20</span>
+                    </div>
                 </div>
 
+                <!-- DIÁLOGO / DESCRIPCIÓN DEL DUNGEON MASTER -->
+                <div id="explorationBox" class="exploration-panel">
+                    <p id="explorationText">El Dungeon Master está tejiendo el destino de la planta...</p>
+                </div>
+
+                <!-- DECISIONES NARRATIVAS / OPCIONES D&D -->
                 <div id="actionChoices" class="choices-container">
                     <!-- Opciones dinámicas de Groq AI -->
                 </div>
-
-                <div id="cardDisplay" style="display:none;"></div>
-
-                <div style="display:flex; gap:10px; margin-bottom: 5px;">
-                    <button id="drawCardBtn" class="fantasy-btn" style="display:none;">Sacar Carta</button>
-                    <button id="nextTurnBtn" class="fantasy-btn" style="display:none;">Siguiente Turno</button>
-                </div>
             </div>
 
-            <!-- PANEL DERECHO: CRÓNICA DE EVENTOS -->
+            <!-- PANEL DERECHO: DIARIO DE AVENTURA -->
             <div id="rightSidebar">
-                <h2>Crónica de Eventos</h2>
+                <h2>Diario de Aventura</h2>
                 <ul id="eventList"></ul>
             </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE BATALLA TÁCTICA -->
-    <div id="battle-modal" class="modal">
-        <div class="fantasy-modal">
-            <h2 id="battle-title">¡Combate!</h2>
-            <p id="battle-desc">Un enemigo en las sombras te ataca.</p>
-            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
-                <button class="fantasy-btn" id="btnAttack">⚔️ Atacar</button>
-                <button class="fantasy-btn" id="btnDefend">🛡️ Defender</button>
-                <button class="fantasy-btn" id="btnSpell"
-                    style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color:white;">🔮 Hechizo</button>
-            </div>
-            <ul id="battle-event-list"
-                style="list-style:none; max-height:80px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.8em;">
-            </ul>
         </div>
     </div>
 
     <!-- MODAL GAME OVER -->
     <div id="gameover-modal" class="modal">
         <div class="fantasy-modal">
-            <h2>¡Fin del Juego!</h2>
-            <p>Tu héroe ha sucumbido en las profundidades de la mazmorra.</p>
+            <h2>¡Fin de la Aventura!</h2>
+            <p>Tu héroe ha sucumbido en las profundidades.</p>
             <button class="fantasy-btn" onclick="location.reload()">VOLVER AL INICIO</button>
         </div>
     </div>
 
-    <!-- CARGA MODULAR -->
     <script type="module" src="js/main.js"></script>
-
-    <!-- REGISTRO PWA SERVICE WORKER -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Registration Failed: ', err));
+                navigator.serviceWorker.register('/sw.js').catch(err => console.log(err));
             });
         }
     </script>

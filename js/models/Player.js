@@ -1,55 +1,37 @@
 export class Player {
     constructor(classKey) {
         this.classKey = classKey;
-        this.inventory = [];
-        this.level = 1;
-        this.xp = 0;
-        this.xpNext = 100;
-        this.gold = 0;
         
-        this.setupStatsByClass(classKey);
-    }
+        const configs = {
+            'warrior': { name: 'Guerrero', hp: 130, mana: 30, dmg: 10 },
+            'mage': { name: 'Maga Arcana', hp: 90, mana: 80, dmg: 18 },
+            'rogue': { name: 'Pícaro', hp: 105, mana: 45, dmg: 12 }
+        };
 
-    setupStatsByClass(type) {
-        if (type === 'warrior') {
-            this.className = "Guerrero";
-            this.health = this.maxHealth = 130;
-            this.mana = this.maxMana = 30;
-            this.bonusDamage = 10;
-            this.goldMultiplier = 1.0;
-        } else if (type === 'mage') {
-            this.className = "Maga Arcana";
-            this.health = this.maxHealth = 90;
-            this.mana = this.maxMana = 80;
-            this.bonusDamage = 0;
-            this.goldMultiplier = 1.0;
-        } else if (type === 'rogue') {
-            this.className = "Pícaro";
-            this.health = this.maxHealth = 105;
-            this.mana = this.maxMana = 45;
-            this.bonusDamage = 5;
-            this.goldMultiplier = 1.3;
-        }
+        const config = configs[classKey] || configs['warrior'];
+        
+        this.className = config.name;
+        this.health = config.hp;
+        this.maxHealth = config.hp;
+        this.mana = config.mana;
+        this.maxMana = config.mana;
+        this.gold = 50;
+        this.level = 1;
+        this.xp = 0;          // Inicializado
+        this.maxXp = 100;      // Inicializado
+        this.inventory = [];
     }
 
     addXp(amount) {
         this.xp += amount;
-        if (this.xp >= this.xpNext) {
+        if (this.xp >= this.maxXp) {
             this.level++;
-            this.xp = 0;
-            this.xpNext = Math.floor(this.xpNext * 1.4);
+            this.xp -= this.maxXp;
+            this.maxXp = Math.floor(this.maxXp * 1.5);
             this.maxHealth += 20;
             this.health = this.maxHealth;
-            return true; // Ha subido de nivel
+            return true;
         }
         return false;
-    }
-
-    addGold(amount) {
-        this.gold += Math.floor(amount * this.goldMultiplier);
-    }
-
-    addItem(name, type) {
-        this.inventory.push({ name, type });
     }
 }
