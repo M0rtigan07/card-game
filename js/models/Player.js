@@ -1,7 +1,7 @@
 export class Player {
     constructor(classKey) {
         this.classKey = classKey;
-        
+
         const configs = {
             'warrior': { name: 'Guerrero', hp: 130, mana: 30, dmg: 10 },
             'mage': { name: 'Maga Arcana', hp: 90, mana: 80, dmg: 18 },
@@ -9,7 +9,7 @@ export class Player {
         };
 
         const config = configs[classKey] || configs['warrior'];
-        
+
         this.className = config.name;
         this.health = config.hp;
         this.maxHealth = config.hp;
@@ -17,9 +17,13 @@ export class Player {
         this.maxMana = config.mana;
         this.gold = 50;
         this.level = 1;
-        this.xp = 0;          // Inicializado
-        this.maxXp = 100;      // Inicializado
+        this.xp = 0;
+        this.maxXp = 100;
         this.inventory = [];
+    }
+
+    addGold(amount) {
+        this.gold += amount;
     }
 
     addXp(amount) {
