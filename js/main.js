@@ -123,9 +123,15 @@ class Game {
 
     // Método para iniciar combate TCG cuando la historia o decisión encuentra un enemigo
     startTcgCombat(enemyData) {
-        this.currentEnemy = enemyData || { name: "Orco de las Sombras", hp: 60, maxHp: 60, atk: 12 };
+        this.currentEnemy = enemyData || { name: "Orco de las Sombras", hp: 60, maxHp: 60, atk: 12, img: 'img/guerrero.png' };
 
-        // Cambiar vista de interfaz
+        // Cambiar la ilustración del marco principal al del Enemigo
+        const sceneImg = document.getElementById('sceneImage');
+        if (sceneImg) {
+            sceneImg.src = this.currentEnemy.img || 'img/guerrero.png';
+        }
+
+        // Mostrar vista TCG
         document.getElementById('actionChoices').style.display = 'none';
         document.getElementById('tcgCombatView').style.display = 'flex';
 
@@ -135,12 +141,12 @@ class Game {
     }
 
     drawTcgHand() {
-        // Baraja de cartas tácticas
+        // Mazo con ilustraciones Pixel Art asignadas
         const availableCards = [
-            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, desc: 'Inflige 15 de daño' },
-            { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, desc: 'Gana 10 de guardia' },
-            { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', val: 25, desc: 'Inflige 25 de daño mágico' },
-            { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, desc: 'Restaura 20 HP' }
+            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, img: 'img/guerrero.png', desc: 'Inflige 15 de daño físico' },
+            { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, img: 'img/guerrero.png', desc: 'Gana 10 de guardia' },
+            { id: 'fireball', name: 'Bola Fuego', cost: 2, type: 'atk', val: 25, img: 'img/maga.png', desc: '25 daño mágico' },
+            { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, img: 'img/picaro.png', desc: 'Restaura 20 HP' }
         ];
 
         this.playerHand = [
@@ -162,6 +168,7 @@ class Game {
             cardEl.className = 'tcg-card';
             cardEl.innerHTML = `
                 <span class="cost">🔮 ${card.cost} MP</span>
+                <img src="${card.img}" alt="${card.name}" class="tcg-card-img">
                 <span class="title">${card.name}</span>
                 <span class="desc">${card.desc}</span>
             `;
@@ -169,6 +176,9 @@ class Game {
             handContainer.appendChild(cardEl);
         });
     }
+
+
+
 
     playTcgCard(card, index) {
         if (this.player.mana < card.cost) {
