@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Mazo del Destino - 16-Bit Edition</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- PANTALLA DE TÍTULO -->
+    <div id="titleScreen" class="screen active">
+        <div class="title-content-box">
+            <div class="sega-logo">SEGA RPG SYSTEM</div>
+            <div class="game-title-retro">El Mazo del Destino</div>
+            <div class="press-start" id="btnPressStart">- PRESS START -</div>
+        </div>
+    </div>
+
+    <!-- SELECCIÓN DE PERSONAJE -->
+    <div id="charScreen" class="screen">
+        <div class="retro-heading">SELECCIONA TU HÉROE</div>
+        <div class="char-grid">
+            <div class="char-card" data-class="warrior">
+                <div class="char-avatar"><img src="img/guerrero.png" alt="Guerrero"></div>
+                <div class="char-name">GUERRERO</div>
+                <div class="char-desc">Fuerza bruta e inquebrantable. Mayor salud y bonificador de daño físico.</div>
+                <div class="char-stats">❤️ HP: 130 | 🔮 MP: 30<br>🗡️ Ataque: +10 Dmg</div>
+            </div>
+
+            <div class="char-card" data-class="mage">
+                <div class="char-avatar"><img src="img/maga.png" alt="Maga"></div>
+                <div class="char-name">MAGA ARCANA</div>
+                <div class="char-desc">Dominadora de las artes místicas. Gran reserva de maná y hechizos potentes.</div>
+                <div class="char-stats">❤️ HP: 90 | 🔮 MP: 80<br>✨ Hechizos de alto daño</div>
+            </div>
+
+            <div class="char-card" data-class="rogue">
+                <div class="char-avatar"><img src="img/picaro.png" alt="Pícaro"></div>
+                <div class="char-name">PÍCARO</div>
+                <div class="char-desc">Astuto y escurridizo. Obtiene más oro de los tesoros y gran evasión.</div>
+                <div class="char-stats">❤️ HP: 105 | 🔮 MP: 45<br>💰 +30% Oro extra</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTRO STORY SCREEN -->
+    <div id="introScreen" class="screen">
+        <div class="typewriter-box" id="introText"></div>
+        <button class="fantasy-btn" id="btnEnterDungeon">ENTRAR A LA MAZMORRA ►</button>
+    </div>
+
+    <!-- TABLERO DE JUEGO PRINCIPAL -->
+    <div id="gameScreen" class="screen">
+        <div class="container">
+            <div id="leftSidebar">
+                <h2>Atributos</h2>
+                <div class="stat-item"><span id="heroClass">Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>
+                <div class="stat-item">❤️ Salud <span id="hpVal">100/100</span></div>
+                <div class="stat-item">🔮 Maná <span id="manaVal">50/50</span></div>
+                <div class="stat-item">💰 Oro <span id="goldVal">0</span> gp</div>
+                <div class="stat-item">🏰 Planta <span id="dungeonLevel">1</span></div>
+
+                <div style="margin-top: 4px;">
+                    <small>Progreso XP</small>
+                    <div class="xp-container">
+                        <div id="xpBar" class="xp-bar"></div>
+                    </div>
+                    <small id="xpText">0 / 100 XP</small>
+                </div>
+
+                <h2>Inventario</h2>
+                <ul id="playerInventory"></ul>
+            </div>
+
+            <div id="mainContent">
+                <h1>El Mazo del Destino</h1>
+                <div id="messageDisplay">Saca una carta para comenzar la exploración.</div>
+                <div id="cardDisplay"></div>
+                <div style="display:flex; gap:10px; margin-bottom: 5px;">
+                    <button id="drawCardBtn" class="fantasy-btn">Sacar Carta</button>
+                    <button id="nextTurnBtn" class="fantasy-btn" style="display:none;">Siguiente Turno</button>
+                </div>
+            </div>
+
+            <div id="rightSidebar">
+                <h2>Crónica de Eventos</h2>
+                <ul id="eventList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE BATALLA -->
+    <div id="battle-modal" class="modal">
+        <div class="fantasy-modal">
+            <h2 id="battle-title">¡Combate!</h2>
+            <p id="battle-desc">Un enemigo te ataca.</p>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+                <button class="fantasy-btn" id="btnAttack">⚔️ Atacar</button>
+                <button class="fantasy-btn" id="btnDefend">🛡️ Defender</button>
+                <button class="fantasy-btn" id="btnSpell"
+                    style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color:white;">🔮 Hechizo</button>
+            </div>
+            <ul id="battle-event-list"
+                style="list-style:none; max-height:80px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.8em;">
+            </ul>
+        </div>
+    </div>
+
+    <!-- MODAL GAME OVER -->
+    <div id="gameover-modal" class="modal">
+        <div class="fantasy-modal">
+            <h2>¡Fin del Juego!</h2>
+            <p>Tu héroe ha caído en las profundidades de la mazmorra.</p>
+            <button class="fantasy-btn" onclick="location.reload()">VOLVER AL INICIO</button>
+        </div>
+    </div>
+
+    <!-- CARGA MODULAR CON ES6 MODULES -->
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

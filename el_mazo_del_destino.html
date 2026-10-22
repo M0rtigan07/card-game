@@ -1,909 +1,1212 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Mazo del Destino - Tarot & RPG</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=IM+Fell+English+SC&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+    <title>El Mazo del Destino - RPG Místico & Groq AI</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=IM+Fell+English:ital@0;1&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for fantasy icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                        },
+                        arcane: {
+                            400: '#c084fc',
+                            600: '#9333ea',
+                            800: '#581c87',
+                            900: '#3b0764',
+                        },
+                        parchment: {
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            900: '#1e1b18',
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        fell: ['"IM Fell English"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        :root {
-            --bg-dark: #0f0d16;
-            --panel-bg: linear-gradient(135deg, #22172f 0%, #3b2356 100%);
-            --gold: #ffd700;
-            --gold-light: #f9e7c2;
-            --gold-border: #bfa76a;
-            --text-main: #f3e8ff;
-            --danger: #ff4d6d;
-            --success: #4ade80;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
+        /* Custom Styling for Dark Fantasy Vibe */
         body {
-            font-family: 'Cinzel', serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-            padding: 10px;
+            background: radial-gradient(circle at center, #1e132b 0%, #0d0814 70%, #050308 100%);
+            background-attachment: fixed;
+            font-family: 'IM Fell English', serif;
         }
 
-        .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-            gap: 15px;
-            width: 100%;
-            max-width: 1250px;
-            height: 92vh;
-            background: rgba(20, 15, 30, 0.95);
-            border: 3px solid var(--gold-border);
-            border-radius: 16px;
-            box-shadow: 0 0 30px rgba(191, 167, 106, 0.25);
-            padding: 15px;
-            overflow: hidden;
+        /* Ambient Glow & Borders */
+        .gold-border {
+            border: 1px solid #ca8a04;
+            box-shadow: 0 0 10px rgba(202, 138, 4, 0.25), inset 0 0 10px rgba(202, 138, 4, 0.15);
         }
 
-        /* Sidebar Izquierdo: Atributos e Inventario */
-        #leftSidebar {
-            flex: 1.1;
-            background: var(--panel-bg);
-            padding: 16px;
-            border-radius: 12px;
-            border: 2px solid var(--gold-border);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fff2a3 0%, #eab308 50%, #855203 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        #leftSidebar h2 {
-            color: var(--gold);
-            font-size: 1.15em;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--gold-border);
-            padding-bottom: 5px;
-            margin-top: 5px;
+        .arcane-border {
+            border: 1px solid #9333ea;
+            box-shadow: 0 0 12px rgba(147, 51, 234, 0.3);
         }
 
-        .stat-item {
-            font-size: 0.95em;
-            background: rgba(30, 10, 50, 0.4);
-            border-left: 4px solid var(--gold);
-            border-radius: 6px;
-            padding: 6px 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        /* 3D Card Flip Animation Styles */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        
+        .card-inner {
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
         }
 
-        .xp-container {
-            width: 100%;
-            background-color: #111;
-            border: 1px solid var(--gold-border);
-            height: 10px;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 2px;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .xp-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            transition: width 0.4s ease;
+        ::-webkit-scrollbar-track {
+            background: #0f0a17;
         }
-
-        #playerInventory {
-            list-style: none;
-            max-height: 110px;
-            overflow-y: auto;
-            background: rgba(10, 5, 20, 0.5);
-            border: 1px solid var(--gold-border);
-            border-radius: 6px;
-            padding: 5px;
+        ::-webkit-scrollbar-thumb {
+            background: #3b2854;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b3ba7;
         }
 
-        #playerInventory li {
-            font-size: 0.88em;
-            padding: 4px 6px;
-            margin-bottom: 4px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Área Central: Juego principal */
-        #mainContent {
-            flex: 2.2;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px;
-            text-align: center;
-            position: relative;
-        }
-
-        h1 {
-            font-family: 'UnifrakturCook', cursive;
-            font-size: 2.2em;
-            color: var(--gold);
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-            letter-spacing: 2px;
-        }
-
-        .deck-selection {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            font-size: 0.95em;
-        }
-
-        .deck-selection select {
-            background: #22172f;
-            color: var(--gold);
-            border: 1px solid var(--gold-border);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-family: 'Cinzel', serif;
-            cursor: pointer;
-        }
-
-        #messageDisplay {
-            background: linear-gradient(90deg, #2a1b3d 0%, #1f132e 100%);
-            border-left: 5px solid #a855f7;
-            border-radius: 8px;
-            color: #e9d5ff;
-            font-size: 1em;
-            padding: 12px 16px;
-            width: 100%;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        #cardDisplay {
-            flex: 1;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin: 10px 0;
-            background: radial-gradient(circle, #1a1025 0%, #0d0814 100%);
-            border-radius: 12px;
-            border: 2px dashed rgba(191, 167, 106, 0.3);
-            min-height: 280px;
-            position: relative;
-        }
-
-        /* Estilo de Tarjetas */
-        .card {
-            width: 190px;
-            height: 270px;
-            background: linear-gradient(135deg, #2a1f3d 0%, #150d22 100%);
-            border: 2px solid var(--gold);
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-            animation: cardAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes cardAppear {
-            0% { transform: scale(0.3) translateY(50px); opacity: 0; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
-        }
-
-        .card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid var(--gold-border);
-        }
-
-        .card h3 {
-            font-size: 0.95em;
-            color: var(--gold);
-            margin: 4px 0;
-            text-align: center;
-        }
-
-        .card p {
-            font-size: 0.75em;
-            color: #d8b4fe;
-            line-height: 1.2;
-            text-align: center;
-            overflow-y: auto;
-            max-height: 50px;
-        }
-
-        /* Botones de acción */
-        #buttonContainer {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            width: 100%;
-            margin-bottom: 5px;
-        }
-
+        /* Button Effects */
         .fantasy-btn {
-            background: linear-gradient(90deg, #bfa76a 0%, #d4af37 100%);
-            border: 2px solid #fff;
-            border-radius: 8px;
-            color: #2c1602;
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
-            font-size: 1em;
-            padding: 10px 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            background: linear-gradient(180deg, #3b1d5a 0%, #1a0b2e 100%);
+            border: 1px solid #9333ea;
             transition: all 0.2s ease;
-        }
-
-        .fantasy-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(90deg, #d4af37 0%, #fef08a 100%);
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
-        }
-
-        .fantasy-btn:active { transform: scale(0.97); }
-
-        /* Sidebar Derecho: Eventos */
-        #rightSidebar {
-            flex: 1.1;
-            background: var(--panel-bg);
-            padding: 16px;
-            border-radius: 12px;
-            border: 2px solid var(--gold-border);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-        }
-
-        #rightSidebar h2 {
-            color: var(--gold);
-            font-size: 1.15em;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--gold-border);
-            padding-bottom: 5px;
-        }
-
-        #eventList {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        #eventList li {
-            font-size: 0.85em;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 10px;
-            border-radius: 6px;
-            border-left: 3px solid var(--gold-border);
-            color: #e2e8f0;
-        }
-
-        #eventList li.last-event {
-            background: rgba(168, 85, 247, 0.2);
-            border-left-color: #a855f7;
-            font-weight: bold;
-        }
-
-        /* Modales */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(10, 5, 20, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .fantasy-modal {
-            background: linear-gradient(145deg, #22172f 0%, #150d22 100%);
-            border: 4px solid var(--gold);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.3);
             position: relative;
+            overflow: hidden;
+        }
+        .fantasy-btn:hover {
+            background: linear-gradient(180deg, #581c87 0%, #2a1047 100%);
+            border-color: #facc15;
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.4);
+            transform: translateY(-1px);
+        }
+        .fantasy-btn:active {
+            transform: translateY(1px);
         }
 
-        .fantasy-modal h2 {
-            font-family: 'UnifrakturCook', cursive;
-            color: var(--gold);
-            font-size: 2.2em;
-            margin-bottom: 15px;
-        }
-
-        .fantasy-modal p {
-            font-size: 1.05em;
-            margin-bottom: 20px;
-            color: #e9d5ff;
-        }
-
-        .modal-scroll {
-            width: 70px;
-            position: absolute;
-            top: -45px;
-            left: 50%;
-            transform: translateX(-50%);
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8));
-        }
-
-        .ai-config-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: none;
-            border: 1px solid var(--gold-border);
-            color: var(--gold);
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-        .ai-config-btn:hover { background: rgba(212, 175, 55, 0.1); }
-
-        @media(max-width: 900px) {
-            .container { flex-direction: column; height: auto; overflow-y: auto; }
-            body { overflow-y: auto; }
+        /* Progress Bar Animations */
+        .stat-bar-fill {
+            transition: width 0.4s ease-in-out;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden text-slate-200 selection:bg-purple-900 selection:text-gold-300">
 
-    <button class="ai-config-btn" onclick="openAiModal()">⚙️ Configurar Groq IA</button>
+    <!-- Ambient Canvas Particle Background -->
+    <canvas id="starsCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
 
-    <div class="container">
-        <!-- Sidebar Izquierdo -->
-        <div id="leftSidebar">
-            <h2>Atributos</h2>
-            <div class="stat-item" id="playerName">Héroe <span>Lvl <b id="lvlVal">1</b></span></div>
-            <div class="stat-item" id="playerHealth">❤️ Salud <span id="hpVal">100/100</span></div>
-            <div class="stat-item" id="playerMana">🔮 Maná <span id="manaVal">50/50</span></div>
-            <div class="stat-item" id="playerGold">💰 Oro <span id="goldVal">0</span> gp</div>
+    <!-- TOP HEADER / NAVBAR -->
+    <header class="relative z-10 bg-slate-950/80 backdrop-blur-md border-b border-gold-600/30 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid font-cinzel fa-hat-wizard text-2xl text-gold-400"></i>
+            <div>
+                <h1 class="font-cinzel text-xl md:text-2xl font-bold tracking-wider gold-gradient-text">EL MAZO DEL DESTINO</h1>
+                <p class="text-xs text-purple-300/70 font-sans tracking-wide">Fantasía Oscura impulsada por Groq AI</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <!-- AI Status Indicator -->
+            <div id="aiStatusBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-sans bg-slate-900 border border-slate-700 text-slate-400">
+                <span id="aiStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                <span id="aiStatusText">Modo Offline</span>
+            </div>
+
+            <!-- Settings Button -->
+            <button id="openConfigBtn" class="px-3 py-1.5 rounded bg-slate-900 hover:bg-slate-800 border border-purple-500/40 text-gold-400 text-sm flex items-center space-x-2 transition">
+                <i class="fa-solid fa-gear"></i>
+                <span class="hidden md:inline font-sans font-medium">Groq API</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN GAME LAYOUT GRID -->
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto p-3 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT PANEL: HERO STATS & INVENTORY (3 cols) -->
+        <section class="lg:col-span-3 flex flex-col space-y-4">
             
-            <div style="margin-top: 5px;">
-                <small>Progreso XP</small>
-                <div class="xp-container"><div id="xpBar" class="xp-bar"></div></div>
-                <small id="xpText">0 / 100 XP</small>
-            </div>
-
-            <h2>Inventario</h2>
-            <ul id="playerInventory">
-                <li style="color: #888; font-style: italic; justify-content: center;">Inventario vacío</li>
-            </ul>
-        </div>
-
-        <!-- Área Central -->
-        <div id="mainContent">
-            <h1>El Mazo del Destino</h1>
-            
-            <div id="deckSelection" class="deck-selection">
-                <label for="deckSelector">Elige Mazo:</label>
-                <select id="deckSelector" onchange="initializeGame()">
-                    <option value="manyThings">Deck of Many Things (Aventuras & Enemigos)</option>
-                    <option value="tarot">Arcanos Mayores (Tarot Místico)</option>
-                </select>
-            </div>
-
-            <div id="messageDisplay">Selecciona tu mazo y pulsa Iniciar Juego para comenzar tu aventura.</div>
-
-            <div id="cardDisplay">
-                <!-- Aquí aparecen las cartas robadas -->
-            </div>
-
-            <div id="buttonContainer">
-                <button id="startGameBtn" class="fantasy-btn" onclick="startGame()">Iniciar Juego</button>
-                <button id="drawCardBtn" class="fantasy-btn" style="display:none;" onclick="drawCard()">Sacar Carta</button>
-                <button id="nextTurnBtn" class="fantasy-btn" style="display:none;" onclick="nextTurn()">Siguiente Turno</button>
-            </div>
-        </div>
-
-        <!-- Sidebar Derecho -->
-        <div id="rightSidebar">
-            <h2>Crónica de Eventos</h2>
-            <ul id="eventList">
-                <li>La aventura está por comenzar...</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Modal de Batalla -->
-    <div id="battle-modal" class="modal">
-        <div class="fantasy-modal">
-            <h2 id="battle-title">¡Combate Épico!</h2>
-            <p id="battle-desc">Un enemigo feroz bloquea tu camino.</p>
-            <div id="battle-actions" style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
-                <button class="fantasy-btn" onclick="battleAction('attack')">⚔️ Atacar</button>
-                <button class="fantasy-btn" onclick="battleAction('defend')">🛡️ Defender</button>
-                <button class="fantasy-btn" onclick="battleAction('spell')" style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color: white;">🔮 Hechizo</button>
-            </div>
-            <ul id="battle-event-list" style="list-style:none; max-height: 90px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.85em;"></ul>
-        </div>
-    </div>
-
-    <!-- Modal de Situación / Encuentro -->
-    <div id="situation-modal" class="modal">
-        <div class="fantasy-modal">
-            <h2>Encrucijada del Destino</h2>
-            <p id="situation-desc">El destino te presenta una elección vital.</p>
-            <div id="situation-options" style="display: flex; flex-direction: column; gap: 10px;"></div>
-        </div>
-    </div>
-
-    <!-- Modal de Game Over -->
-    <div id="gameover-modal" class="modal">
-        <div class="fantasy-modal">
-            <img src="img/gameover_scroll.png" alt="Pergamino" class="modal-scroll" onerror="this.style.display='none'">
-            <h2>¡Fin del Juego!</h2>
-            <p>Tus fuerzas se han agotado en el camino y la oscuridad te ha consumido.</p>
-            <button class="fantasy-btn" onclick="location.reload()">Reintentar Aventura</button>
-        </div>
-    </div>
-
-    <!-- Modal de Configuración Groq IA -->
-    <div id="ai-modal" class="modal">
-        <div class="fantasy-modal">
-            <h2>Configurar Groq IA</h2>
-            <p style="font-size: 0.9em;">Introduce tu clave API de Groq para habilitar narrativas dinámicas de IA en tiempo real.</p>
-            <input type="password" id="groqApiKeyInput" placeholder="gsk_..." style="width: 100%; padding: 10px; margin-bottom: 15px; background: #111; border: 1px solid var(--gold-border); color: #fff; border-radius: 6px; font-family: monospace;">
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="fantasy-btn" onclick="saveApiKey()">Guardar</button>
-                <button class="fantasy-btn" onclick="closeAiModal()" style="background: #444; color: #fff;">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // --- ESTADO GLOBAL DEL JUEGO ---
-        let player = {
-            name: "Héroe",
-            health: 100,
-            maxHealth: 100,
-            mana: 50,
-            maxMana: 50,
-            gold: 0,
-            level: 1,
-            xp: 0,
-            xpNext: 100,
-            inventory: [],
-            hasCompanion: false,
-            bonusDamage: 0
-        };
-
-        let currentDeck = [];
-        let drawnThisTurn = 0;
-        const MAX_CARDS_PER_TURN = 2;
-        let turnCounter = 1;
-        let activeEnemy = null;
-        let groqApiKey = localStorage.getItem('groq_api_key') || '';
-
-        // --- MAZOS UTILIZANDO TU CARPETA IMG ---[cite: 4, 8]
-        const decksData = {
-            manyThings: [
-                { id: 'gema', name: "La Gema", type: "tesoro", desc: "Encuentras una gema valiosa brillante. Ganas 500 oro.", img: "img/gema.jpeg" },
-                { id: 'ruina', name: "La Ruina", type: "maldicion", desc: "Un percance imprevisto hace que pierdas todo tu oro guardado.", img: "img/ruina.jpeg" },
-                { id: 'espada', name: "La Espada", type: "equipo", desc: "Consigues una espada legendaria. +15 daño permanente.", img: "img/espada.jpeg" },
-                { id: 'estrella', name: "La Estrella", type: "bendicion", desc: "La luz estelar te revitaliza por completo (+30 HP).", img: "img/estrella.jpeg" },
-                { id: 'vacio', name: "El Vacío", type: "maldicion", desc: "Una energía oscura te desgarra. Pierdes 25 puntos de salud.", img: "img/vacio.jpeg" },
-                { id: 'sabio', name: "El Sabio", type: "experiencia", desc: "Adquieres conocimiento ancestral. Subes de experiencia.", img: "img/sabio.jpeg" },
-                { id: 'caballero', name: "El Caballero", type: "aliado", desc: "Un leal caballero se une a tu cruzada para ayudarte en batalla.", img: "img/caballero.jpeg" },
-                { id: 'craneo', name: "El Cráneo", type: "combate", desc: "¡Un Guerrero Esqueleto emerge de la cripta para matarte!", img: "img/craneo.jpeg", enemy: { name: "Guerrero Esqueleto", hp: 50, attack: 15 } },
-                { id: 'troll', name: "El Troll", type: "combate", desc: "¡Un temible Troll gigante de las cavernas te ataca rugiendo!", img: "img/troll.jpeg", enemy: { name: "Troll Gigante", hp: 80, attack: 22 } },
-                { id: 'tienda', name: "La Tienda", type: "evento", desc: "Un mercader ambulante ofrece suministros útiles.", img: "img/tienda.jpeg" },
-                { id: 'vision', name: "La Visión", type: "místico", desc: "Tu mente se ilumina con secretos arcanos (+25 Maná).", img: "img/vision.jpeg" }
-            ],
-            tarot: [
-                { id: 'loco', name: "El Loco", type: "evento", desc: "Nuevos comienzos y aventuras inesperadas.", img: "img/amantes.jpeg" },
-                { id: 'mago', name: "El Mago", type: "místico", desc: "Canaliza energía arcana pura recuperando maná.", img: "img/vision.jpeg" },
-                { id: 'emperador', name: "El Emperador", type: "equipo", desc: "Autoridad y poder férreo que refuerzan tu temple.", img: "img/caballero.jpeg" },
-                { id: 'rueda', name: "Rueda Fortuna", type: "tesoro", desc: "El destino gira a tu favor otorgando riquezas.", img: "img/gema.jpeg" },
-                { id: 'muerte', name: "La Muerte", type: "combate", desc: "Un espectro del inframundo reclama tu alma.", img: "img/craneo.jpeg", enemy: { name: "Espectro del Umbral", hp: 65, attack: 18 } }
-            ]
-        };
-
-        // --- AUDIO SINTETIZADOR WEB NATIVO ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'card') {
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-            } else if (type === 'hit') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-            } else if (type === 'gold') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.25);
-            }
-        }
-
-        // --- INICIALIZACIÓN Y CONTROL DEL JUEGO ---
-        function initializeGame() {
-            const deckKey = document.getElementById('deckSelector').value;
-            currentDeck = JSON.parse(JSON.stringify(decksData[deckKey] || decksData.manyThings));
-            drawnThisTurn = 0;
-            turnCounter = 1;
-            player.health = player.maxHealth;
-            player.mana = player.maxMana;
-            player.gold = 0;
-            player.level = 1;
-            player.xp = 0;
-            player.xpNext = 100;
-            player.inventory = [];
-            player.hasCompanion = false;
-            player.bonusDamage = 0;
-
-            document.getElementById('cardDisplay').innerHTML = '';
-            document.getElementById('startGameBtn').style.display = 'inline-block';
-            document.getElementById('drawCardBtn').style.display = 'none';
-            document.getElementById('nextTurnBtn').style.display = 'none';
-            
-            updateStatsUI();
-            updateInventoryUI();
-            logEvent("Mazo preparado. Haz clic en 'Iniciar Juego'.");
-        }
-
-        function startGame() {
-            playSound('card');
-            document.getElementById('startGameBtn').style.display = 'none';
-            document.getElementById('drawCardBtn').style.display = 'inline-block';
-            document.getElementById('deckSelection').style.display = 'none';
-            setMessage(`Turno ${turnCounter}: Saca tu primera carta del mazo.`);
-            logEvent("¡La aventura ha comenzado!");
-        }
-
-        function updateStatsUI() {
-            document.getElementById('hpVal').textContent = `${player.health}/${player.maxHealth}`;
-            document.getElementById('manaVal').textContent = `${player.mana}/${player.maxMana}`;
-            document.getElementById('goldVal').textContent = player.gold;
-            document.getElementById('lvlVal').textContent = player.level;
-            
-            const xpPerc = Math.min(100, (player.xp / player.xpNext) * 100);
-            document.getElementById('xpBar').style.width = `${xpPerc}%`;
-            document.getElementById('xpText').textContent = `${player.xp} / ${player.xpNext} XP`;
-        }
-
-        function logEvent(msg) {
-            const list = document.getElementById('eventList');
-            const items = list.querySelectorAll('li');
-            items.forEach(el => el.classList.remove('last-event'));
-            const li = document.createElement('li');
-            li.className = 'last-event';
-            li.textContent = msg;
-            list.prepend(li);
-        }
-
-        function setMessage(txt) {
-            document.getElementById('messageDisplay').textContent = txt;
-        }
-
-        // --- SISTEMA DE ROBO DE CARTAS ---
-        async function drawCard() {
-            if (currentDeck.length === 0) {
-                setMessage("¡El mazo está agotado! Pasa al siguiente turno o reinicia.");
-                return;
-            }
-
-            playSound('card');
-            const index = Math.floor(Math.random() * currentDeck.length);
-            const card = currentDeck.splice(index, 1)[0];
-
-            displayCardVisual(card);
-            drawnThisTurn++;
-
-            // Procesar Efecto de Carta con IA opcional
-            await processCardEffect(card);
-
-            if (player.health <= 0) {
-                triggerGameOver();
-                return;
-            }
-
-            if (drawnThisTurn >= MAX_CARDS_PER_TURN) {
-                document.getElementById('drawCardBtn').style.display = 'none';
-                document.getElementById('nextTurnBtn').style.display = 'inline-block';
-                setMessage(`Límite de ${MAX_CARDS_PER_TURN} cartas alcanzado este turno.`);
-            } else {
-                setMessage(`Turno ${turnCounter}: Puedes sacar otra carta (${drawnThisTurn}/${MAX_CARDS_PER_TURN}).`);
-            }
-        }
-
-        function displayCardVisual(card) {
-            const container = document.getElementById('cardDisplay');
-            container.innerHTML = `
-                <div class="card">
-                    <img src="${card.img}" alt="${card.name}" onerror="this.src='img/gameover_scroll.png'">
-                    <h3>${card.name}</h3>
-                    <p>${card.desc}</p>
+            <!-- Hero Card -->
+            <div class="bg-slate-900/90 rounded-lg p-4 gold-border flex flex-col space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <div>
+                        <h2 id="heroName" class="font-cinzel font-bold text-lg text-gold-300">Valerius el Místico</h2>
+                        <span id="heroClass" class="text-xs text-purple-300 font-sans">Aventurero Arcano</span>
+                    </div>
+                    <div class="bg-purple-950 border border-purple-600 px-2.5 py-1 rounded text-center">
+                        <span class="text-xs text-purple-300 block font-sans uppercase">Nivel</span>
+                        <span id="heroLevel" class="font-cinzel font-bold text-gold-400 text-lg leading-tight">1</span>
+                    </div>
                 </div>
-            `;
-        }
 
-        async function processCardEffect(card) {
-            let descText = card.desc;
+                <!-- Health Bar -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-sans">
+                        <span class="text-red-400 font-semibold"><i class="fa-solid fa-heart mr-1"></i>Salud</span>
+                        <span id="hpText" class="text-slate-300">100 / 100</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-red-900/50">
+                        <div id="hpBar" class="bg-gradient-to-r from-red-700 to-red-500 h-full stat-bar-fill w-full"></div>
+                    </div>
+                </div>
 
-            // Si hay API key de Groq, generamos narrativa IA en vivo
-            if (groqApiKey) {
-                const aiNarrative = await askGroq(`Describe de forma mística y breve en español el efecto de robar la carta "${card.name}" (${card.desc}) para un héroe de nivel ${player.level}.`);
-                if (aiNarrative) descText = aiNarrative;
+                <!-- Mana Bar -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-sans">
+                        <span class="text-blue-400 font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Maná</span>
+                        <span id="manaText" class="text-slate-300">50 / 50</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-blue-900/50">
+                        <div id="manaBar" class="bg-gradient-to-r from-blue-700 to-blue-400 h-full stat-bar-fill w-full"></div>
+                    </div>
+                </div>
+
+                <!-- XP Bar -->
+                <div class="space-y-1">
+                    <div class="flex justify-between text-xs font-sans">
+                        <span class="text-purple-400 font-semibold"><i class="fa-solid fa-star mr-1"></i>Experiencia</span>
+                        <span id="xpText" class="text-slate-300">0 / 100</span>
+                    </div>
+                    <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-purple-900/50">
+                        <div id="xpBar" class="bg-gradient-to-r from-purple-700 to-purple-400 h-full stat-bar-fill w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Gold & Stat Counters -->
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-sm font-sans">
+                    <div class="bg-slate-950/70 p-2 rounded border border-gold-600/20 flex items-center space-x-2">
+                        <i class="fa-solid fa-coins text-gold-400 text-base"></i>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block uppercase">Oro</span>
+                            <span id="heroGold" class="font-bold text-gold-300">50</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/70 p-2 rounded border border-purple-600/20 flex items-center space-x-2">
+                        <i class="fa-solid fa-hand-fist text-purple-400 text-base"></i>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block uppercase">Ataque Base</span>
+                            <span id="heroAtk" class="font-bold text-purple-300">12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Panel -->
+            <div class="bg-slate-900/90 rounded-lg p-4 arcane-border flex-1 flex flex-col">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <h3 class="font-cinzel text-md font-bold text-purple-300"><i class="fa-solid fa-shield-halved mr-2"></i>Inventario</h3>
+                    <span id="invCapacity" class="text-xs text-slate-400 font-sans">3 / 8 slots</span>
+                </div>
+
+                <!-- Inventory Slot Grid -->
+                <div id="inventoryGrid" class="grid grid-cols-4 gap-2 flex-1 auto-rows-max">
+                    <!-- Dynamic Inventory Items will be rendered here -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CENTER PANEL: BOARD & CARD PLAY AREA (6 cols) -->
+        <section class="lg:col-span-6 flex flex-col space-y-4">
+
+            <!-- Deck Selector -->
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800 flex items-center justify-between font-sans text-xs">
+                <span class="text-slate-400 font-cinzel font-semibold uppercase tracking-wider pl-2">Seleccionar Mazo:</span>
+                <div class="flex space-x-2">
+                    <button id="selectDeckTarot" class="px-3 py-1.5 rounded font-medium border border-purple-500 bg-purple-900/60 text-gold-300 transition">
+                        <i class="fa-solid fa-eye mr-1"></i>Tarot Arcano
+                    </button>
+                    <button id="selectDeckManyThings" class="px-3 py-1.5 rounded font-medium border border-slate-700 bg-slate-950 text-slate-400 hover:border-gold-500/50 transition">
+                        <i class="fa-solid fa-cards mr-1"></i>Muchas Cosas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Interactive Card Play Area -->
+            <div class="flex-1 bg-slate-950/80 rounded-xl p-4 md:p-6 gold-border flex flex-col items-center justify-center relative overflow-hidden min-h-[420px]">
+                
+                <!-- Background Arcane Ring SVG -->
+                <svg class="absolute w-80 h-80 opacity-10 pointer-events-none animate-spin-slow" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#ca8a04" stroke-width="1" stroke-dasharray="4 2"/>
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="#9333ea" stroke-width="0.5"/>
+                    <polygon points="50,10 85,75 15,75" fill="none" stroke="#ca8a04" stroke-width="0.5"/>
+                    <polygon points="50,90 15,25 85,25" fill="none" stroke="#ca8a04" stroke-width="0.5"/>
+                </svg>
+
+                <!-- Interactive 3D Card Container -->
+                <div id="cardContainer" class="w-64 h-96 perspective-1000 cursor-pointer group mb-4">
+                    <div id="cardInner" class="card-inner relative w-full h-full rounded-xl shadow-2xl">
+                        
+                        <!-- CARD BACK (Default state) -->
+                        <div class="card-front absolute inset-0 w-full h-full rounded-xl bg-slate-900 border-2 border-gold-500/60 p-3 flex flex-col items-center justify-between shadow-2xl">
+                            <div class="w-full h-full rounded-lg border border-purple-500/30 bg-gradient-to-b from-purple-950 via-slate-950 to-purple-950 flex flex-col items-center justify-center p-4 text-center">
+                                <div class="w-20 h-20 rounded-full border border-gold-400/40 flex items-center justify-center mb-2 bg-purple-900/20">
+                                    <i class="fa-solid fa-dharmachakra text-4xl text-gold-400 group-hover:rotate-180 transition duration-700"></i>
+                                </div>
+                                <h4 class="font-cinzel text-lg text-gold-300 font-bold tracking-widest">EL DESTINO</h4>
+                                <p class="text-xs text-purple-300/60 font-sans mt-2">Haz clic o presiona el botón para consultar a las cartas</p>
+                            </div>
+                        </div>
+
+                        <!-- CARD FRONT (Flipped state) -->
+                        <div class="card-back absolute inset-0 w-full h-full rounded-xl bg-slate-900 border-2 border-gold-400 p-3 flex flex-col justify-between shadow-2xl">
+                            <div class="flex items-center justify-between border-b border-gold-600/30 pb-1">
+                                <span id="cardTypeBadge" class="text-[10px] uppercase font-sans tracking-widest px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-600">Tarot</span>
+                                <i id="cardRarityIcon" class="fa-solid fa-gem text-gold-400 text-xs"></i>
+                            </div>
+
+                            <!-- Card Illustration -->
+                            <div class="my-2 h-36 w-full rounded border border-slate-700 overflow-hidden relative bg-slate-950 flex items-center justify-center">
+                                <img id="cardImage" src="" alt="Carta" class="w-full h-full object-cover opacity-90 transition transform hover:scale-105 duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80"></div>
+                            </div>
+
+                            <!-- Card Name & Lore -->
+                            <div class="text-center space-y-1">
+                                <h3 id="cardTitle" class="font-cinzel font-bold text-lg text-gold-300 leading-tight">La Torre</h3>
+                                <p id="cardDesc" class="text-xs text-slate-300 italic leading-snug line-clamp-3">Un cambio repentino sacude los cimientos de tu existencia...</p>
+                            </div>
+
+                            <div class="border-t border-slate-800 pt-1 text-center">
+                                <span id="cardEffectText" class="text-xs font-sans text-purple-300 font-semibold">+20 Oro / Batalla Inminente</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex flex-wrap items-center justify-center gap-3 w-full max-w-xs z-10">
+                    <button id="drawCardBtn" class="fantasy-btn w-full py-3 px-6 rounded-lg text-gold-300 font-cinzel font-bold tracking-wider text-base flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-hand-sparkles"></i>
+                        <span>Robar Carta del Destino</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Narrator & Dynamic Story Box -->
+            <div class="bg-slate-900/90 rounded-lg p-4 arcane-border flex flex-col space-y-2 relative">
+                <div class="flex items-center justify-between text-xs font-sans text-purple-300 border-b border-slate-800 pb-1">
+                    <span class="font-cinzel font-bold flex items-center text-gold-400">
+                        <i class="fa-solid fa-scroll mr-2"></i>Narrador del Mazo
+                    </span>
+                    <span id="aiThinkingSpinner" class="hidden text-gold-400 animate-pulse flex items-center space-x-1">
+                        <i class="fa-solid fa-spinner animate-spin"></i>
+                        <span>Groq tejiendo el destino...</span>
+                    </span>
+                </div>
+                <p id="narratorOutput" class="text-sm font-fell text-slate-200 italic leading-relaxed min-h-[48px]">
+                    "Bienvenido, viajero del arcano. Selecciona un mazo y roba una carta para comenzar tu travesía."
+                </p>
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANEL: EVENT LOG (3 cols) -->
+        <section class="lg:col-span-3 flex flex-col space-y-4">
+            <div class="bg-slate-900/90 rounded-lg p-4 gold-border flex-1 flex flex-col min-h-[300px]">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                    <h3 class="font-cinzel text-md font-bold text-gold-300"><i class="fa-solid fa-book-bookmark mr-2"></i>Bitácora de Eventos</h3>
+                    <button id="clearLogBtn" class="text-[10px] text-slate-500 hover:text-slate-300 font-sans uppercase">Limpiar</button>
+                </div>
+
+                <div id="eventLog" class="flex-1 overflow-y-auto space-y-2 pr-1 text-xs font-sans max-h-[500px]">
+                    <div class="p-2 rounded bg-slate-950/60 border-l-2 border-purple-500 text-slate-300">
+                        <span class="text-[10px] text-slate-500 block">Inicio de la Partida</span>
+                        Te has adentrado en la cámara mística del mazo.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BATTLE MODAL -->
+    <div id="battleModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-xl max-w-lg w-full p-6 gold-border flex flex-col space-y-4 relative shadow-2xl">
+            <div class="text-center border-b border-red-900/40 pb-3">
+                <span class="text-xs uppercase font-sans tracking-widest text-red-400 font-bold">¡Encuentro Hostil!</span>
+                <h2 id="enemyName" class="font-cinzel text-2xl font-bold text-gold-300">Esqueleto Guardián</h2>
+            </div>
+
+            <!-- Enemy Visualization & HP -->
+            <div class="flex items-center space-x-4 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                <div class="w-20 h-20 rounded border border-red-800 overflow-hidden flex-shrink-0 bg-slate-900">
+                    <img id="enemyImg" src="" alt="Enemigo" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1 space-y-2">
+                    <div class="flex justify-between text-xs font-sans">
+                        <span class="text-red-400 font-semibold">Salud Enemiga</span>
+                        <span id="enemyHpText" class="text-slate-300">50 / 50</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-red-950">
+                        <div id="enemyHpBar" class="bg-red-600 h-full stat-bar-fill w-full"></div>
+                    </div>
+                    <p id="enemyDesc" class="text-xs italic text-slate-400 font-fell">Una criatura no-muerta con espada oxidada.</p>
+                </div>
+            </div>
+
+            <!-- Battle Combat Log -->
+            <div id="battleLog" class="h-28 bg-slate-950 rounded p-2 overflow-y-auto text-xs font-sans space-y-1 border border-slate-800">
+                <p class="text-purple-300">¡El combate ha comenzado! Elige tu acción.</p>
+            </div>
+
+            <!-- Action Buttons Grid -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button id="btnBattleAttack" class="fantasy-btn p-3 rounded font-cinzel font-bold text-sm text-gold-300 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-sword text-red-400"></i>
+                    <span>Atacar</span>
+                </button>
+                <button id="btnBattleSpell" class="fantasy-btn p-3 rounded font-cinzel font-bold text-sm text-gold-300 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-bolt text-blue-400"></i>
+                    <span>Hechizo (10 MP)</span>
+                </button>
+                <button id="btnBattleItem" class="fantasy-btn p-3 rounded font-cinzel font-bold text-sm text-gold-300 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-flask text-green-400"></i>
+                    <span>Usar Poción</span>
+                </button>
+                <button id="btnBattleFlee" class="fantasy-btn p-3 rounded font-cinzel font-bold text-sm text-gold-300 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-person-running text-slate-400"></i>
+                    <span>Huir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DILEMMA / ENCOUNTER MODAL -->
+    <div id="dilemmaModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-xl max-w-md w-full p-6 arcane-border flex flex-col space-y-4 shadow-2xl">
+            <div class="text-center border-b border-purple-800/40 pb-2">
+                <span class="text-xs uppercase font-sans tracking-widest text-purple-400 font-bold">Encrucijada del Destino</span>
+                <h2 id="dilemmaTitle" class="font-cinzel text-xl font-bold text-gold-300">Un Encuentro Inesperado</h2>
+            </div>
+
+            <p id="dilemmaDesc" class="text-sm font-fell italic text-slate-200 leading-relaxed bg-slate-950 p-3 rounded border border-slate-800">
+                Te encuentras con una figura encapuchada que te ofrece un trato misterioso...
+            </p>
+
+            <div id="dilemmaOptions" class="flex flex-col space-y-2 pt-2">
+                <!-- Dynamic Choices injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIGURATION / GROQ API MODAL -->
+    <div id="configModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-xl max-w-md w-full p-6 gold-border flex flex-col space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-cinzel font-bold text-lg text-gold-300 flex items-center">
+                    <i class="fa-solid fa-brain mr-2 text-purple-400"></i>Configuración Groq AI
+                </h3>
+                <button id="closeConfigBtn" class="text-slate-400 hover:text-slate-100"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="space-y-3 font-sans text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">API Key de Groq:</label>
+                    <input type="password" id="groqApiKeyInput" placeholder="gsk_..." class="w-full bg-slate-950 border border-slate-700 rounded p-2.5 text-slate-100 focus:outline-none focus:border-purple-500 font-mono text-sm">
+                    <p class="text-[10px] text-slate-500 mt-1">Tu clave se guarda únicamente en el localStorage de tu navegador.</p>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">Modelo de IA:</label>
+                    <select id="groqModelSelect" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-purple-500">
+                        <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Recomendado)</option>
+                        <option value="llama3-8b-8192">llama3-8b-8192 (Ultra Rápido)</option>
+                        <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+                    <span class="text-slate-300 font-semibold">Activar Motor IA Groq:</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="groqToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-950 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+                <button id="saveConfigBtn" class="fantasy-btn px-4 py-2 rounded text-gold-300 font-bold font-sans text-xs">
+                    Guardar Configuración
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 bg-slate-950/80 border-t border-slate-900 px-4 py-2 text-center text-[11px] text-slate-500 font-sans">
+        El Mazo del Destino &copy; 2026 - Optimizado para despliegue estático en Vercel | Groq LPU Powered
+    </footer>
+
+
+    <!-- GAME LOGIC JAVASCRIPT -->
+    <script>
+        /* ==========================================================================
+           1. AUDIO SYNTHESIZER (Web Audio API - No external assets)
+           ========================================================================== */
+        class AudioSynth {
+            constructor() {
+                this.ctx = null;
             }
 
-            logEvent(`Carta robada: [${card.name}] - ${descText}`);
-            setMessage(descText);
-
-            switch(card.id) {
-                case 'gema':
-                case 'rueda':
-                    playSound('gold');
-                    player.gold += 500;
-                    break;
-                case 'ruina':
-                    player.gold = 0;
-                    break;
-                case 'espada':
-                case 'emperador':
-                    player.bonusDamage += 15;
-                    player.inventory.push({ name: "Espada Legendaria", type: "Arma (+15 Dmg)" });
-                    break;
-                case 'estrella':
-                    player.health = Math.min(player.maxHealth, player.health + 30);
-                    player.mana = Math.min(player.maxMana, player.mana + 20);
-                    break;
-                case 'vacio':
-                case 'muerte':
-                    playSound('hit');
-                    player.health -= 25;
-                    break;
-                case 'sabio':
-                    gainXp(100);
-                    break;
-                case 'caballero':
-                    player.hasCompanion = true;
-                    player.inventory.push({ name: "Caballero Leal", type: "Aliado" });
-                    break;
-                case 'vision':
-                case 'mago':
-                    player.mana = Math.min(player.maxMana, player.mana + 25);
-                    break;
-                case 'tienda':
-                    openSituationModal();
-                    break;
-            }
-
-            if (card.enemy) {
-                startBattle(card.enemy);
-            }
-
-            updateStatsUI();
-            updateInventoryUI();
-        }
-
-        function gainXp(amount) {
-            player.xp += amount;
-            if (player.xp >= player.xpNext) {
-                player.level++;
-                player.xp = 0;
-                player.xpNext = Math.floor(player.xpNext * 1.4);
-                player.maxHealth += 20;
-                player.health = player.maxHealth;
-                logEvent(`¡Nivel superado! Ahora eres Nivel ${player.level}`);
-            }
-        }
-
-        function nextTurn() {
-            turnCounter++;
-            drawnThisTurn = 0;
-            document.getElementById('drawCardBtn').style.display = 'inline-block';
-            document.getElementById('nextTurnBtn').style.display = 'none';
-            document.getElementById('cardDisplay').innerHTML = '';
-            setMessage(`Turno ${turnCounter} iniciado. ¡Saca tu carta!`);
-            logEvent(`--- Turno ${turnCounter} ---`);
-        }
-
-        // --- SISTEMA DE COMBATE CONTRA ENEMIGOS ---
-        function startBattle(enemyData) {
-            activeEnemy = { ...enemyData };
-            document.getElementById('battle-title').textContent = `¡Combate: ${activeEnemy.name}!`;
-            document.getElementById('battle-desc').textContent = `Salud del enemigo: ${activeEnemy.hp} | Ataque: ${activeEnemy.attack}`;
-            document.getElementById('battle-event-list').innerHTML = `<li>¡${activeEnemy.name} se lanza al ataque!</li>`;
-            document.getElementById('battle-modal').style.display = 'flex';
-        }
-
-        function battleAction(action) {
-            if (!activeEnemy) return;
-            playSound('hit');
-
-            let playerDmg = 20 + player.bonusDamage;
-            if (player.hasCompanion) playerDmg += 10;
-
-            let logMsg = "";
-
-            if (action === 'attack') {
-                activeEnemy.hp -= playerDmg;
-                logMsg = `Atacas a ${activeEnemy.name} infligiendo ${playerDmg} de daño.`;
-            } else if (action === 'defend') {
-                playerDmg = Math.floor(playerDmg / 2);
-                activeEnemy.hp -= playerDmg;
-                logMsg = `Te defiendes y contraatacas por ${playerDmg} de daño.`;
-            } else if (action === 'spell') {
-                if (player.mana >= 15) {
-                    player.mana -= 15;
-                    activeEnemy.hp -= 45;
-                    logMsg = `¡Lanzas un Hechizo Arcano por 45 de daño!`;
-                } else {
-                    logMsg = `¡No tienes suficiente maná para el hechizo!`;
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                 }
             }
 
-            if (activeEnemy.hp <= 0) {
-                logMsg += ` ¡Has derrotado a ${activeEnemy.name}!`;
-                appendBattleLog(logMsg);
-                gainXp(120);
-                player.gold += 300;
-                updateStatsUI();
-                setTimeout(() => {
-                    document.getElementById('battle-modal').style.display = 'none';
-                    setMessage(`¡Victoria sobre ${activeEnemy.name}! Recompensas obtenidas.`);
-                }, 1500);
-                return;
+            playTone(freq, type = 'sine', duration = 0.2, startVol = 0.3) {
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(startVol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
             }
 
-            // Turno del enemigo
-            player.health -= activeEnemy.attack;
-            logMsg += ` ${activeEnemy.name} contraataca y te inflige ${activeEnemy.attack} HP.`;
-            appendBattleLog(logMsg);
-            
-            document.getElementById('battle-desc').textContent = `Salud del enemigo: ${activeEnemy.hp} | Ataque: ${activeEnemy.attack}`;
-            updateStatsUI();
+            playCardFlip() {
+                this.playTone(300, 'triangle', 0.1, 0.2);
+                setTimeout(() => this.playTone(500, 'sine', 0.15, 0.15), 50);
+            }
 
-            if (player.health <= 0) {
-                document.getElementById('battle-modal').style.display = 'none';
-                triggerGameOver();
+            playAttack() {
+                this.playTone(120, 'sawtooth', 0.15, 0.4);
+            }
+
+            playHeal() {
+                this.playTone(400, 'sine', 0.2, 0.2);
+                setTimeout(() => this.playTone(600, 'sine', 0.3, 0.2), 100);
+            }
+
+            playGold() {
+                this.playTone(987.77, 'sine', 0.1, 0.2); // B5
+                setTimeout(() => this.playTone(1318.51, 'sine', 0.25, 0.2), 80); // E6
+            }
+
+            playVictory() {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => this.playTone(freq, 'triangle', 0.3, 0.3), idx * 120);
+                });
+            }
+
+            playDefeat() {
+                this.playTone(200, 'sawtooth', 0.3, 0.3);
+                setTimeout(() => this.playTone(150, 'sawtooth', 0.4, 0.3), 200);
             }
         }
 
-        function appendBattleLog(msg) {
-            const list = document.getElementById('battle-event-list');
-            const li = document.createElement('li');
-            li.textContent = msg;
-            list.prepend(li);
-        }
+        const audio = new AudioSynth();
 
-        // --- ENCUENTROS Y SITUACIONES ---
-        function openSituationModal() {
-            const modal = document.getElementById('situation-modal');
-            const opts = document.getElementById('situation-options');
-            document.getElementById('situation-desc').textContent = "El mercader de la tienda te ofrece pócimas y tratos místicos.";
-            opts.innerHTML = `
-                <button class="fantasy-btn" onclick="handleShopChoice('potion')">Comprar Pócima de Vida (200 oro)</button>
-                <button class="fantasy-btn" onclick="handleShopChoice('blessing')">Bendición Arcana (+15 Maná, 150 oro)</button>
-                <button class="fantasy-btn" onclick="closeSituationModal()" style="background:#555; color:#fff;">Ignorar y Continuar</button>
-            `;
-            modal.style.display = 'flex';
-        }
+        /* ==========================================================================
+           2. GAME DATA (Decks, Items, Monsters)
+           ========================================================================== */
+        const TAROT_DECK = [
+            { id: 't1', title: 'El Mago', rarity: 'Épico', img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80', desc: 'Canalizas las fuerzas del cosmos. Recuperas maná y ganas sabiduría.', type: 'BUFF_MANA', value: 30, textEffect: '+30 Maná, +15 XP' },
+            { id: 't2', title: 'La Torre', rarity: 'Raro', img: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?auto=format&fit=crop&w=400&q=80', desc: 'Los cimientos se quiebran. Una emboscada de enemigos no-muertos.', type: 'BATTLE', enemyId: 'skeleton', textEffect: 'Batalla contra Esqueleto' },
+            { id: 't3', title: 'La Estrella', rarity: 'Leyenda', img: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=400&q=80', desc: 'Una luz renovadora baña tus heridas. Curación completa.', type: 'HEAL', value: 50, textEffect: '+50 Salud' },
+            { id: 't4', title: 'La Rueda de la Fortuna', rarity: 'Raro', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80', desc: 'El azar sonríe a tu favor. Encuentras un cofre con monedas de oro.', type: 'GOLD', value: 40, textEffect: '+40 Oro' },
+            { id: 't5', title: 'El Ermitaño', rarity: 'Común', img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80', desc: 'Reflexión profunda en la penumbra. Te encuentras en un dilema moral.', type: 'DILEMMA', textEffect: 'Encuentro de Decisión' }
+        ];
 
-        function handleShopChoice(choice) {
-            if (choice === 'potion' && player.gold >= 200) {
-                player.gold -= 200;
-                player.health = Math.min(player.maxHealth, player.health + 40);
-                logEvent("Compraste y bebiste una Pócima de Vida.");
-            } else if (choice === 'blessing' && player.gold >= 150) {
-                player.gold -= 150;
-                player.mana = Math.min(player.maxMana, player.mana + 30);
-                logEvent("Recibiste una Bendición Arcana.");
-            } else {
-                alert("¡Oro insuficiente!");
-                return;
+        const MANY_THINGS_DECK = [
+            { id: 'm1', title: 'Gema del Destino', rarity: 'Leyenda', img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=400&q=80', desc: 'Riquezas inimaginables brotan del mazo sagrado.', type: 'GOLD', value: 100, textEffect: '+100 Oro!' },
+            { id: 'm2', title: 'Calavera Arcana', rarity: 'Épico', img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=400&q=80', desc: 'Un espectro poderoso surge de las sombras reclamando tu alma.', type: 'BATTLE', enemyId: 'lich', textEffect: 'Batalla contra el Lich' },
+            { id: 'm3', title: 'El Caballero', rarity: 'Épico', img: 'https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=400&q=80', desc: 'Obtienes un artefacto antiguo de gran poder de ataque.', type: 'ITEM', item: { id: 'sword', name: 'Espada Arcana', icon: 'fa-sword', type: 'WEAPON', atkBonus: 8 }, textEffect: 'Obtienes: Espada Arcana (+8 ATK)' },
+            { id: 'm4', title: 'El Dragón', rarity: 'Leyenda', img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=400&q=80', desc: 'Un dragón ancestral desciende envuelto en llamas.', type: 'BATTLE', enemyId: 'dragon', textEffect: 'Batalla Final contra Dragón' },
+            { id: 'm5', title: 'El Pozo', rarity: 'Raro', img: 'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=400&q=80', desc: 'Caes en una trampa arcanamente diseñada.', type: 'DAMAGE', value: 20, textEffect: '-20 Salud' }
+        ];
+
+        const ENEMIES = {
+            skeleton: { name: 'Esqueleto Guardián', hp: 45, maxHp: 45, atk: 8, xp: 35, gold: 20, img: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?auto=format&fit=crop&w=200&q=80', desc: 'Un antiguo guerrero caído levantado por necromancia.' },
+            lich: { name: 'Lich del Abismo', hp: 80, maxHp: 80, atk: 14, xp: 75, gold: 60, img: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=200&q=80', desc: 'Un hechicero inmortal sediento de almas humanas.' },
+            dragon: { name: 'Dragón Infernal', hp: 130, maxHp: 130, atk: 20, xp: 150, gold: 150, img: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=200&q=80', desc: 'La máxima prueba de coraje y maestría arcanas.' }
+        };
+
+        const FALLBACK_DILEMMAS = [
+            {
+                title: 'El Mercader Encapuchado',
+                desc: 'Un extraño te ofrece una poción resplandeciente a cambio de unas cuantas monedas.',
+                options: [
+                    { text: 'Comprar Poción de Salud (15 Oro)', effect: 'BUY_POTION', cost: 15 },
+                    { text: 'Ignorarlo e irte', effect: 'NONE' }
+                ]
+            },
+            {
+                title: 'Altar de Sangre',
+                desc: 'Un altar antiguo promete poder a cambio de un sacrificio de tu propia vitalidad.',
+                options: [
+                    { text: 'Ofrecer 15 HP por +30 XP', effect: 'SACRIFICE_HP', hpCost: 15, xpGain: 30 },
+                    { text: 'Destruir el altar', effect: 'NONE' }
+                ]
             }
-            updateStatsUI();
-            closeSituationModal();
-        }
+        ];
 
-        function closeSituationModal() {
-            document.getElementById('situation-modal').style.display = 'none';
-        }
-
-        function updateInventoryUI() {
-            const invList = document.getElementById('playerInventory');
-            if (player.inventory.length === 0) {
-                invList.innerHTML = `<li style="color: #888; font-style: italic; justify-content: center;">Inventario vacío</li>`;
-                return;
+        /* ==========================================================================
+           3. GAME STATE & HERO MANAGEMENT
+           ========================================================================== */
+        const gameState = {
+            hero: {
+                name: 'Valerius',
+                class: 'Aventurero Arcano',
+                level: 1,
+                hp: 100,
+                maxHp: 100,
+                mana: 50,
+                maxMana: 50,
+                xp: 0,
+                maxXp: 100,
+                gold: 50,
+                baseAtk: 12,
+                inventory: [
+                    { id: 'pot_hp_1', name: 'Poción de Salud', icon: 'fa-flask text-red-400', type: 'HEAL_ITEM', value: 35 },
+                    { id: 'pot_mn_1', name: 'Elixir de Maná', icon: 'fa-vial text-blue-400', type: 'MANA_ITEM', value: 25 }
+                ]
+            },
+            activeDeckType: 'TAROT', // TAROT or MANY_THINGS
+            isCardFlipped: false,
+            currentEnemy: null,
+            groq: {
+                apiKey: localStorage.getItem('groq_api_key') || '',
+                model: localStorage.getItem('groq_model') || 'llama-3.3-70b-versatile',
+                enabled: localStorage.getItem('groq_enabled') === 'true'
             }
-            invList.innerHTML = '';
-            player.inventory.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = `<span>⚔️ ${item.name}</span> <small style="color:var(--gold);">${item.type}</small>`;
-                invList.appendChild(li);
-            });
-        }
+        };
 
-        function triggerGameOver() {
-            document.getElementById('gameover-modal').style.display = 'flex';
-        }
+        /* ==========================================================================
+           4. GROQ API & NARRATIVE MODULE
+           ========================================================================== */
+        async function fetchGroqNarrative(card, player) {
+            if (!gameState.groq.enabled || !gameState.groq.apiKey) {
+                return null;
+            }
 
-        // --- INTEGRACIÓN GROQ IA ---
-        function openAiModal() {
-            document.getElementById('groqApiKeyInput').value = groqApiKey;
-            document.getElementById('ai-modal').style.display = 'flex';
-        }
-        function closeAiModal() {
-            document.getElementById('ai-modal').style.display = 'none';
-        }
-        function saveApiKey() {
-            groqApiKey = document.getElementById('groqApiKeyInput').value.trim();
-            localStorage.setItem('groq_api_key', groqApiKey);
-            closeAiModal();
-            alert("¡Clave de Groq IA guardada con éxito!");
-        }
+            const prompt = `Eres el Narrador Místico de un juego RPG de fantasía oscura estilo D&D. 
+            El jugador (${player.name}, Nivel ${player.level}, HP: ${player.hp}/${player.maxHp}, Oro: ${player.gold}) acaba de robar la carta "${card.title}".
+            Efecto: "${card.desc}".
+            Genera una narración inmersiva, elegante y poética de máximo 2 oraciones sobre cómo el destino se manifiesta alrededor del héroe.`;
 
-        async function askGroq(promptText) {
-            if (!groqApiKey) return null;
             try {
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
-                        "Authorization": `Bearer ${groqApiKey}`,
+                        "Authorization": `Bearer ${gameState.groq.apiKey}`,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: [
-                            { role: "system", content: "Eres un narrador de rol de fantasía épica medieval oscuro y conciso (máximo 2 líneas)." },
-                            { role: "user", content: promptText }
-                        ],
-                        temperature: 0.7
+                        model: gameState.groq.model,
+                        messages: [{ role: "user", content: prompt }],
+                        temperature: 0.7,
+                        max_tokens: 100
                     })
                 });
+
                 if (!response.ok) return null;
                 const data = await response.json();
-                return data.choices[0].message.content;
-            } catch (e) {
-                console.error("Error conectando con Groq IA:", e);
+                return data.choices?.[0]?.message?.content?.trim();
+            } catch (err) {
+                console.warn("Groq AI Error, falling back:", err);
                 return null;
             }
         }
 
-        // Iniciar al cargar
-        window.onload = initializeGame;
+        async function fetchGroqDilemma(player) {
+            if (!gameState.groq.enabled || !gameState.groq.apiKey) return null;
+
+            const systemPrompt = `Eres un Game Master de fantasía. Responde ÚNICAMENTE en JSON válido con el formato:
+            {
+              "title": "Título corto",
+              "desc": "Descripción del dilema (2 oraciones)",
+              "options": [
+                { "text": "Opción 1", "effect": "GOLD_GAIN", "value": 25 },
+                { "text": "Opción 2", "effect": "HP_LOSS", "value": 10 }
+              ]
+            }`;
+
+            try {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${gameState.groq.apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: gameState.groq.model,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: `Crea un dilema para el héroe de nivel ${player.level} con ${player.hp} HP.` }
+                        ],
+                        response_format: { type: "json_object" },
+                        temperature: 0.8
+                    })
+                });
+
+                if (!response.ok) return null;
+                const data = await response.json();
+                return JSON.parse(data.choices?.[0]?.message?.content);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        /* ==========================================================================
+           5. UI RENDERING & GAME ENGINE
+           ========================================================================== */
+        function updateHeroUI() {
+            const h = gameState.hero;
+            
+            document.getElementById('heroName').textContent = h.name;
+            document.getElementById('heroLevel').textContent = h.level;
+            document.getElementById('hpText').textContent = `${h.hp} / ${h.maxHp}`;
+            document.getElementById('hpBar').style.width = `${(h.hp / h.maxHp) * 100}%`;
+            
+            document.getElementById('manaText').textContent = `${h.mana} / ${h.maxMana}`;
+            document.getElementById('manaBar').style.width = `${(h.mana / h.maxMana) * 100}%`;
+
+            document.getElementById('xpText').textContent = `${h.xp} / ${h.maxXp}`;
+            document.getElementById('xpBar').style.width = `${(h.xp / h.maxXp) * 100}%`;
+
+            document.getElementById('heroGold').textContent = h.gold;
+            
+            // Calculate total attack (base + equipment)
+            const weaponBonus = h.inventory
+                .filter(i => i.type === 'WEAPON')
+                .reduce((acc, i) => acc + (i.atkBonus || 0), 0);
+            document.getElementById('heroAtk').textContent = h.baseAtk + weaponBonus;
+
+            // Render Inventory
+            const invGrid = document.getElementById('inventoryGrid');
+            invGrid.innerHTML = '';
+            document.getElementById('invCapacity').textContent = `${h.inventory.length} / 8 slots`;
+
+            for (let i = 0; i < 8; i++) {
+                const item = h.inventory[i];
+                const slot = document.createElement('div');
+                slot.className = 'w-full h-12 rounded border bg-slate-950/80 flex items-center justify-center relative group cursor-pointer transition';
+                
+                if (item) {
+                    slot.className += ' border-purple-500/50 hover:border-gold-400';
+                    slot.innerHTML = `
+                        <i class="fa-solid ${item.icon} text-lg"></i>
+                        <div class="absolute bottom-full mb-1 hidden group-hover:block bg-slate-900 border border-gold-500/50 text-[10px] p-2 rounded z-30 w-28 text-center shadow-lg pointer-events-none">
+                            <span class="font-bold text-gold-300 block">${item.name}</span>
+                            <span class="text-slate-400">Clic para usar</span>
+                        </div>
+                    `;
+                    slot.onclick = () => useItem(i);
+                } else {
+                    slot.className += ' border-slate-800 opacity-40';
+                }
+                invGrid.appendChild(slot);
+            }
+
+            // Update AI Status badge
+            const badge = document.getElementById('aiStatusBadge');
+            const dot = document.getElementById('aiStatusDot');
+            const txt = document.getElementById('aiStatusText');
+            if (gameState.groq.enabled && gameState.groq.apiKey) {
+                badge.className = "hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-sans bg-purple-950 border border-purple-600 text-purple-300";
+                dot.className = "w-2 h-2 rounded-full bg-purple-400 animate-pulse";
+                txt.textContent = "Groq AI Activo";
+            } else {
+                badge.className = "hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-sans bg-slate-900 border border-slate-700 text-slate-400";
+                dot.className = "w-2 h-2 rounded-full bg-slate-500";
+                txt.textContent = "Modo Offline";
+            }
+        }
+
+        function logEvent(msg, type = 'info') {
+            const log = document.getElementById('eventLog');
+            const entry = document.createElement('div');
+            let borderClass = 'border-purple-500';
+            if (type === 'gold') borderClass = 'border-gold-400';
+            if (type === 'combat') borderClass = 'border-red-500';
+            if (type === 'heal') borderClass = 'border-green-500';
+
+            entry.className = `p-2 rounded bg-slate-950/60 border-l-2 ${borderClass} text-slate-300 transition animate-fade-in`;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            entry.innerHTML = `<span class="text-[10px] text-slate-500 block">${time}</span>${msg}`;
+            
+            log.prepend(entry);
+        }
+
+        function gainXp(amount) {
+            const h = gameState.hero;
+            h.xp += amount;
+            logEvent(`Ganaste +${amount} XP`, 'info');
+            if (h.xp >= h.maxXp) {
+                h.level += 1;
+                h.xp -= h.maxXp;
+                h.maxXp = Math.floor(h.maxXp * 1.5);
+                h.maxHp += 15;
+                h.hp = h.maxHp;
+                h.maxMana += 10;
+                h.mana = h.maxMana;
+                h.baseAtk += 3;
+                logEvent(`¡HAS SUBIDO AL NIVEL ${h.level}! Estadísticas mejoradas.`, 'gold');
+                audio.playVictory();
+            }
+            updateHeroUI();
+        }
+
+        function useItem(index) {
+            const h = gameState.hero;
+            const item = h.inventory[index];
+            if (!item) return;
+
+            if (item.type === 'HEAL_ITEM') {
+                h.hp = Math.min(h.maxHp, h.hp + item.value);
+                logEvent(`Usaste ${item.name} y recuperaste ${item.value} HP.`, 'heal');
+                audio.playHeal();
+                h.inventory.splice(index, 1);
+            } else if (item.type === 'MANA_ITEM') {
+                h.mana = Math.min(h.maxMana, h.mana + item.value);
+                logEvent(`Usaste ${item.name} y recuperaste ${item.value} MP.`, 'heal');
+                audio.playHeal();
+                h.inventory.splice(index, 1);
+            }
+            updateHeroUI();
+        }
+
+        /* ==========================================================================
+           6. CARD DRAW & EFFECT ENGINE
+           ========================================================================== */
+        async function drawCard() {
+            const cardInner = document.getElementById('cardInner');
+            const drawBtn = document.getElementById('drawCardBtn');
+            const narrator = document.getElementById('narratorOutput');
+            const spinner = document.getElementById('aiThinkingSpinner');
+
+            drawBtn.disabled = true;
+            audio.playCardFlip();
+
+            // Select card pool
+            const deck = gameState.activeDeckType === 'TAROT' ? TAROT_DECK : MANY_THINGS_DECK;
+            const drawnCard = deck[Math.floor(Math.random() * deck.length)];
+
+            // Render Card Front Details
+            document.getElementById('cardTitle').textContent = drawnCard.title;
+            document.getElementById('cardDesc').textContent = drawnCard.desc;
+            document.getElementById('cardImage').src = drawnCard.img;
+            document.getElementById('cardEffectText').textContent = drawnCard.textEffect;
+            document.getElementById('cardTypeBadge').textContent = gameState.activeDeckType === 'TAROT' ? 'Tarot' : 'Muchas Cosas';
+
+            // Flip Animation
+            cardInner.classList.add('flipped');
+            gameState.isCardFlipped = true;
+
+            // Narrator AI fetch
+            spinner.classList.remove('hidden');
+            narrator.textContent = "Consultando el tejido del tiempo y el espacio...";
+
+            const aiStory = await fetchGroqNarrative(drawnCard, gameState.hero);
+            spinner.classList.add('hidden');
+
+            if (aiStory) {
+                narrator.textContent = `"${aiStory}"`;
+            } else {
+                narrator.textContent = `"${drawnCard.desc}"`;
+            }
+
+            logEvent(`Robaste la carta: <strong>${drawnCard.title}</strong>`, 'info');
+
+            // Apply Gameplay Effects
+            setTimeout(() => {
+                applyCardEffect(drawnCard);
+                
+                // Allow resetting/drawing again
+                setTimeout(() => {
+                    drawBtn.disabled = false;
+                }, 1000);
+            }, 800);
+        }
+
+        function resetCard() {
+            const cardInner = document.getElementById('cardInner');
+            if (gameState.isCardFlipped) {
+                cardInner.classList.remove('flipped');
+                gameState.isCardFlipped = false;
+            }
+        }
+
+        function applyCardEffect(card) {
+            const h = gameState.hero;
+
+            switch (card.type) {
+                case 'GOLD':
+                    h.gold += card.value;
+                    audio.playGold();
+                    logEvent(`Obtuviste +${card.value} Oro.`, 'gold');
+                    break;
+
+                case 'HEAL':
+                    h.hp = Math.min(h.maxHp, h.hp + card.value);
+                    audio.playHeal();
+                    logEvent(`Te has curado +${card.value} HP.`, 'heal');
+                    break;
+
+                case 'BUFF_MANA':
+                    h.mana = Math.min(h.maxMana, h.mana + card.value);
+                    gainXp(15);
+                    audio.playHeal();
+                    break;
+
+                case 'DAMAGE':
+                    h.hp = Math.max(1, h.hp - card.value);
+                    audio.playAttack();
+                    logEvent(`Sufriste -${card.value} HP por efecto de la carta.`, 'combat');
+                    break;
+
+                case 'ITEM':
+                    if (h.inventory.length < 8) {
+                        h.inventory.push({ ...card.item, icon: 'fa-shield-cat text-gold-400' });
+                        logEvent(`Añadido al inventario: ${card.item.name}`, 'gold');
+                    } else {
+                        logEvent(`Inventario lleno. No pudiste recoger ${card.item.name}`, 'combat');
+                    }
+                    break;
+
+                case 'BATTLE':
+                    startBattle(card.enemyId);
+                    break;
+
+                case 'DILEMMA':
+                    openDilemmaModal();
+                    break;
+            }
+
+            updateHeroUI();
+        }
+
+        /* ==========================================================================
+           7. BATTLE SYSTEM
+           ========================================================================== */
+        function startBattle(enemyKey) {
+            const enemyTemplate = ENEMIES[enemyKey] || ENEMIES.skeleton;
+            gameState.currentEnemy = { ...enemyTemplate, hp: enemyTemplate.hp };
+
+            document.getElementById('enemyName').textContent = gameState.currentEnemy.name;
+            document.getElementById('enemyImg').src = gameState.currentEnemy.img;
+            document.getElementById('enemyDesc').textContent = gameState.currentEnemy.desc;
+            document.getElementById('enemyHpText').textContent = `${gameState.currentEnemy.hp} / ${gameState.currentEnemy.maxHp}`;
+            document.getElementById('enemyHpBar').style.width = '100%';
+
+            const battleLog = document.getElementById('battleLog');
+            battleLog.innerHTML = `<p class="text-purple-300">¡Un ${gameState.currentEnemy.name} se interpone en tu camino!</p>`;
+
+            document.getElementById('battleModal').classList.remove('hidden');
+            logEvent(`¡Encuentro de combate contra ${gameState.currentEnemy.name}!`, 'combat');
+        }
+
+        function appendBattleLog(msg, colorClass = 'text-slate-300') {
+            const battleLog = document.getElementById('battleLog');
+            const p = document.createElement('p');
+            p.className = colorClass;
+            p.textContent = msg;
+            battleLog.appendChild(p);
+            battleLog.scrollTop = battleLog.scrollHeight;
+        }
+
+        function handleBattleRound(playerAction) {
+            const h = gameState.hero;
+            const e = gameState.currentEnemy;
+            if (!e) return;
+
+            // Player Turn
+            if (playerAction === 'ATTACK') {
+                const weaponBonus = h.inventory
+                    .filter(i => i.type === 'WEAPON')
+                    .reduce((acc, i) => acc + (i.atkBonus || 0), 0);
+                const dmg = (h.baseAtk + weaponBonus) + Math.floor(Math.random() * 5);
+                e.hp = Math.max(0, e.hp - dmg);
+                audio.playAttack();
+                appendBattleLog(`Atacas a ${e.name} causando ${dmg} de daño.`, 'text-gold-300');
+            } else if (playerAction === 'SPELL') {
+                if (h.mana < 10) {
+                    appendBattleLog(`¡No tienes suficiente Maná!`, 'text-red-400');
+                    return;
+                }
+                h.mana -= 10;
+                const spellDmg = 25 + Math.floor(Math.random() * 10);
+                e.hp = Math.max(0, e.hp - spellDmg);
+                audio.playHeal();
+                appendBattleLog(`Lanzas una ráfaga arcana provocando ${spellDmg} de daño.`, 'text-purple-300');
+            } else if (playerAction === 'POTION') {
+                const potIdx = h.inventory.findIndex(i => i.type === 'HEAL_ITEM');
+                if (potIdx !== -1) {
+                    useItem(potIdx);
+                    appendBattleLog(`Te curaste durante el combate.`, 'text-green-400');
+                } else {
+                    appendBattleLog(`No tienes pociones de salud disponibles.`, 'text-red-400');
+                    return;
+                }
+            } else if (playerAction === 'FLEE') {
+                appendBattleLog(`Escapaste del combate con éxito.`, 'text-slate-400');
+                setTimeout(() => {
+                    document.getElementById('battleModal').classList.add('hidden');
+                }, 1000);
+                return;
+            }
+
+            // Update Enemy UI
+            document.getElementById('enemyHpText').textContent = `${e.hp} / ${e.maxHp}`;
+            document.getElementById('enemyHpBar').style.width = `${(e.hp / e.maxHp) * 100}%`;
+
+            // Check Enemy Death
+            if (e.hp <= 0) {
+                appendBattleLog(`¡Has derrotado a ${e.name}!`, 'text-gold-400 font-bold');
+                h.gold += e.gold;
+                audio.playVictory();
+                logEvent(`Victoria contra ${e.name}. +${e.gold} Oro.`, 'gold');
+                gainXp(e.xp);
+                
+                setTimeout(() => {
+                    document.getElementById('battleModal').classList.add('hidden');
+                    resetCard();
+                }, 1500);
+                return;
+            }
+
+            // Enemy Turn Response
+            setTimeout(() => {
+                const enemyDmg = Math.max(1, e.atk - Math.floor(Math.random() * 3));
+                h.hp = Math.max(0, h.hp - enemyDmg);
+                audio.playAttack();
+                appendBattleLog(`${e.name} te ataca causando ${enemyDmg} de daño.`, 'text-red-400');
+                updateHeroUI();
+
+                if (h.hp <= 0) {
+                    appendBattleLog(`¡Has caído en combate!`, 'text-red-600 font-bold');
+                    audio.playDefeat();
+                    logEvent(`Derrota en combate. Reviviendo con salud mínima.`, 'combat');
+                    h.hp = 20;
+                    h.gold = Math.floor(h.gold / 2);
+                    setTimeout(() => {
+                        document.getElementById('battleModal').classList.add('hidden');
+                        resetCard();
+                        updateHeroUI();
+                    }, 2000);
+                }
+            }, 600);
+        }
+
+        /* ==========================================================================
+           8. DILEMMA / ENCOUNTER SYSTEM
+           ========================================================================== */
+        async function openDilemmaModal() {
+            const modal = document.getElementById('dilemmaModal');
+            const titleEl = document.getElementById('dilemmaTitle');
+            const descEl = document.getElementById('dilemmaDesc');
+            const optionsEl = document.getElementById('dilemmaOptions');
+
+            optionsEl.innerHTML = '<p class="text-xs text-purple-300 animate-pulse">Generando encuentro...</p>';
+            modal.classList.remove('hidden');
+
+            const dilemmaData = await fetchGroqDilemma(gameState.hero) || FALLBACK_DILEMMAS[Math.floor(Math.random() * FALLBACK_DILEMMAS.length)];
+
+            titleEl.textContent = dilemmaData.title;
+            descEl.textContent = `"${dilemmaData.desc}"`;
+            optionsEl.innerHTML = '';
+
+            dilemmaData.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = 'fantasy-btn p-3 rounded text-xs font-sans text-left text-gold-300 hover:text-white transition';
+                btn.textContent = opt.text;
+                btn.onclick = () => {
+                    handleDilemmaChoice(opt);
+                    modal.classList.add('hidden');
+                    resetCard();
+                };
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function handleDilemmaChoice(option) {
+            const h = gameState.hero;
+            if (option.effect === 'BUY_POTION' && h.gold >= option.cost) {
+                h.gold -= option.cost;
+                h.inventory.push({ id: 'pot_dilemma', name: 'Poción Mayor', icon: 'fa-flask text-red-400', type: 'HEAL_ITEM', value: 50 });
+                logEvent(`Compraste una Poción Mayor por ${option.cost} Oro.`, 'gold');
+            } else if (option.effect === 'SACRIFICE_HP') {
+                h.hp = Math.max(1, h.hp - option.hpCost);
+                gainXp(option.xpGain);
+            } else if (option.effect === 'GOLD_GAIN') {
+                h.gold += option.value || 20;
+                audio.playGold();
+            } else if (option.effect === 'HP_LOSS') {
+                h.hp = Math.max(1, h.hp - (option.value || 10));
+            }
+            updateHeroUI();
+        }
+
+        /* ==========================================================================
+           9. INITIALIZATION & EVENT LISTENERS
+           ========================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Canvas Ambient Particle Stars
+            const canvas = document.getElementById('starsCanvas');
+            const ctx = canvas.getContext('2d');
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const stars = Array.from({ length: 60 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.01 + 0.005
+            }));
+
+            function animateStars() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                stars.forEach(s => {
+                    s.alpha += s.speed;
+                    if (s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
+                    ctx.fillStyle = `rgba(202, 138, 4, ${Math.abs(s.alpha)})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                requestAnimationFrame(animateStars);
+            }
+            animateStars();
+
+            // Initial UI Update
+            updateHeroUI();
+
+            // Card Deck Selector Buttons
+            const btnTarot = document.getElementById('selectDeckTarot');
+            const btnMany = document.getElementById('selectDeckManyThings');
+
+            btnTarot.addEventListener('click', () => {
+                gameState.activeDeckType = 'TAROT';
+                btnTarot.className = "px-3 py-1.5 rounded font-medium border border-purple-500 bg-purple-900/60 text-gold-300 transition";
+                btnMany.className = "px-3 py-1.5 rounded font-medium border border-slate-700 bg-slate-950 text-slate-400 hover:border-gold-500/50 transition";
+                resetCard();
+            });
+
+            btnMany.addEventListener('click', () => {
+                gameState.activeDeckType = 'MANY_THINGS';
+                btnMany.className = "px-3 py-1.5 rounded font-medium border border-gold-500 bg-gold-950/60 text-gold-300 transition";
+                btnTarot.className = "px-3 py-1.5 rounded font-medium border border-slate-700 bg-slate-950 text-slate-400 hover:border-purple-500/50 transition";
+                resetCard();
+            });
+
+            // Card Draw Button
+            document.getElementById('drawCardBtn').addEventListener('click', () => {
+                if (!gameState.isCardFlipped) {
+                    drawCard();
+                } else {
+                    resetCard();
+                    setTimeout(drawCard, 400);
+                }
+            });
+
+            document.getElementById('cardContainer').addEventListener('click', () => {
+                if (!gameState.isCardFlipped) {
+                    drawCard();
+                }
+            });
+
+            // Battle Modal Action Buttons
+            document.getElementById('btnBattleAttack').onclick = () => handleBattleRound('ATTACK');
+            document.getElementById('btnBattleSpell').onclick = () => handleBattleRound('SPELL');
+            document.getElementById('btnBattleItem').onclick = () => handleBattleRound('POTION');
+            document.getElementById('btnBattleFlee').onclick = () => handleBattleRound('FLEE');
+
+            // Config Modal Handlers
+            const configModal = document.getElementById('configModal');
+            document.getElementById('openConfigBtn').onclick = () => {
+                document.getElementById('groqApiKeyInput').value = gameState.groq.apiKey;
+                document.getElementById('groqModelSelect').value = gameState.groq.model;
+                document.getElementById('groqToggle').checked = gameState.groq.enabled;
+                configModal.classList.remove('hidden');
+            };
+
+            document.getElementById('closeConfigBtn').onclick = () => configModal.classList.add('hidden');
+
+            document.getElementById('saveConfigBtn').onclick = () => {
+                const key = document.getElementById('groqApiKeyInput').value.trim();
+                const model = document.getElementById('groqModelSelect').value;
+                const enabled = document.getElementById('groqToggle').checked;
+
+                gameState.groq.apiKey = key;
+                gameState.groq.model = model;
+                gameState.groq.enabled = enabled;
+
+                localStorage.setItem('groq_api_key', key);
+                localStorage.setItem('groq_model', model);
+                localStorage.setItem('groq_enabled', enabled);
+
+                updateHeroUI();
+                configModal.classList.add('hidden');
+                logEvent(`Configuración de Groq API actualizada.`, 'info');
+            };
+
+            document.getElementById('clearLogBtn').onclick = () => {
+                document.getElementById('eventLog').innerHTML = '';
+            };
+        });
     </script>
 </body>
 </html>
