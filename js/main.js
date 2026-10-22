@@ -53,18 +53,37 @@ class Game {
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
+
+        // Map de imágenes por clase
+        const heroImages = {
+            'warrior': 'img/guerrero.png', // Cambia a las rutas reales de tus imágenes de héroes
+            'mage': 'img/maga.png',
+            'rogue': 'img/picaro.png'
+        };
+
+        // Actualizar el UI con la imagen del personaje
+        const portraitContainer = document.getElementById('introHeroPortrait');
+        if (portraitContainer) {
+            portraitContainer.innerHTML = `<img src="${heroImages[classKey] || heroImages['warrior']}" alt="${this.player.className}">`;
+        }
+
+        const titleHeader = document.getElementById('introHeroTitle');
+        if (titleHeader) {
+            titleHeader.textContent = `ORIGEN: ${this.player.className.toUpperCase()}`;
+        }
+
         this.ui.showScreen('introScreen');
 
-        // 1. Mensaje de espera
-        this.ui.typewriterIntro(`CONSULTANDO LOS ORÁCULOS DEL DESTINO...`);
+        // Mostrar texto de carga breve
+        this.ui.typewriterIntro(`CONSULTANDO LOS ORÁCULOS ANCESTRALES...`);
 
-        // 2. Obtener el texto dinámico (Groq o Fallback local)
+        // Obtener historia de Groq / Fallback
         const story = await this.groq.generateCharacterLore(this.player.className);
 
-        // 3. Escribir la historia final limpia
+        // Escribir la historia épica final
         this.ui.typewriterIntro(story.toUpperCase());
     }
-
+    
     startMainGame() {
         this.deck.reset();
         this.dungeonLevel = 1;

@@ -51,8 +51,19 @@
 
     <!-- INTRO STORY SCREEN -->
     <div id="introScreen" class="screen">
-        <div class="typewriter-box" id="introText"></div>
-        <button class="fantasy-btn" id="btnEnterDungeon">ENTRAR A LA MAZMORRA ►</button>
+        <div class="intro-container">
+            <!-- LADO IZQUIERDO: PORTRAIT / CARTA DEL HÉROE -->
+            <div class="intro-hero-portrait" id="introHeroPortrait">
+                <!-- Se llenará dinámicamente con JS -->
+            </div>
+
+            <!-- LADO DERECHO: DIÁLOGO NARRATIVO Y BOTÓN -->
+            <div class="intro-narrative-box">
+                <div class="intro-header-title" id="introHeroTitle">EL DESTINO DEL HÉROE</div>
+                <div class="typewriter-box" id="introText">Cargando el oráculo...</div>
+                <button class="fantasy-btn" id="btnEnterDungeon">ENTRAR A LA MAZMORRA ►</button>
+            </div>
+        </div>
     </div>
 
     <!-- TABLERO DE JUEGO PRINCIPAL -->
