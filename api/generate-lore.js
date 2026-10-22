@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // 1. Cabeceras CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,38 +7,123 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // Eventos de respaldo inmediato si la IA falla o no hay API Key
-    const fallbackExploration = {
-        npcType: "warrior",
-        description: "Un veterano de la mazmorra te observa en la penumbra: \"Ten cuidado, aventurero... las paredes oyen tus pasos.\"",
-        choices: [
-            { text: "🗡️ [FUERZA] Avanzar despejando el pasillo", action: "strength" },
-            { text: "🚪 Explorar las estancias adyacentes", action: "pass" }
-        ]
-    };
-
-    const fallbackIntro = {
-        story: "EL MAZO DEL DESTINO TE AGUARDA EN LAS PROFUNDIDADES. PREPARA TU ACERO Y ADÉNTRATE EN LAS SOMBRAS."
-    };
-
     try {
-        // 2. Parseo seguro del cuerpo de la petición
         let body = req.body;
         if (typeof body === 'string') {
             try { body = JSON.parse(body); } catch (e) { body = {}; }
         }
         body = body || {};
 
-        const { type, className, dungeonLevel } = body;
+        const { type, className = "Guerrero", dungeonLevel = 1 } = body;
         const apiKey = process.env.GROQ_API_KEY;
 
-        // Si no hay API Key en Vercel, responder con éxito pero datos de respaldo
-        if (!apiKey) {
-            console.warn("GROQ_API_KEY no encontrada en las variables de entorno.");
-            return res.status(200).json(type === 'exploration' ? fallbackExploration : fallbackIntro);
+        // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
+        const dndEncounterDatabase = {
+            // ENCUENTROS PARA GUERRERO
+            "Guerrero": [
+                {
+                    npcType: "warrior",
+                    description: "Un veterano malherido apoya su espadón en una pira: \"Mi escuadra cayó ante el Capitán Orco... Toma mi escudo o avanza a vengar nuestras vidas.\"",
+                    choices: [
+                        { text: "🗣️ \"Prometo honor a tus caídos. Guiaré mi acero contra el orco.\"", action: "strength" },
+                        { text: "✨ \"Déjame intentar curar tus heridas con vendas de campaña.\"", action: "magic" },
+                        { text: "⚔️ \"Examino el pasillo en busca de los orcos. ¡A las armas!\"", action: "combat" }
+                    ]
+                },
+                {
+                    npcType: "warrior",
+                    description: "Un autómata de bronce guardián bloquea el puente de piedra: \"Solo aquellos dignos en el arte del combate atravesarán los portones del rey.\"",
+                    choices: [
+                        { text: "🗡️ [FUERZA] \"Demostraré mi valía en un duelo honorable.\"", action: "strength" },
+                        { text: "💰 \"Acepta este tributo de oro y déjame pasar sin sangre.\"", action: "buy" },
+                        { text: "🚪 \"Buscaré un paso subterráneo alternativo.\"", action: "pass" }
+                    ]
+                }
+            ],
+            // ENCUENTROS PARA MAGA ARCANA
+            "Maga Arcana": [
+                {
+                    npcType: "mage",
+                    description: "El fantasma de una archimaga flota sobre un glifo rúnico parpadeante: \"El flujo del maná en esta planta está corrupto... Rompe el nexo antes de que devore tu mente.\"",
+                    choices: [
+                        { text: "✨ [ARCANO] \"Usaré mi canalización para purificar la runa.\"", action: "magic" },
+                        { text: "🗣️ \"Dime qué secretos esconde la orden a cambio de ayudarte.\"", action: "strength" },
+                        { text: "⚔️ \"Ese nexo alberga una criatura sombría. ¡A prepararse!\"", action: "combat" }
+                    ]
+                },
+                {
+                    npcType: "mage",
+                    description: "Un demonio encuadernado en un libro parlante sobre un pedestal te llama: \"Libérame del sello de plata y te otorgaré un hechizo olvidado...\"",
+                    choices: [
+                        { text: "✨ [CONOCIMIENTO] \"Descifraré el sello sin romper la prisión.\"", action: "magic" },
+                        { text: "🚪 \"Un demonio encarcelado debe permanecer así. Me retiro.\"", action: "pass" },
+                        { text: "⚔️ \"¡Destruyo el tomo para extinguir tu maldad!\"", action: "combat" }
+                    ]
+                }
+            ],
+            // ENCUENTROS PARA PÍCARO
+            "Pícaro": [
+                {
+                    npcType: "rogue",
+                    description: "Un contrabandista encapuchado saca una dula de joyas en las sombras: \"Tengo las llaves del cofre del tesoro real... ¿Nos repartimos el botín o me delatarás?\"",
+                    choices: [
+                        { text: "💰 [PERSUASIÓN] \"Acepto el trato, pero me llevo el 60%.\"", action: "buy" },
+                        { text: "🗡️ [INMERCENARIO] \"Te quitaré las llaves y el saco ahora mismo.\"", action: "strength" },
+                        { text: "🚪 \"No me mezclo en asuntos de ladrones torpes.\"", action: "pass" }
+                    ]
+                },
+                {
+                    npcType: "rogue",
+                    description: "Una estatua de gárgola con ojos de rubí susurra: \"Un paso en falso y activarás las cuchillas del techo... Resuelve mi acertijo o sangra.\"",
+                    choices: [
+                        { text: "🗣️ [PERSPICACIA] \"Escucho tu acertijo, criatura de piedra.\"", action: "magic" },
+                        { text: "🗡️ [AGILIDAD] \"Inhabilito el mecanismo de trampa con mis ganzúas.\"", action: "strength" },
+                        { text: "⚔️ \"¡Rompo la estatua a golpes antes de que se mueva!\"", action: "combat" }
+                    ]
+                }
+            ]
+        };
+
+        // ENCUENTROS PROFUNDOS PARA PLANTAS AVANZADAS (Planta > 3)
+        const deepDungeonEncounters = [
+            {
+                npcType: "mage",
+                description: "Un devorador de mentes te observa desde el techo: \"Siento la ambición de tu alma. Entrégame tus recuerdos de la superficie o perece.\"",
+                choices: [
+                    { text: "✨ [VOLUNTAD] \"Mi mente es una fortaleza inexpugnable.\"", action: "magic" },
+                    { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
+                    { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
+                ]
+            },
+            {
+                npcType: "warrior",
+                description: "Un Caballero de la Muerte en armadura oxidada te corta el paso: \"Nadie ha salido con vida de la Planta " + dungeonLevel + ". Tu aventura termina aquí.\"",
+                choices: [
+                    { text: "⚔️ \"¡Defiéndete, monstruo! El Mazo del Destino me guía.\"", action: "combat" },
+                    { text: "🗡️ [DIPLOMACIA DE ACERO] \"Probemos la resistencia de tu armadura.\"", action: "strength" },
+                    { text: "💰 \"Ofrezco mi oro si me permites buscar el altar de luz.\"", action: "buy" }
+                ]
+            }
+        ];
+
+        // SELECCIÓN INTELIGENTE DE FALLBACK
+        function getSmartFallback() {
+            if (dungeonLevel > 3 && Math.random() > 0.4) {
+                return deepDungeonEncounters[Math.floor(Math.random() * deepDungeonEncounters.length)];
+            }
+            const classList = dndEncounterDatabase[className] || dndEncounterDatabase["Guerrero"];
+            return classList[Math.floor(Math.random() * classList.length)];
         }
 
+        const fallbackEvent = getSmartFallback();
+
+        const fallbackIntro = {
+            story: `EL DESTINO DE ${className.toUpperCase()} ESTÁ FORJADO EN SANGRE Y MANÁ. ADÉNTRATE EN LA PLANTA ${dungeonLevel}.`
+        };
+
         if (type === 'exploration') {
+            if (!apiKey) return res.status(200).json(fallbackEvent);
+
             try {
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
@@ -51,28 +135,30 @@ export default async function handler(req, res) {
                         model: "llama-3.3-70b-versatile",
                         messages: [{
                             role: "system",
-                            content: "Eres un Dungeon Master de D&D. Devuelve EXCLUSIVAMENTE un objeto JSON sin markdown con este formato: {\"npcType\": \"warrior|mage|rogue\", \"description\": \"texto narrativo con diálogos hablados entre comillas (máx 35 palabras)\", \"choices\": [{\"text\": \"opción 1 con tipo de habilidad entre corchetes [FUERZA], [MAGIA] o [PERSPICACIA]\", \"action\": \"strength|magic|buy|pass\"}, {\"text\": \"opción 2\", \"action\": \"strength|magic|buy|pass\"}, {\"text\": \"opción 3\", \"action\": \"pass\"}]}"
+                            content: "Eres un Dungeon Master de D&D. Genera un encuentro conversacional rico donde un PNJ hable directamente usando comillas. Devuelve EXCLUSIVAMENTE un objeto JSON sin markdown: {\"npcType\": \"warrior|mage|rogue\", \"description\": \"diálogo directo del PNJ (máx 35 palabras)\", \"choices\": [{\"text\": \"\\\"🗣️ o ⚔️ Respuesta hablada del héroe entre comillas\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 2\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 3\\\"\", \"action\": \"pass\"}]}"
                         }, {
                             role: "user",
-                            content: `Genera un encuentro de D&D con un PNJ en la Planta ${dungeonLevel || 1} para la clase ${className || 'Guerrero'}.`
+                            content: `Genera un encuentro narrativo D&D único e inmersivo en la Planta ${dungeonLevel} para un héroe de clase ${className}.`
                         }],
-                        temperature: 0.8,
-                        max_tokens: 200
+                        temperature: 0.85,
+                        max_tokens: 220
                     })
                 });
 
-                if (!response.ok) return res.status(200).json(fallbackExploration);
+                if (!response.ok) return res.status(200).json(fallbackEvent);
 
                 const data = await response.json();
                 let content = data.choices?.[0]?.message?.content?.trim();
                 content = content.replace(/```json/g, '').replace(/```/g, '').trim();
                 return res.status(200).json(JSON.parse(content));
             } catch (err) {
-                return res.status(200).json(fallbackExploration);
+                return res.status(200).json(fallbackEvent);
             }
         }
 
-        // LORE INICIAL DE CLASE
+        // LORE INICIAL
+        if (!apiKey) return res.status(200).json(fallbackIntro);
+
         try {
             const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
@@ -87,7 +173,7 @@ export default async function handler(req, res) {
                         content: "Eres un narrador de D&D. Genera introducciones cortas y épicas (máximo 35 palabras) en español sin markdown."
                     }, {
                         role: "user",
-                        content: `Escribe una frase narrativa de inicio para un héroe ${className || 'Guerrero'}.`
+                        content: `Escribe una frase narrativa de inicio para un héroe ${className}.`
                     }],
                     temperature: 0.7,
                     max_tokens: 100
@@ -104,8 +190,13 @@ export default async function handler(req, res) {
         }
 
     } catch (criticalError) {
-        // Captura global: NUNCA responder con 500
-        console.error("Error crítico en serverless function:", criticalError);
-        return res.status(200).json(fallbackExploration);
+        return res.status(200).json({
+            npcType: "warrior",
+            description: "Un veterano de la mazmorra te observa en la penumbra: \"Ten cuidado, aventurero... las paredes oyen tus pasos.\"",
+            choices: [
+                { text: "\"🗡️ [FUERZA] Avanzar despejando el pasillo\"", action: "strength" },
+                { text: "\"🚪 Explorar las estancias adyacentes\"", action: "pass" }
+            ]
+        });
     }
 }

@@ -94,7 +94,7 @@ class Game {
                 })
             });
             const eventData = await response.json();
-            
+
             // Imagen del PNJ según respuesta
             const npcImages = {
                 'warrior': 'img/guerrero.png',
@@ -105,10 +105,10 @@ class Game {
             if (sceneImg) sceneImg.src = npcImages[eventData.npcType] || 'img/guerrero.png';
 
             document.getElementById('explorationText').textContent = eventData.description;
-            
+
             const choicesContainer = document.getElementById('actionChoices');
             choicesContainer.innerHTML = '';
-            
+
             eventData.choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
@@ -124,11 +124,11 @@ class Game {
     // Método para iniciar combate TCG cuando la historia o decisión encuentra un enemigo
     startTcgCombat(enemyData) {
         this.currentEnemy = enemyData || { name: "Orco de las Sombras", hp: 60, maxHp: 60, atk: 12 };
-        
+
         // Cambiar vista de interfaz
         document.getElementById('actionChoices').style.display = 'none';
         document.getElementById('tcgCombatView').style.display = 'flex';
-        
+
         this.ui.logEvent(`⚔️ ¡ENTRAS EN COMBATE TCG contra ${this.currentEnemy.name}!`);
         this.updateTcgUI();
         this.drawTcgHand();
@@ -201,7 +201,7 @@ class Game {
     winTcgCombat() {
         this.audio.play('sega');
         this.ui.logEvent(`🏆 ¡Has derrotado a ${this.currentEnemy.name}!`);
-        
+
         // Recompensas RPG
         this.player.addGold(120);
         this.player.addXp(50);
@@ -210,7 +210,7 @@ class Game {
         // Volver al modo exploración RPG
         document.getElementById('tcgCombatView').style.display = 'none';
         document.getElementById('actionChoices').style.display = 'flex';
-        
+
         this.loadNextExplorationEvent();
     }
 
@@ -223,38 +223,50 @@ class Game {
     async handleExplorationChoice(action) {
         this.audio.play('card');
 
-        // Tirada de Dado D20
+        // Si la respuesta conversacional desata un combate de cartas TCG
+        if (action === 'combat') {
+            this.ui.logEvent(`⚔️ ¡La conversación ha terminado en desafío!`);
+            this.startTcgCombat({
+                name: `Enemigo de Planta ${this.dungeonLevel}`,
+                hp: 40 + (this.dungeonLevel * 15),
+                maxHp: 40 + (this.dungeonLevel * 15),
+                atk: 10 + (this.dungeonLevel * 2)
+            });
+            return;
+        }
+
+        // Lógica de Tirada D20 para acciones de habilidad
         const d20 = Math.floor(Math.random() * 20) + 1;
         const d20Box = document.getElementById('d20Overlay');
         const d20Val = document.getElementById('d20Val');
-        
+
         if (d20Box && d20Val) {
             d20Val.textContent = d20;
             d20Box.style.display = 'flex';
         }
 
         if (action === 'buy') {
-            if (this.player.gold >= 50) {
-                this.player.gold -= 50;
-                this.player.health = this.player.maxHealth;
-                this.ui.logEvent(`💊 Has comprado una poción (-50 Oro). ¡Salud al máximo!`);
+            if (this.player.gold >= 40) {
+                this.player.gold -= 40;
+                this.player.health = Math.min(this.player.maxHealth, this.player.health + 35);
+                this.ui.logEvent(`💰 Compras suministros (-40 Oro). Recuperas 35 HP.`);
             } else {
-                this.ui.logEvent(`❌ No tienes suficiente oro.`);
+                this.ui.logEvent(`❌ No tienes suficiente oro para el trato.`);
             }
         } else if (action === 'pass') {
-            this.ui.logEvent(`🏃 Has decidido no arriesgarte y pasar de largo.`);
+            this.ui.logEvent(`🏃 Te retiras con cautela sin llamar la atención.`);
         } else {
-            // Chequeo de D20
-            if (d20 >= 10) {
-                const xpGain = 40;
+            // Chequeo D20 (Fuerza / Magia)
+            if (d20 >= 9) {
+                const xpGain = 45;
                 const leveledUp = this.player.addXp(xpGain);
-                this.player.addGold(100);
-                this.ui.logEvent(`🎲 [Tirada D20: ${d20}] ¡ÉXITO! +100 Oro, +${xpGain} XP.`);
+                this.player.addGold(80);
+                this.ui.logEvent(`🎲 [Tirada D20: ${d20}] ¡ÉXITO NARRATIVO! +80 Oro, +${xpGain} XP.`);
                 if (leveledUp) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
             } else {
                 this.audio.play('hit');
-                this.player.health -= 25;
-                this.ui.logEvent(`🎲 [Tirada D20: ${d20}] ¡FALLO CRÍTICO! Sufres 25 de daño.`);
+                this.player.health -= 20;
+                this.ui.logEvent(`🎲 [Tirada D20: ${d20}] ¡FALLO DE HABILIDAD! Sufres 20 de daño.`);
             }
         }
 
@@ -266,7 +278,7 @@ class Game {
         }
 
         this.dungeonLevel++;
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1400));
         await this.loadNextExplorationEvent();
     }
 }
