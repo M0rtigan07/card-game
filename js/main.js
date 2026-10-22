@@ -122,42 +122,9 @@ class Game {
     }
 
     // Método para iniciar combate TCG cuando la historia o decisión encuentra un enemigo
-    startTcgCombat(enemyData) {
-        this.currentEnemy = enemyData || { name: "Orco de las Sombras", hp: 60, maxHp: 60, atk: 12, img: 'img/guerrero.png' };
+  
 
-        // Cambiar la ilustración del marco principal al del Enemigo
-        const sceneImg = document.getElementById('sceneImage');
-        if (sceneImg) {
-            sceneImg.src = this.currentEnemy.img || 'img/guerrero.png';
-        }
-
-        // Mostrar vista TCG
-        document.getElementById('actionChoices').style.display = 'none';
-        document.getElementById('tcgCombatView').style.display = 'flex';
-
-        this.ui.logEvent(`⚔️ ¡ENTRAS EN COMBATE TCG contra ${this.currentEnemy.name}!`);
-        this.updateTcgUI();
-        this.drawTcgHand();
-    }
-
-   drawTcgHand() {
-        // Mazo con imágenes locales o relativas
-        const availableCards = [
-            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, img: 'img/estocada.png', desc: 'Inflige 15 daño físico' },
-            { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, img: 'img/escudo.png', desc: 'Gana 10 de guardia' },
-            { id: 'fireball', name: 'Bola Fuego', cost: 2, type: 'atk', val: 25, img: 'img/bolafuego.png', desc: '25 daño mágico' },
-            { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, img: 'img/pocion.png', desc: 'Restaura 20 HP' }
-        ];
-
-        this.playerHand = [
-            availableCards[0],
-            availableCards[1],
-            availableCards[2],
-            availableCards[3]
-        ];
-
-        this.renderHand();
-    }
+  
 
     renderHand() {
         const handContainer = document.getElementById('playerHand');
@@ -185,14 +152,81 @@ class Game {
         });
     }
 
-    
+    // INICIAR COMBATE TCG
+    startTcgCombat(enemyData) {
+        const levelMultiplier = this.dungeonLevel;
+        
+        // Atributos del enemigo según la planta
+        this.currentEnemy = enemyData || {
+            name: `Aparecido de Planta ${this.dungeonLevel}`,
+            hp: 40 + (levelMultiplier * 18),
+            maxHp: 40 + (levelMultiplier * 18),
+            atk: 8 + (levelMultiplier * 3),
+            shield: 0,
+            img: 'img/maga.png'
+        };
 
+        this.playerShield = 0; // Escudo del jugador por turno
 
+        // Activar elementos visuales VS en la escena
+        document.getElementById('enemyPortraitContainer').style.display = 'flex';
+        document.getElementById('vsBadge').style.display = 'inline';
+        document.getElementById('enemyStatus').style.display = 'block';
+        document.getElementById('enemySceneImage').src = this.currentEnemy.img;
+        document.getElementById('enemyPortraitName').textContent = this.currentEnemy.name;
 
+        // Mostrar tablero TCG
+        document.getElementById('actionChoices').style.display = 'none';
+        document.getElementById('tcgCombatView').style.display = 'flex';
+
+        // Escuchar botón de Fin de Turno
+        const endTurnBtn = document.getElementById('endTurnTcgBtn');
+        if (endTurnBtn) {
+            endTurnBtn.onclick = () => this.executeEnemyTurn();
+        }
+
+        this.ui.logEvent(`⚔️ ¡ENTRAS EN COMBATE contra ${this.currentEnemy.name}!`);
+        this.updateTcgUI();
+        this.drawTcgHand();
+    }
+
+    // BASE DE DATOS DE CARTAS POR CLASE ESCALADAS POR NIVEL DEL JUGADOR
+    getClassDeck() {
+        const lvl = this.player.level; // Escalado por Nivel
+        const cKey = this.player.classKey || 'warrior';
+
+        const decks = {
+            'warrior': [
+                { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', val: 15 + (lvl * 5), img: 'img/guerrero.png', desc: `Inflige ${15 + (lvl * 5)} daño físico` },
+                { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', val: 12 + (lvl * 4), img: 'img/guerrero.png', desc: `Gana ${12 + (lvl * 4)} guardia` },
+                { id: 'whirlwind', name: 'Torbellino', cost: 2, type: 'atk', val: 28 + (lvl * 8), img: 'img/guerrero.png', desc: `Inflige ${28 + (lvl * 8)} daño pesado` },
+                { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', val: 18 + (lvl * 3), img: 'img/guerrero.png', desc: `Recupera ${18 + (lvl * 3)} HP` }
+            ],
+            'mage': [
+                { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', val: 25 + (lvl * 7), img: 'img/maga.png', desc: `Inflige ${25 + (lvl * 7)} daño arcano` },
+                { id: 'ice_barrier', name: 'Barrera de Hielo', cost: 1, type: 'def', val: 15 + (lvl * 5), img: 'img/maga.png', desc: `Gana ${15 + (lvl * 5)} guardia` },
+                { id: 'arcane_missile', name: 'Proyectiles', cost: 1, type: 'atk', val: 16 + (lvl * 4), img: 'img/maga.png', desc: `Inflige ${16 + (lvl * 4)} daño rápido` },
+                { id: 'mana_heal', name: 'Canalización', cost: 1, type: 'heal', val: 22 + (lvl * 4), img: 'img/maga.png', desc: `Sana ${22 + (lvl * 4)} HP` }
+            ],
+            'rogue': [
+                { id: 'backstab', name: 'Puñalada', cost: 1, type: 'atk', val: 20 + (lvl * 6), img: 'img/picaro.png', desc: `Inflige ${20 + (lvl * 6)} daño crítico` },
+                { id: 'evasion', name: 'Doble Paso', cost: 1, type: 'def', val: 14 + (lvl * 4), img: 'img/picaro.png', desc: `Gana ${14 + (lvl * 4)} esquiva/def` },
+                { id: 'poison_blade', name: 'Hoja Envenenada', cost: 2, type: 'atk', val: 32 + (lvl * 8), img: 'img/picaro.png', desc: `Inflige ${32 + (lvl * 8)} daño venenoso` },
+                { id: 'shadow_heal', name: 'Venda de Sombras', cost: 1, type: 'heal', val: 16 + (lvl * 3), img: 'img/picaro.png', desc: `Cura ${16 + (lvl * 3)} HP` }
+            ]
+        };
+
+        return decks[cKey] || decks['warrior'];
+    }
+
+    drawTcgHand() {
+        this.playerHand = [...this.getClassDeck()];
+        this.renderHand();
+    }
 
     playTcgCard(card, index) {
         if (this.player.mana < card.cost) {
-            this.ui.logEvent(`❌ ¡Maná insuficiente!`);
+            this.ui.logEvent(`❌ ¡Maná insuficiente para jugar ${card.name}!`);
             return;
         }
 
@@ -200,14 +234,24 @@ class Game {
         this.player.mana -= card.cost;
 
         if (card.type === 'atk') {
-            this.currentEnemy.hp -= card.val;
-            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${card.val} de daño.`);
+            // Aplicar daño primero al escudo del enemigo
+            let remainingAtk = card.val;
+            if (this.currentEnemy.shield > 0) {
+                const absorbed = Math.min(this.currentEnemy.shield, remainingAtk);
+                this.currentEnemy.shield -= absorbed;
+                remainingAtk -= absorbed;
+            }
+            this.currentEnemy.hp -= remainingAtk;
+            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${card.val} de daño a ${this.currentEnemy.name}.`);
+        } else if (card.type === 'def') {
+            this.playerShield += card.val;
+            this.ui.logEvent(`🛡️ Usas ${card.name} y obtienes ${card.val} de escudo.`);
         } else if (card.type === 'heal') {
             this.player.health = Math.min(this.player.maxHealth, this.player.health + card.val);
-            this.ui.logEvent(`✨ Usas ${card.name} y recuperas ${card.val} HP.`);
+            this.ui.logEvent(`✨ Usas ${card.name} y restauras ${card.val} HP.`);
         }
 
-        // Eliminar carta jugada
+        // Remover la carta jugada
         this.playerHand.splice(index, 1);
         this.renderHand();
         this.updateTcgUI();
@@ -218,27 +262,82 @@ class Game {
         }
     }
 
+    // TURNO DEL ENEMIGO
+    executeEnemyTurn() {
+        if (!this.currentEnemy || this.currentEnemy.hp <= 0) return;
+
+        this.ui.logEvent(`⏳ Fin de tu turno. ¡${this.currentEnemy.name} contraataca!`);
+        this.audio.play('hit');
+
+        // Cálculo de daño recibido (absorbido por el escudo del jugador)
+        let incomingDmg = this.currentEnemy.atk;
+        if (this.playerShield > 0) {
+            const absorbed = Math.min(this.playerShield, incomingDmg);
+            this.playerShield -= absorbed;
+            incomingDmg -= absorbed;
+            this.ui.logEvent(`🛡️ Tu guardia absorbió ${absorbed} de daño.`);
+        }
+
+        if (incomingDmg > 0) {
+            this.player.health -= incomingDmg;
+            this.ui.logEvent(`💥 Recibes ${incomingDmg} de daño del enemigo.`);
+        }
+
+        // Reiniciar maná para el nuevo turno del jugador
+        this.player.mana = this.player.maxMana;
+        this.playerShield = 0; // Se resetea la guardia por turno
+
+        // Comprobar derrota del jugador
+        if (this.player.health <= 0) {
+            this.ui.showGameOver();
+            return;
+        }
+
+        // Robar nueva mano
+        this.drawTcgHand();
+        this.updateTcgUI();
+    }
+
     winTcgCombat() {
         this.audio.play('sega');
         this.ui.logEvent(`🏆 ¡Has derrotado a ${this.currentEnemy.name}!`);
 
         // Recompensas RPG
-        this.player.addGold(120);
-        this.player.addXp(50);
-        this.ui.updateStats(this.player, this.dungeonLevel);
+        this.player.addGold(100 + (this.dungeonLevel * 15));
+        const leveledUp = this.player.addXp(60);
+        
+        if (leveledUp) {
+            this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
+        }
 
-        // Volver al modo exploración RPG
+        // Ocultar visuales del combate
+        document.getElementById('enemyPortraitContainer').style.display = 'none';
+        document.getElementById('vsBadge').style.display = 'none';
+        document.getElementById('enemyStatus').style.display = 'none';
         document.getElementById('tcgCombatView').style.display = 'none';
+        
+        // Volver al modo RPG
         document.getElementById('actionChoices').style.display = 'flex';
-
+        this.dungeonLevel++;
         this.loadNextExplorationEvent();
     }
 
     updateTcgUI() {
         document.getElementById('enemyName').textContent = this.currentEnemy.name;
         document.getElementById('enemyHp').textContent = `❤️ HP: ${Math.max(0, this.currentEnemy.hp)}/${this.currentEnemy.maxHp}`;
+        document.getElementById('enemyAtk').textContent = `⚔️ ATK: ${this.currentEnemy.atk}`;
+        document.getElementById('enemyShield').textContent = `🛡️ DEF: ${this.currentEnemy.shield}`;
         this.ui.updateStats(this.player, this.dungeonLevel);
     }
+
+
+
+
+   
+
+   
+
+    
 
     async handleExplorationChoice(action) {
         this.audio.play('card');
