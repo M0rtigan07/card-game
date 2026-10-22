@@ -5,15 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Mazo del Destino - 16-Bit Edition</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-    <!-- PANTALLA DE TÍTULO -->
+    <!-- 1. PANTALLA DE TÍTULO -->
     <div id="titleScreen" class="screen active">
         <div class="title-content-box">
             <div class="sega-logo">SEGA RPG SYSTEM</div>
@@ -22,7 +20,7 @@
         </div>
     </div>
 
-    <!-- SELECCIÓN DE PERSONAJE -->
+    <!-- 2. SELECCIÓN DE PERSONAJE -->
     <div id="charScreen" class="screen">
         <div class="retro-heading">SELECCIONA TU HÉROE</div>
         <div class="char-grid">
@@ -49,24 +47,24 @@
         </div>
     </div>
 
-    <!-- INTRO STORY SCREEN -->
+    <!-- 3. INTRO STORY SCREEN -->
     <div id="introScreen" class="screen">
         <div class="intro-container">
-            <!-- LADO IZQUIERDO: PORTRAIT / CARTA DEL HÉROE -->
-            <div class="intro-hero-portrait" id="introHeroPortrait">
-                <!-- Se llenará dinámicamente con JS -->
+            <!-- LADO IZQUIERDO: PORTRAIT DEL HÉROE -->
+            <div class="intro-hero-portrait">
+                <img id="introHeroImg" src="" alt="Héroe Elegido">
             </div>
 
             <!-- LADO DERECHO: DIÁLOGO NARRATIVO Y BOTÓN -->
             <div class="intro-narrative-box">
-                <div class="intro-header-title" id="introHeroTitle">EL DESTINO DEL HÉROE</div>
-                <div class="typewriter-box" id="introText">Cargando el oráculo...</div>
+                <div class="intro-header-title" id="introHeroTitle">DESTINO DEL HÉROE</div>
+                <div class="typewriter-box" id="introText"></div>
                 <button class="fantasy-btn" id="btnEnterDungeon">ENTRAR A LA MAZMORRA ►</button>
             </div>
         </div>
     </div>
 
-    <!-- TABLERO DE JUEGO PRINCIPAL -->
+    <!-- 4. TABLERO DE JUEGO PRINCIPAL -->
     <div id="gameScreen" class="screen">
         <div class="container">
             <div id="leftSidebar">
@@ -114,11 +112,9 @@
             <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
                 <button class="fantasy-btn" id="btnAttack">⚔️ Atacar</button>
                 <button class="fantasy-btn" id="btnDefend">🛡️ Defender</button>
-                <button class="fantasy-btn" id="btnSpell"
-                    style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color:white;">🔮 Hechizo</button>
+                <button class="fantasy-btn" id="btnSpell" style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color:white;">🔮 Hechizo</button>
             </div>
-            <ul id="battle-event-list"
-                style="list-style:none; max-height:80px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.8em;">
+            <ul id="battle-event-list" style="list-style:none; max-height:80px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.8em;">
             </ul>
         </div>
     </div>
