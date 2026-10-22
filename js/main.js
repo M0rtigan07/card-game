@@ -139,7 +139,7 @@ class Game {
             enemyImg = 'img/dragon.png';
             enemyName = 'Dragón Anciano';
         } else {
-            enemyImg = 'img/guerrero.png';
+            enemyImg = 'img/guerreroCorrupto.png';
             enemyName = 'Guerrero Corrupto';
         }
 
@@ -306,10 +306,11 @@ class Game {
         this.updateTcgUI();
     }
 
-    winTcgCombat() {
+    async winTcgCombat() {
         this.audio.play('sega');
         this.ui.logEvent(`🏆 ¡Has derrotado a ${this.currentEnemy.name}!`);
 
+        // Recompensas RPG
         this.player.addGold(100 + (this.dungeonLevel * 15));
         const leveledUp = this.player.addXp(60);
 
@@ -317,11 +318,26 @@ class Game {
             this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
+        // Ocultar visuales del combate de cartas
         document.getElementById('enemyPortraitContainer').style.display = 'none';
         document.getElementById('vsBadge').style.display = 'none';
         document.getElementById('enemyStatus').style.display = 'none';
         document.getElementById('tcgCombatView').style.display = 'none';
 
+        // MOSTRAR MODAL CON EL GIF ANIMADO DE VICTORIA
+        const victoryModal = document.getElementById('victoryAnimationModal');
+        if (victoryModal) {
+            victoryModal.style.display = 'flex';
+        }
+
+        // Esperar 3 segundos viendo la animación del GIF y luego avanzar
+        await new Promise(r => setTimeout(r, 3000));
+
+        if (victoryModal) {
+            victoryModal.style.display = 'none';
+        }
+
+        // Volver al modo exploración RPG y subir de planta
         document.getElementById('actionChoices').style.display = 'flex';
         this.dungeonLevel++;
         this.loadNextExplorationEvent();

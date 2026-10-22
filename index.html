@@ -85,6 +85,19 @@
 
     <!-- 4. TABLERO DE JUEGO Y EXPLORACIÓN D&D -->
     <div id="gameScreen" class="screen">
+
+        <!-- CONTENEDOR DE ANIMACIÓN DE VICTORIA (GIF PIXEL ART) -->
+        <div id="victoryAnimationModal" class="modal" style="display:none;">
+            <div class="fantasy-modal victory-modal-box">
+                <h2>¡VICTORIA TCG!</h2>
+                <div class="pixel-gif-container">
+                    <!-- Coloca aquí tu archivo gif en pixel art, por ejemplo: img/victory_fx.gif -->
+                    <img src="img/victoria_pergamino.gif" alt="Victoria Pixel Art" class="victory-pixel-gif">
+                </div>
+                <p id="victoryRewardText">¡Has barrido al enemigo de la mazmorra!</p>
+            </div>
+        </div>
+
         <div class="container">
             <!-- PANEL IZQUIERDO: HOJA DE PERSONAJE -->
             <div id="leftSidebar">
@@ -156,13 +169,15 @@
                 <div id="actionChoices" class="choices-container"></div>
 
                 <!-- TABLERO DE COMBATE TCG -->
-                <div id="tcgCombatView" style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
+                <div id="tcgCombatView"
+                    style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
                     <!-- MANO DE CARTAS DEL JUGADOR -->
                     <div id="playerHand" class="tcg-hand">
                         <!-- Se generan dinámicamente -->
                     </div>
 
-                    <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn ⏳</button>
+                    <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn
+                        ⏳</button>
                 </div>
             </div>
 
@@ -172,7 +187,8 @@
                 <ul id="eventList"></ul>
                 <!-- IMAGEN INFERIOR DEL DRAGÓN EN EL DIARIO -->
                 <div class="sidebar-dragon-box">
-                    <img src="img/dragon.png" alt="Dragón Guardián" class="sidebar-dragon-img" onerror="this.style.display='none'">
+                    <img src="img/dragon.png" alt="Dragón Guardián" class="sidebar-dragon-img"
+                        onerror="this.style.display='none'">
                 </div>
             </div>
         </div>

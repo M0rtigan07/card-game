@@ -875,3 +875,34 @@ h1 {
 .sidebar-dragon-img:hover {
     transform: scale(1.05);
 }
+
+/* ESTILOS PARA EL MODAL Y GIF DE VICTORIA */
+.victory-modal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border: 3px solid var(--gold);
+    background: radial-gradient(circle, #2a1642 0%, #0d0617 100%);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pixel-gif-container {
+    width: 200px;
+    height: 140px;
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.victory-pixel-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
