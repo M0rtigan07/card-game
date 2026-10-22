@@ -108,11 +108,12 @@
             </div>
 
             <!-- PANEL CENTRAL: ESCENA VISUAL D&D + DIÁLOGOS + DADO D20 -->
+            <!-- PANEL CENTRAL: EXPLORACIÓN O COMBATE TCG -->
             <div id="mainContent">
-                <h1 id="dungeonTitle">Cámara de la MazmorRA</h1>
+                <h1 id="dungeonTitle">Cámara de la Mazmorra</h1>
 
-                <!-- VISOR DE ESCENA VISUAL (PNJ / MONSTRUO / ESCENARIO) -->
-                <div class="scene-frame">
+                <!-- VISOR DE ESCENA RPG -->
+                <div id="rpgSceneView" class="scene-frame">
                     <img id="sceneImage" src="img/guerrero.png" alt="Escena de la Mazmorra">
                     <div class="d20-overlay" id="d20Overlay" style="display:none;">
                         <span class="d20-label">TIRADA D20</span>
@@ -120,14 +121,30 @@
                     </div>
                 </div>
 
-                <!-- DIÁLOGO / DESCRIPCIÓN DEL DUNGEON MASTER -->
+                <!-- DIÁLOGO / MISIONES RPG -->
                 <div id="explorationBox" class="exploration-panel">
-                    <p id="explorationText">El Dungeon Master está tejiendo el destino de la planta...</p>
+                    <p id="explorationText">El Dungeon Master está tejiendo tu misión...</p>
                 </div>
 
-                <!-- DECISIONES NARRATIVAS / OPCIONES D&D -->
-                <div id="actionChoices" class="choices-container">
-                    <!-- Opciones dinámicas de Groq AI -->
+                <!-- OPCIONES EXPLORACIÓN RPG -->
+                <div id="actionChoices" class="choices-container"></div>
+
+                <!-- TABLERO DE COMBATE TCG (ESTILO MAGIC / SLAY THE SPIRE) -->
+                <div id="tcgCombatView"
+                    style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
+                    <!-- ENEMY STATUS -->
+                    <div id="enemyStatus" class="enemy-card-status">
+                        <h3 id="enemyName">Esqueleto Guerrero</h3>
+                        <p id="enemyHp">❤️ HP: 50/50</p>
+                    </div>
+
+                    <!-- MANO DE CARTAS DEL JUGADOR -->
+                    <div id="playerHand" class="tcg-hand">
+                        <!-- Las cartas jugables se generan dinámicamente -->
+                    </div>
+
+                    <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn
+                        ⏳</button>
                 </div>
             </div>
 

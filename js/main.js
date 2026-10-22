@@ -9,6 +9,9 @@ class Game {
         this.groq = new GroqAI();
         this.ui = new UIManager();
 
+        this.currentEnemy = null;
+        this.playerHand = [];
+
         this.player = null;
         this.dungeonLevel = 1;
 
@@ -116,6 +119,105 @@ class Game {
         } catch (err) {
             document.getElementById('explorationText').textContent = "Avanzas por un pasillo silencioso sin amenazas a la vista.";
         }
+    }
+
+    // Método para iniciar combate TCG cuando la historia o decisión encuentra un enemigo
+    startTcgCombat(enemyData) {
+        this.currentEnemy = enemyData || { name: "Orco de las Sombras", hp: 60, maxHp: 60, atk: 12 };
+        
+        // Cambiar vista de interfaz
+        document.getElementById('actionChoices').style.display = 'none';
+        document.getElementById('tcgCombatView').style.display = 'flex';
+        
+        this.ui.logEvent(`⚔️ ¡ENTRAS EN COMBATE TCG contra ${this.currentEnemy.name}!`);
+        this.updateTcgUI();
+        this.drawTcgHand();
+    }
+
+    drawTcgHand() {
+        // Baraja de cartas tácticas
+        const availableCards = [
+            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, desc: 'Inflige 15 de daño' },
+            { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, desc: 'Gana 10 de guardia' },
+            { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', val: 25, desc: 'Inflige 25 de daño mágico' },
+            { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, desc: 'Restaura 20 HP' }
+        ];
+
+        this.playerHand = [
+            availableCards[0],
+            availableCards[1],
+            availableCards[2],
+            availableCards[3]
+        ];
+
+        this.renderHand();
+    }
+
+    renderHand() {
+        const handContainer = document.getElementById('playerHand');
+        handContainer.innerHTML = '';
+
+        this.playerHand.forEach((card, index) => {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'tcg-card';
+            cardEl.innerHTML = `
+                <span class="cost">🔮 ${card.cost} MP</span>
+                <span class="title">${card.name}</span>
+                <span class="desc">${card.desc}</span>
+            `;
+            cardEl.addEventListener('click', () => this.playTcgCard(card, index));
+            handContainer.appendChild(cardEl);
+        });
+    }
+
+    playTcgCard(card, index) {
+        if (this.player.mana < card.cost) {
+            this.ui.logEvent(`❌ ¡Maná insuficiente!`);
+            return;
+        }
+
+        this.audio.play('card');
+        this.player.mana -= card.cost;
+
+        if (card.type === 'atk') {
+            this.currentEnemy.hp -= card.val;
+            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${card.val} de daño.`);
+        } else if (card.type === 'heal') {
+            this.player.health = Math.min(this.player.maxHealth, this.player.health + card.val);
+            this.ui.logEvent(`✨ Usas ${card.name} y recuperas ${card.val} HP.`);
+        }
+
+        // Eliminar carta jugada
+        this.playerHand.splice(index, 1);
+        this.renderHand();
+        this.updateTcgUI();
+
+        // Comprobar victoria TCG
+        if (this.currentEnemy.hp <= 0) {
+            this.winTcgCombat();
+        }
+    }
+
+    winTcgCombat() {
+        this.audio.play('sega');
+        this.ui.logEvent(`🏆 ¡Has derrotado a ${this.currentEnemy.name}!`);
+        
+        // Recompensas RPG
+        this.player.addGold(120);
+        this.player.addXp(50);
+        this.ui.updateStats(this.player, this.dungeonLevel);
+
+        // Volver al modo exploración RPG
+        document.getElementById('tcgCombatView').style.display = 'none';
+        document.getElementById('actionChoices').style.display = 'flex';
+        
+        this.loadNextExplorationEvent();
+    }
+
+    updateTcgUI() {
+        document.getElementById('enemyName').textContent = this.currentEnemy.name;
+        document.getElementById('enemyHp').textContent = `❤️ HP: ${Math.max(0, this.currentEnemy.hp)}/${this.currentEnemy.maxHp}`;
+        this.ui.updateStats(this.player, this.dungeonLevel);
     }
 
     async handleExplorationChoice(action) {

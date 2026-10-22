@@ -690,3 +690,66 @@ h1 {
     background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
     transform: translateX(4px);
 }
+
+/* SISTEMA DE COMBATE TCG ESTILO MAGIC */
+.enemy-card-status {
+    background: linear-gradient(135deg, #450a0a 0%, #180505 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 8px 20px;
+    color: #fca5a5;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.tcg-hand {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 140px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px dashed var(--gold-border);
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.tcg-card {
+    width: 95px;
+    height: 130px;
+    background: linear-gradient(145deg, #1e1b4b 0%, #0f172a 100%);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tcg-card:hover {
+    transform: translateY(-10px) scale(1.08);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+}
+
+.tcg-card .cost {
+    font-size: 0.7em;
+    color: #60a5fa;
+    font-weight: bold;
+    align-self: flex-start;
+}
+
+.tcg-card .title {
+    font-size: 0.75em;
+    color: var(--gold);
+    text-align: center;
+}
+
+.tcg-card .desc {
+    font-size: 0.6em;
+    color: #cbd5e1;
+    text-align: center;
+}
