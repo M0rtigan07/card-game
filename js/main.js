@@ -53,15 +53,18 @@ class Game {
     }
 
     async initGame() {
-        // Simular progreso de carga de recursos e imágenes
-        this.ui.setLoadingProgress(30, "CARGANDO GRÁFICOS 16-BIT...");
-        await new Promise(r => setTimeout(r, 400));
+        // Aumentamos los tiempos para que la carga sea más pausada y atmosférica
+        this.ui.setLoadingProgress(20, "INICIALIZANDO SISTEMA SEGA...");
+        await new Promise(r => setTimeout(r, 800));
 
-        this.ui.setLoadingProgress(70, "INICIALIZANDO SONIDOS SEGA...");
-        await new Promise(r => setTimeout(r, 400));
+        this.ui.setLoadingProgress(50, "CARGANDO GRÁFICOS 16-BIT...");
+        await new Promise(r => setTimeout(r, 1000));
+
+        this.ui.setLoadingProgress(80, "PREPARANDO MAZO DE CARTAS...");
+        await new Promise(r => setTimeout(r, 900));
 
         this.ui.setLoadingProgress(100, "¡SISTEMA LISTO!");
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 700));
 
         // Transición suave a la pantalla de título
         this.ui.showScreen('titleScreen');
