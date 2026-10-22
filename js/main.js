@@ -52,6 +52,21 @@ class Game {
         document.getElementById('btnSpell').addEventListener('click', () => this.battle.executeTurn('spell', this.player));
     }
 
+    async initGame() {
+        // Simular progreso de carga de recursos e imágenes
+        this.ui.setLoadingProgress(30, "CARGANDO GRÁFICOS 16-BIT...");
+        await new Promise(r => setTimeout(r, 400));
+
+        this.ui.setLoadingProgress(70, "INICIALIZANDO SONIDOS SEGA...");
+        await new Promise(r => setTimeout(r, 400));
+
+        this.ui.setLoadingProgress(100, "¡SISTEMA LISTO!");
+        await new Promise(r => setTimeout(r, 300));
+
+        // Transición suave a la pantalla de título
+        this.ui.showScreen('titleScreen');
+    }
+
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
@@ -159,7 +174,13 @@ class Game {
     }
 }
 
-// Iniciar aplicación
-window.addEventListener('DOMContentLoaded', () => {
+
+// Iniciar aplicación de forma segura
+window.addEventListener('DOMContentLoaded', async () => {
     window.game = new Game();
+    try {
+        await window.game.initGame();
+    } catch (err) {
+        console.error("Error al iniciar el juego:", err);
+    }
 });

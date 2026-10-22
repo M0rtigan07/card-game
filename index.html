@@ -5,11 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Mazo del Destino - 16-Bit Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@600;700;900&family=UnifrakturCook:wght@700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Configuración PWA y para tablets Android -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+
 </head>
 
 <body>
+
+    <!-- PANTALLA DE CARGA (LOADING SCREEN) -->
+    <div id="loadingScreen" class="screen active">
+        <div class="loading-box">
+            <div class="sega-logo">SEGA RPG SYSTEM</div>
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">CARGANDO RECURSOS...</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- 1. PANTALLA DE TÍTULO -->
     <div id="titleScreen" class="screen active">
@@ -112,9 +134,11 @@
             <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
                 <button class="fantasy-btn" id="btnAttack">⚔️ Atacar</button>
                 <button class="fantasy-btn" id="btnDefend">🛡️ Defender</button>
-                <button class="fantasy-btn" id="btnSpell" style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color:white;">🔮 Hechizo</button>
+                <button class="fantasy-btn" id="btnSpell"
+                    style="background: linear-gradient(90deg, #60a5fa, #3b82f6); color:white;">🔮 Hechizo</button>
             </div>
-            <ul id="battle-event-list" style="list-style:none; max-height:80px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.8em;">
+            <ul id="battle-event-list"
+                style="list-style:none; max-height:80px; overflow-y:auto; text-align:left; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-size:0.8em;">
             </ul>
         </div>
     </div>
@@ -130,6 +154,17 @@
 
     <!-- CARGA MODULAR CON ES6 MODULES -->
     <script type="module" src="js/main.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('Service Worker no registrado: ', err);
+                });
+            });
+        }
+    </script>
+
 </body>
 
 </html>

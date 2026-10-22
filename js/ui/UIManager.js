@@ -35,6 +35,13 @@ export class UIManager {
         }, 30);
     }
 
+    setLoadingProgress(percent, message = "CARGANDO...") {
+        const bar = document.getElementById('loadingBar');
+        const txt = document.getElementById('loadingText');
+        if (bar) bar.style.width = `${percent}%`;
+        if (txt) txt.textContent = message;
+    }
+
     updateStats(player, dungeonLevel) {
         document.getElementById('heroClass').textContent = player.className;
         document.getElementById('lvlVal').textContent = player.level;
