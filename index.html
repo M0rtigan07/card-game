@@ -72,7 +72,7 @@
     <div id="introScreen" class="screen">
         <div class="intro-container">
             <div class="intro-hero-portrait">
-                <img id="introHeroImg" src="" alt="Héroe Elegido">
+                <img id="introHeroImg" src="img/guerrero.png" alt="Héroe Elegido">
             </div>
 
             <div class="intro-narrative-box">
@@ -107,12 +107,9 @@
                 <ul id="playerInventory"></ul>
             </div>
 
-            <!-- PANEL CENTRAL: ESCENA VISUAL D&D + DIÁLOGOS + DADO D20 -->
             <!-- PANEL CENTRAL: EXPLORACIÓN O COMBATE TCG -->
             <div id="mainContent">
                 <h1 id="dungeonTitle">Cámara de la Mazmorra</h1>
-
-                <!-- VISOR DE ESCENA RPG -->
 
                 <!-- VISOR DE ESCENA RPG (VS BATTLE VIEW) -->
                 <div id="rpgSceneView" class="scene-frame">
@@ -128,7 +125,7 @@
 
                         <!-- Retrato del Enemigo (Solo en Combate TCG) -->
                         <div class="character-portrait" id="enemyPortraitContainer" style="display:none;">
-                            <img id="enemySceneImage" src="img/maga.png" alt="Enemigo">
+                            <img id="enemySceneImage" src="img/gargola.png" alt="Enemigo">
                             <span class="character-tag enemy-tag" id="enemyPortraitName">ENEMIGO</span>
                         </div>
                     </div>
@@ -140,9 +137,9 @@
                     </div>
                 </div>
 
-                <!-- PANEL ATRIBUTOS DEL ENEMIGO -->
+                <!-- ÚNICO PANEL DE ATRIBUTOS DEL ENEMIGO -->
                 <div id="enemyStatus" class="enemy-card-status" style="display:none;">
-                    <h3 id="enemyName">Esqueleto Guerrero</h3>
+                    <h3 id="enemyName">Estatua de Gárgola</h3>
                     <div class="enemy-stats-row">
                         <span id="enemyHp">❤️ HP: 100/100</span>
                         <span id="enemyAtk">⚔️ ATK: 12</span>
@@ -158,22 +155,14 @@
                 <!-- OPCIONES EXPLORACIÓN RPG -->
                 <div id="actionChoices" class="choices-container"></div>
 
-                <!-- TABLERO DE COMBATE TCG (ESTILO MAGIC / SLAY THE SPIRE) -->
-                <div id="tcgCombatView"
-                    style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
-                    <!-- ENEMY STATUS -->
-                    <div id="enemyStatus" class="enemy-card-status">
-                        <h3 id="enemyName">Esqueleto Guerrero</h3>
-                        <p id="enemyHp">❤️ HP: 50/50</p>
-                    </div>
-
+                <!-- TABLERO DE COMBATE TCG -->
+                <div id="tcgCombatView" style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
                     <!-- MANO DE CARTAS DEL JUGADOR -->
                     <div id="playerHand" class="tcg-hand">
-                        <!-- Las cartas jugables se generan dinámicamente -->
+                        <!-- Se generan dinámicamente -->
                     </div>
 
-                    <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn
-                        ⏳</button>
+                    <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn ⏳</button>
                 </div>
             </div>
 
@@ -181,6 +170,10 @@
             <div id="rightSidebar">
                 <h2>Diario de Aventura</h2>
                 <ul id="eventList"></ul>
+                <!-- IMAGEN INFERIOR DEL DRAGÓN EN EL DIARIO -->
+                <div class="sidebar-dragon-box">
+                    <img src="img/dragon.png" alt="Dragón Guardián" class="sidebar-dragon-img" onerror="this.style.display='none'">
+                </div>
             </div>
         </div>
     </div>

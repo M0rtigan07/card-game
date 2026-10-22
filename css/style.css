@@ -852,3 +852,26 @@ h1 {
     margin-top: 4px;
     font-weight: bold;
 }
+
+/* ILUSTRACIÓN DEL DRAGÓN EN LA PARTE INFERIOR DEL DIARIO DE AVENTURA */
+.sidebar-dragon-box {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--gold-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar-dragon-img {
+    width: 100%;
+    max-height: 160px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+    transition: transform 0.3s ease;
+}
+
+.sidebar-dragon-img:hover {
+    transform: scale(1.05);
+}
