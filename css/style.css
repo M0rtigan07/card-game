@@ -691,57 +691,95 @@ h1 {
     transform: translateX(4px);
 }
 
-/* ESTILOS DE CARTA TCG CON ARTE PIXEL ART */
+/* CONTENEDOR HORIZONTAL DE CARTAS (ESTILO HEARTHSTONE / MAGIC) */
+.tcg-hand {
+    display: flex;
+    flex-direction: row; /* Fuerza la disposición horizontal */
+    justify-content: center;
+    align-items: flex-end;
+    gap: -15px; /* Ligero solapamiento estilo abanico */
+    width: 100%;
+    min-height: 180px;
+    padding: 15px 10px;
+    background: rgba(10, 5, 20, 0.6);
+    border: 2px solid var(--gold-border);
+    border-radius: 12px;
+    overflow-x: auto;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* CARTA INDIVIDUAL ESTILO TCG PREMIUM */
 .tcg-card {
-    width: 105px;
-    height: 145px;
-    background: linear-gradient(145deg, #1e1b4b 0%, #0f172a 100%);
-    border: 2px solid var(--gold);
-    border-radius: 8px;
+    width: 110px;
+    height: 160px;
+    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
+    border: 2px solid #d4af37;
+    border-radius: 10px;
     padding: 6px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    position: relative;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+    flex-shrink: 0; /* Evita que las cartas se aplasten si hay varias */
 }
 
+/* EFECTO HOVER EN ABANICO */
 .tcg-card:hover {
-    transform: translateY(-10px) scale(1.08);
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-    border-color: #fef08a;
+    transform: translateY(-20px) scale(1.15) rotate(0deg) !important;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 10px 20px rgba(0, 0, 0, 0.9);
+    border-color: #fff176;
+}
+
+/* GEMA DE MANÁ EN LA CARTA */
+.tcg-card .cost-gem {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 26px;
+    height: 26px;
+    background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
+    border: 2px solid #93c5fd;
+    border-radius: 50%;
+    color: white;
+    font-size: 0.65em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
 }
 
 .tcg-card-img {
     width: 100%;
-    height: 50px;
-    object-fit: contain;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--gold-border);
-    border-radius: 4px;
-    image-rendering: pixelated; /* Mantiene la nitidez retro */
-    margin: 2px 0;
-}
-
-.tcg-card .cost {
-    font-size: 0.65em;
-    color: #60a5fa;
-    font-family: 'Press Start 2P', cursive;
-    align-self: flex-start;
+    height: 65px;
+    object-fit: cover;
+    border: 1px solid #d4af37;
+    border-radius: 5px;
+    margin-top: 8px;
+    image-rendering: pixelated;
 }
 
 .tcg-card .title {
-    font-size: 0.7em;
-    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.72em;
+    color: #fef08a;
     font-weight: bold;
     text-align: center;
+    margin: 2px 0;
 }
 
 .tcg-card .desc {
     font-size: 0.58em;
     color: #cbd5e1;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 3px;
+    border-radius: 4px;
+    width: 100%;
 }

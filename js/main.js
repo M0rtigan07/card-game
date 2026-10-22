@@ -140,12 +140,12 @@ class Game {
         this.drawTcgHand();
     }
 
-    drawTcgHand() {
-        // Mazo con ilustraciones Pixel Art asignadas
+   drawTcgHand() {
+        // Mazo con imágenes locales o relativas
         const availableCards = [
-            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, img: 'img/estocada.png', desc: 'Inflige 15 de daño físico' },
+            { id: 'strike', name: 'Estocada', cost: 1, type: 'atk', val: 15, img: 'img/estocada.png', desc: 'Inflige 15 daño físico' },
             { id: 'shield', name: 'Escudo', cost: 1, type: 'def', val: 10, img: 'img/escudo.png', desc: 'Gana 10 de guardia' },
-            { id: 'fireball', name: 'Bola Fuego', cost: 2, type: 'atk', val: 25, img: 'img/bolaFuego.png', desc: '25 daño mágico' },
+            { id: 'fireball', name: 'Bola Fuego', cost: 2, type: 'atk', val: 25, img: 'img/bolafuego.png', desc: '25 daño mágico' },
             { id: 'heal', name: 'Poción', cost: 1, type: 'heal', val: 20, img: 'img/pocion.png', desc: 'Restaura 20 HP' }
         ];
 
@@ -161,21 +161,31 @@ class Game {
 
     renderHand() {
         const handContainer = document.getElementById('playerHand');
+        if (!handContainer) return;
+        
         handContainer.innerHTML = '';
 
         this.playerHand.forEach((card, index) => {
             const cardEl = document.createElement('div');
             cardEl.className = 'tcg-card';
+            
+            // Ligera inclinación para efecto abanico
+            const rotation = (index - (this.playerHand.length - 1) / 2) * 4;
+            cardEl.style.transform = `rotate(${rotation}deg)`;
+
             cardEl.innerHTML = `
-                <span class="cost">🔮 ${card.cost} MP</span>
-                <img src="${card.img}" alt="${card.name}" class="tcg-card-img">
+                <div class="cost-gem">${card.cost}</div>
+                <img src="${card.img}" alt="${card.name}" class="tcg-card-img" onerror="this.src='img/guerrero.png'">
                 <span class="title">${card.name}</span>
                 <span class="desc">${card.desc}</span>
             `;
+            
             cardEl.addEventListener('click', () => this.playTcgCard(card, index));
             handContainer.appendChild(cardEl);
         });
     }
+
+    
 
 
 
