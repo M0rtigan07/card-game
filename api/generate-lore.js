@@ -167,13 +167,13 @@ export default async function handler(req, res) {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
+                    model: "openai/gpt-oss-120b",
                     messages: [{
                         role: "system",
-                        content: "Eres un narrador de D&D. Genera introducciones cortas y épicas (máximo 35 palabras) en español sin markdown."
+                        content: "Eres un narrador de D&D. Genera introducciones épicas  en español sin markdown."
                     }, {
                         role: "user",
-                        content: `Escribe una frase narrativa de inicio para un héroe ${className}.`
+                        content: `Escribe una frase epica narrativa de inicio para un héroe ${className}.`
                     }],
                     temperature: 0.7,
                     max_tokens: 100
