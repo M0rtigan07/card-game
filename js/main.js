@@ -56,14 +56,21 @@ class Game {
         this.audio.play('card');
         this.player = new Player(classKey);
 
+        // Mapeo dinámico de retratos según la clase
         const heroImages = {
             'warrior': 'img/guerrero.png',
             'mage': 'img/maga.png',
             'rogue': 'img/picaro.png'
         };
 
+        // Guardamos la imagen de clase en la instancia del jugador
+        this.player.img = heroImages[classKey] || heroImages['warrior'];
+
+        // Actualizamos tanto la pantalla de intro como el visor principal del juego
         const heroImgEl = document.getElementById('introHeroImg');
-        if (heroImgEl) heroImgEl.src = heroImages[classKey] || heroImages['warrior'];
+        const sceneImg = document.getElementById('sceneImage');
+        if (heroImgEl) heroImgEl.src = this.player.img;
+        if (sceneImg) sceneImg.src = this.player.img;
 
         document.getElementById('introHeroTitle').textContent = `CLASE: ${this.player.className.toUpperCase()}`;
         this.ui.showScreen('introScreen');
@@ -75,6 +82,13 @@ class Game {
 
     async startMainGame() {
         this.dungeonLevel = 1;
+
+        // Garantizar que el visor muestra la imagen del héroe seleccionado
+        const sceneImg = document.getElementById('sceneImage');
+        if (sceneImg && this.player?.img) {
+            sceneImg.src = this.player.img;
+        }
+
         this.ui.updateStats(this.player, this.dungeonLevel);
         this.ui.logEvent(`🐉 ¡${this.player.className} entra en la Planta ${this.dungeonLevel}!`);
         await this.loadNextExplorationEvent();
@@ -83,6 +97,12 @@ class Game {
     async loadNextExplorationEvent() {
         document.getElementById('explorationText').textContent = "Escuchando los pasos en la penumbra...";
         document.getElementById('d20Overlay').style.display = 'none';
+
+        // Asegurar que el marco del héroe muestre la imagen del Pícaro/Maga/Guerrero
+        const sceneImg = document.getElementById('sceneImage');
+        if (sceneImg && this.player?.img) {
+            sceneImg.src = this.player.img;
+        }
 
         try {
             const response = await fetch("/api/generate-lore", {
@@ -95,14 +115,6 @@ class Game {
                 })
             });
             const eventData = await response.json();
-
-            const npcImages = {
-                'warrior': 'img/guerrero.png',
-                'mage': 'img/maga.png',
-                'rogue': 'img/picaro.png'
-            };
-            const sceneImg = document.getElementById('sceneImage');
-            if (sceneImg) sceneImg.src = npcImages[eventData.npcType] || 'img/guerrero.png';
 
             document.getElementById('explorationText').textContent = eventData.description;
 
