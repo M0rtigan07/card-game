@@ -157,7 +157,7 @@ class Game {
         if (sceneImg && this.player?.img) {
             sceneImg.src = this.player.img;
         } const mainContent = document.getElementById('mainContent');
-        const explorationView = new ExplorationView(mainContent, gameInstance);
+        const explorationView = new ExplorationView(mainContent, this);
 
         // Renderizamos la vista modular en el centro
         explorationView.render();
