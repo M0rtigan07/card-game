@@ -2,6 +2,7 @@ import { AudioManager } from './audio.js';
 import { Player } from './models/Player.js';
 import { UIManager } from './ui/UIManager.js';
 import { GroqAI } from './systems/GroqAI.js';
+import { ExplorationView } from './views/ExplorationView.js';
 
 class Game {
     constructor() {
@@ -87,7 +88,28 @@ class Game {
         const sceneImg = document.getElementById('sceneImage');
         if (sceneImg && this.player?.img) {
             sceneImg.src = this.player.img;
-        }
+        } const mainContent = document.getElementById('mainContent');
+        const explorationView = new ExplorationView(mainContent, gameInstance);
+
+        // Renderizamos la vista modular en el centro
+        explorationView.render();
+
+        // Establecemos el primer evento de la mazmorra
+        explorationView.setNarrative(
+            "Te adentras en la fría oscuridad de la primera planta. Una estatua de gárgola parece observar cada uno de tus movimientos.",
+            [
+                {
+                    text: "Examinar la estatua con cautela",
+                    callback: () => console.log("Inspeccionando estatua...")
+                },
+                {
+                    text: "Avanzar por el pasillo de la izquierda",
+                    callback: () => console.log("Avanzando por el pasillo...")
+                }
+            ]
+        );
+
+
 
         this.ui.updateStats(this.player, this.dungeonLevel);
         this.ui.logEvent(`🐉 ¡${this.player.className} entra en la Planta ${this.dungeonLevel}!`);
