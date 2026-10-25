@@ -103,7 +103,12 @@
             <!-- PANEL IZQUIERDO: HOJA DE PERSONAJE -->
             <div id="leftSidebar">
                 <h2>Hoja de Héroe</h2>
-                <div class="stat-item"><span id="heroClass">Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>
+                <div class="character-portrait">
+                    <img id="sceneImage" src="img/guerrero.png" alt="Héroe">
+                    <span class="character-tag">HÉROE</span>
+                    <canvas id="renderCanvas" style="width: 100%; height: 100%; outline: none;"></canvas>
+                </div>
+                <div class="stat-item"><span id="heroClass"></span> <span>Lvl <b id="lvlVal">1</b></span></div>
                 <div class="stat-item">❤️ Salud <span id="hpVal">100/100</span></div>
                 <div class="stat-item">🔮 Maná <span id="manaVal">50/50</span></div>
                 <div class="stat-item">💰 Oro <span id="goldVal">0</span> gp</div>
@@ -129,11 +134,7 @@
                 <div id="rpgSceneView" class="scene-frame">
                     <div class="vs-container">
                         <!-- Retrato del Héroe -->
-                        <div class="character-portrait">
-                            <img id="sceneImage" src="img/guerrero.png" alt="Héroe">
-                            <span class="character-tag">HÉROE</span>
-                            <canvas id="renderCanvas" style="width: 100%; height: 100%; outline: none;"></canvas>
-                        </div>
+
 
                         <!-- Verses Indicator -->
                         <span class="vs-badge" id="vsBadge" style="display:none;">VS</span>
