@@ -271,8 +271,12 @@ class Game {
         }
         if (enemyPortraitName) enemyPortraitName.textContent = this.currentEnemy.name;
 
-        document.getElementById('actionChoices').style.display = 'none';
-        document.getElementById('tcgCombatView').style.display = 'flex';
+        // Ocultar opciones de exploración y mostrar el tablero de cartas TCG
+        const choicesEl = document.getElementById('actionChoices');
+        if (choicesEl) choicesEl.style.display = 'none';
+
+        const tcgCombatView = document.getElementById('tcgCombatView');
+        if (tcgCombatView) tcgCombatView.style.display = 'flex';
 
         const endTurnBtn = document.getElementById('endTurnTcgBtn');
         if (endTurnBtn) {

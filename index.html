@@ -193,7 +193,7 @@
             <div id="mainContent">
                 <h1 id="dungeonTitle">Cámara de la Mazmorra</h1>
 
-                <!-- VISOR DE ESCENA RPG ESTILO ELVIRA -->
+                <!-- VISOR DE ESCENA RPG / VS -->
                 <div id="rpgSceneView" class="elvira-scene-frame">
                     <div class="vs-container">
                         <!-- Retrato del Héroe (Izquierda) -->
@@ -205,7 +205,7 @@
                         <!-- Indicador VS -->
                         <span class="vs-badge" id="vsBadge" style="display:none;">VS</span>
 
-                        <!-- Retrato del Enemigo (Derecha - Solo en Combate) -->
+                        <!-- Retrato del Enemigo (Derecha - Solo en Combate TCG) -->
                         <div class="character-portrait" id="enemyPortraitContainer" style="display:none;">
                             <img id="enemySceneImage" src="img/guerreroCorrupto.png" alt="Enemigo">
                             <span class="character-tag enemy-tag" id="enemyPortraitName">ENEMIGO</span>
@@ -213,7 +213,7 @@
                     </div>
                 </div>
 
-                <!-- PANEL DE ATRIBUTOS DEL ENEMIGO (Solo en Combate) -->
+                <!-- PANEL DE ATRIBUTOS DEL ENEMIGO (Solo en Combate TCG) -->
                 <div id="enemyStatus" class="enemy-card-status" style="display:none;">
                     <h3 id="enemyName">Guerrero Corrupto</h3>
                     <div class="enemy-stats-row">
@@ -231,10 +231,10 @@
                 <!-- OPCIONES EXPLORACIÓN RPG -->
                 <div id="actionChoices" class="choices-container"></div>
 
-                <!-- TABLERO DE COMBATE TCG (¡AQUÍ APARECE EL MAZO DE CARTAS!) -->
+                <!-- TABLERO DE COMBATE TCG (MOSTRADO DINÁMICAMENTE EN BATALLA) -->
                 <div id="tcgCombatView" style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
                     <div id="playerHand" class="tcg-hand">
-                        <!-- Las cartas se generan dinámicamente aquí -->
+                        <!-- Las cartas se generan dinámicamente aquí mediante drawTcgHand() -->
                     </div>
                     <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn ⏳</button>
                 </div>
