@@ -20,7 +20,7 @@ class Game {
         this.initEvents();
     }
 
-    initEvents() {
+   initEvents() {
         document.getElementById('btnPressStart').addEventListener('click', () => {
             this.audio.play('sega');
 
@@ -34,27 +34,24 @@ class Game {
             } else {
                 // Si es la primera vez, mostramos el teclado estilo Castlevania
                 this.ui.showScreen('nameEntryScreen');
-                this.initNameKeyboard(); // <-- Llamamos a la función del teclado
+                this.initNameKeyboard();
             }
-
-
-            // 2. Al pulsar CONFIRMAR NOMBRE en la pantalla de Castlevania
-            const confirmBtn = document.getElementById('btnConfirmName');
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', () => {
-                    const nameDisplay = document.getElementById('typedHeroName').textContent.trim();
-                    if (nameDisplay.length > 0) {
-                        this.playerName = nameDisplay;
-                        // Guardamos en la memoria del navegador
-                        localStorage.setItem('mazo_hero_name', this.playerName);
-                        this.audio.play('card');
-                        this.ui.showScreen('charScreen');
-                    }
-                });
-            }
-
-            this.ui.showScreen('charScreen');
         });
+
+        // Botón de confirmar nombre en la pantalla Castlevania
+        const confirmBtn = document.getElementById('btnConfirmName');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                const nameDisplay = document.getElementById('typedHeroName').textContent.trim();
+                if (nameDisplay.length > 0) {
+                    this.playerName = nameDisplay;
+                    // Guardamos en la memoria del navegador
+                    localStorage.setItem('mazo_hero_name', this.playerName);
+                    this.audio.play('card');
+                    this.ui.showScreen('charScreen');
+                }
+            });
+        }
 
         document.querySelectorAll('.char-card').forEach(card => {
             card.addEventListener('click', (e) => {
@@ -109,6 +106,11 @@ class Game {
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
+
+        // Si por lo que sea recargó y saltó el teclado, recuperamos de localStorage
+        if (!this.playerName) {
+            this.playerName = localStorage.getItem('mazo_hero_name') || "HÉROE";
+        }
 
         // Actualizar la etiqueta debajo de la carta del panel izquierdo
         const heroTag = document.getElementById('heroClassTag');
