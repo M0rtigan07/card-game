@@ -3,6 +3,7 @@ import { Player } from './models/Player.js';
 import { UIManager } from './ui/UIManager.js';
 import { GroqAI } from './systems/GroqAI.js';
 import { ExplorationView } from './views/ExplorationView.js';
+import { TcgCombatView } from './views/TcgCombatView.js';
 
 class Game {
     constructor() {
@@ -274,11 +275,9 @@ class Game {
         if (enemyPortraitName) enemyPortraitName.textContent = this.currentEnemy.name;
 
         // --- CAMBIO CLAVE: OCULTAR OPCIONES DE EXPLORACIÓN Y MOSTRAR TCG ---
-        const actionChoices = document.getElementById('actionChoices');
-        if (actionChoices) actionChoices.style.display = 'none';
-
-        const tcgView = document.getElementById('tcgCombatView');
-        if (tcgView) tcgView.style.display = 'flex';
+        const mainContent = document.getElementById('mainContent');
+        const tcgView = new TcgCombatView(mainContent, this);
+        tcgView.render(this.currentEnemy, this.player);
         // -----------------------------------------------------------------
 
         const endTurnBtn = document.getElementById('endTurnTcgBtn');
@@ -426,16 +425,6 @@ class Game {
             this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
-        // Ocultar elementos de combate
-        document.getElementById('enemyPortraitContainer').style.display = 'none';
-        document.getElementById('vsBadge').style.display = 'none';
-        document.getElementById('enemyStatus').style.display = 'none';
-        document.getElementById('tcgCombatView').style.display = 'none';
-
-        // Mostrar botones de exploración de nuevo
-        const actionChoices = document.getElementById('actionChoices');
-        if (actionChoices) actionChoices.style.display = 'flex';
-
         const victoryModal = document.getElementById('victoryAnimationModal');
         if (victoryModal) {
             victoryModal.style.display = 'flex';
@@ -448,7 +437,13 @@ class Game {
         }
 
         this.dungeonLevel++;
-        this.loadNextExplorationEvent();
+
+        // Volvemos a inicializar la vista de exploración estándar en el contenedor central
+        const mainContent = document.getElementById('mainContent');
+        const explorationView = new ExplorationView(mainContent, this);
+        explorationView.render();
+
+        await this.loadNextExplorationEvent();
     }
 
     updateTcgUI() {
