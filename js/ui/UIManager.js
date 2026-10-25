@@ -43,6 +43,12 @@ export class UIManager {
     }
 
     updateStats(player, dungeonLevel) {
+
+        const heroTag = document.getElementById('heroClassTag');
+        if (heroTag && player.className) {
+            heroTag.textContent = player.className.toUpperCase();
+        }
+
         document.getElementById('heroClass').textContent = player.className;
         document.getElementById('lvlVal').textContent = player.level;
         document.getElementById('hpVal').textContent = `${player.health}/${player.maxHealth}`;

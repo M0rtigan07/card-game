@@ -57,6 +57,12 @@ class Game {
         this.audio.play('card');
         this.player = new Player(classKey);
 
+        // Actualizar la etiqueta debajo de la carta del panel izquierdo
+        const heroTag = document.getElementById('heroClassTag');
+        if (heroTag) {
+            heroTag.textContent = this.player.className.toUpperCase();
+        }
+
         // Mapeo dinámico de retratos según la clase
         const heroImages = {
             'warrior': 'img/guerrero.png',
