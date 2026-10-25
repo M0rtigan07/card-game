@@ -386,11 +386,35 @@ class Game {
     executeEnemyTurn() {
         if (!this.currentEnemy || this.currentEnemy.hp <= 0) return;
 
-        this.ui.logEvent(`⏳ Fin de tu turno. ¡${this.currentEnemy.name} contraataca!`);
         this.audio.play('hit');
 
-        let incomingDmg = this.currentEnemy.atk;
-        if (this.playerShield > 0) {
+        // Definir baraja de cartas del enemigo según el tipo
+        const enemyCards = [
+            { name: '🔪 Zarpazo Furtivo', type: 'atk', val: this.currentEnemy.atk + 4, desc: 'Ataque rápido' },
+            { name: '🛡️ Bloqueo Sombrío', type: 'def', val: 8, desc: 'Gana 8 de escudo' },
+            { name: '🔥 Fulgor Oscuro', type: 'atk', val: this.currentEnemy.atk + 8, desc: 'Ataque pesado' }
+        ];
+
+        // La IA elige una carta aleatoria de su baraja
+        const chosenCard = enemyCards[Math.floor(Math.random() * enemyCards.length)];
+
+        let announcementEl = document.getElementById('enemyActionAnnouncement');
+        if (announcementEl) {
+            announcementEl.textContent = `⚡ ${this.currentEnemy.name} juega: [${chosenCard.name}] (${chosenCard.desc})`;
+        }
+
+        this.ui.logEvent(`⏳ Fin de tu turno. ¡${this.currentEnemy.name} usa ${chosenCard.name}!`);
+
+        let incomingDmg = 0;
+        if (chosenCard.type === 'atk') {
+            incomingDmg = chosenCard.val;
+        } else if (chosenCard.type === 'def') {
+            this.currentEnemy.shield += chosenCard.val;
+            this.ui.logEvent(`🛡️ ${this.currentEnemy.name} se protege con ${chosenCard.val} de escudo.`);
+        }
+
+        // Aplicar escudo del jugador
+        if (this.playerShield > 0 && incomingDmg > 0) {
             const absorbed = Math.min(this.playerShield, incomingDmg);
             this.playerShield -= absorbed;
             incomingDmg -= absorbed;
@@ -399,9 +423,10 @@ class Game {
 
         if (incomingDmg > 0) {
             this.player.health -= incomingDmg;
-            this.ui.logEvent(`💥 Recibes ${incomingDmg} de daño del enemigo.`);
+            this.ui.logEvent(`💥 Recibes ${incomingDmg} de daño.`);
         }
 
+        // Reiniciar maná y escudo del jugador para el nuevo turno
         this.player.mana = this.player.maxMana;
         this.playerShield = 0;
 
