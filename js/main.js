@@ -241,20 +241,32 @@ class Game {
         }
     }
 
-    triggerNpcEvent(npcKey) {
+   triggerNpcEvent(npcKey) {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
-        // Renderizar la vista de exploración con el marco de Elvira
+        // Renderizar la vista de exploración en el panel central
         const mainContent = document.getElementById('mainContent');
         const explorationView = new ExplorationView(mainContent, this);
         explorationView.render();
 
-        // Cambiar la imagen del visor al retrato del PNJ
-        const sceneImg = document.getElementById('sceneImage');
-        if (sceneImg) {
-            sceneImg.src = npc.img;
-            sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
+        // --- CORRECCIÓN AQUÍ ---
+        // Buscamos específicamente la imagen de la escena central (o creamos un id único para ella)
+        // para que NUNCA toque la foto de la izquierda del héroe.
+        const sceneImg = document.getElementById('sceneImage'); 
+        
+        // Si tienes la estructura de ExplorationView, podemos asegurarnos de cambiar la imagen central así:
+        const explorationSceneImg = document.querySelector('#rpgSceneView img') || sceneImg;
+        
+        if (explorationSceneImg) {
+            explorationSceneImg.src = npc.img;
+            explorationSceneImg.onerror = () => { explorationSceneImg.src = 'img/guerrero.png'; };
+        }
+
+        // Restaurar la imagen del héroe en el panel izquierdo por si acaso
+        const leftHeroImg = document.querySelector('#leftSidebar #sceneImage');
+        if (leftHeroImg && this.player?.img) {
+            leftHeroImg.src = this.player.img;
         }
 
         const sceneBadge = document.getElementById('sceneBadgeOverlay');
