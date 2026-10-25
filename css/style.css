@@ -118,13 +118,8 @@ body::after {
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* 1. PANTALLA DE TÍTULO */
@@ -182,26 +177,13 @@ body::after {
 }
 
 @keyframes blink {
-
-    0%,
-    49% {
-        opacity: 1;
-    }
-
-    50%,
-    100% {
-        opacity: 0;
-    }
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
 }
 
 @keyframes pulseGlow {
-    0% {
-        transform: scale(0.98);
-    }
-
-    100% {
-        transform: scale(1.02);
-    }
+    0% { transform: scale(0.98); }
+    100% { transform: scale(1.02); }
 }
 
 /* 2. SELECCIÓN DE PERSONAJE */
@@ -444,6 +426,57 @@ body::after {
     justify-content: space-between;
 }
 
+/* --- CRUZ SEGA D-PAD (BAJO EL INVENTARIO EN EL PANEL IZQUIERDO) --- */
+.dpad-container {
+    background: rgba(10, 6, 20, 0.8);
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+}
+
+.dpad-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold);
+    text-shadow: 1px 1px #000;
+}
+
+.dpad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 30px);
+    grid-template-rows: repeat(3, 30px);
+    gap: 2px;
+}
+
+.dpad-btn {
+    background: linear-gradient(135deg, #2a2a3a 0%, #15151a 100%);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.dpad-btn:active {
+    background: var(--gold);
+    color: #000;
+}
+
+.dpad-center {
+    background: #111;
+    border-radius: 50%;
+    border: 1px solid #333;
+}
+
 #mainContent {
     flex: 2.2;
     display: flex;
@@ -642,62 +675,13 @@ h1 {
     100% { transform: scale(1); }
 }
 
-/* PANEL NARRATIVO ESTILO MASTER DE D&D */
-.exploration-panel {
-    background: linear-gradient(135deg, rgba(20, 12, 35, 0.95), rgba(10, 5, 20, 0.95));
-    border: 2px solid var(--gold);
-    border-radius: 10px;
-    padding: 15px 20px;
-    width: 100%;
-    min-height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
-    margin-bottom: 12px;
-}
-
-#explorationText {
-    font-family: 'Cinzel', serif;
-    font-size: 1.05em;
-    color: var(--gold-light);
-    line-height: 1.5;
-}
-
-.choices-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-}
-
-.choice-btn {
-    width: 100%;
-    text-align: left;
-    padding: 10px 16px;
-    font-size: 0.88em;
-    background: linear-gradient(90deg, #1f132e 0%, #2a1b3d 100%);
-    color: var(--gold);
-    border: 2px solid var(--gold-border);
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.choice-btn:hover {
-    border-color: var(--gold);
-    background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
-    transform: translateX(4px);
-}
-
 /* CONTENEDOR HORIZONTAL DE CARTAS (ESTILO HEARTHSTONE / MAGIC) */
 .tcg-hand {
     display: flex;
-    flex-direction: row; /* Fuerza la disposición horizontal */
+    flex-direction: row;
     justify-content: center;
     align-items: flex-end;
-    gap: -15px; /* Ligero solapamiento estilo abanico */
+    gap: -15px;
     width: 100%;
     min-height: 180px;
     padding: 15px 10px;
@@ -724,10 +708,9 @@ h1 {
     position: relative;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
     transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
-    flex-shrink: 0; /* Evita que las cartas se aplasten si hay varias */
+    flex-shrink: 0;
 }
 
-/* EFECTO HOVER EN ABANICO */
 .tcg-card:hover {
     transform: translateY(-20px) scale(1.15) rotate(0deg) !important;
     z-index: 10;
@@ -735,7 +718,6 @@ h1 {
     border-color: #fff176;
 }
 
-/* GEMA DE MANÁ EN LA CARTA */
 .tcg-card .cost-gem {
     position: absolute;
     top: -8px;
