@@ -1138,3 +1138,65 @@ h1 {
     object-fit: contain;
     image-rendering: pixelated;
 }
+
+/* --- ESTILO ELVIRA PARA EL VISOR CENTRAL --- */
+.elvira-scene-frame {
+    position: relative;
+    width: 100%;
+    height: 240px; /* Ampliamos un poco la altura para mayor protagonismo visual */
+    background: #040806;
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+.elvira-scene-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+    filter: contrast(110%) brightness(95%);
+}
+
+.elvira-scene-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    background: rgba(12, 8, 24, 0.85);
+    border: 1px solid var(--gold-border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Ajuste del panel de texto narrativo para que combine con el marco */
+.exploration-panel {
+    background: linear-gradient(135deg, rgba(27, 18, 38, 0.95), rgba(15, 10, 24, 0.95));
+    border: 2px solid var(--gold-border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    width: 100%;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+    margin-bottom: 12px;
+}
+
+#explorationText {
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    color: var(--gold-light);
+    line-height: 1.5;
+}

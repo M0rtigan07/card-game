@@ -189,33 +189,17 @@
 
 
             <!-- PANEL CENTRAL: EXPLORACIÓN O COMBATE TCG -->
+            <!-- PANEL CENTRAL: AVENTURA ESTILO ELVIRA -->
             <div id="mainContent">
                 <h1 id="dungeonTitle">Cámara de la Mazmorra</h1>
 
-                <!-- VISOR DE ESCENA RPG (VS BATTLE VIEW) -->
-                <div id="rpgSceneView" class="scene-frame">
-                    <div class="vs-container">
-                        <!-- Retrato del Héroe -->
-
-
-                        <!-- Verses Indicator -->
-                        <span class="vs-badge" id="vsBadge" style="display:none;">VS</span>
-
-                        <!-- Retrato del Enemigo (Solo en Combate TCG) -->
-                        <div class="character-portrait" id="enemyPortraitContainer" style="display:none;">
-                            <img id="enemySceneImage" src="img/gargola.png" alt="Enemigo">
-                            <span class="character-tag enemy-tag" id="enemyPortraitName">ENEMIGO</span>
-                        </div>
-                    </div>
-
-                    <!-- Overlay D20 para RPG -->
-                    <div class="d20-overlay" id="d20Overlay" style="display:none;">
-                        <span class="d20-label">TIRADA D20</span>
-                        <span class="d20-value" id="d20Val">20</span>
-                    </div>
+                <!-- VISOR DE ESCENA RPG ESTILO ELVIRA -->
+                <div id="rpgSceneView" class="elvira-scene-frame">
+                    <img id="sceneImage" src="img/guerrero.png" alt="Escena de la Mazmorra">
+                    <div class="elvira-scene-badge" id="sceneBadgeOverlay">CÁMARA OSCURA</div>
                 </div>
 
-                <!-- ÚNICO PANEL DE ATRIBUTOS DEL ENEMIGO -->
+                <!-- ÚNICO PANEL DE ATRIBUTOS DEL ENEMIGO (SI APLICA) -->
                 <div id="enemyStatus" class="enemy-card-status" style="display:none;">
                     <h3 id="enemyName">Estatua de Gárgola</h3>
                     <div class="enemy-stats-row">
@@ -236,11 +220,7 @@
                 <!-- TABLERO DE COMBATE TCG -->
                 <div id="tcgCombatView"
                     style="display:none; width:100%; flex-direction:column; align-items:center; gap:10px;">
-                    <!-- MANO DE CARTAS DEL JUGADOR -->
-                    <div id="playerHand" class="tcg-hand">
-                        <!-- Se generan dinámicamente -->
-                    </div>
-
+                    <div id="playerHand" class="tcg-hand"></div>
                     <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white;">End Turn
                         ⏳</button>
                 </div>
