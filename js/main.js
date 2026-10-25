@@ -189,13 +189,13 @@ class Game {
     async loadNextExplorationEvent() {
         document.getElementById('explorationText').textContent = "Escuchando los pasos en la penumbra...";
 
-        // Si estamos en la Planta 2 o si salta el evento del Conde Valerius
+        // El Conde Valerius SOLO aparece de forma exclusiva en la Planta 2
         if (this.dungeonLevel === 2) {
             this.triggerNpcEvent('valerius');
             return;
         }
 
-        // Lógica estándar para el resto de plantas (llamada a la API o eventos genéricos)
+        // Resto de la exploración normal para otras plantas...
         try {
             const response = await fetch("/api/generate-lore", {
                 method: "POST",
@@ -208,7 +208,6 @@ class Game {
             });
             const eventData = await response.json();
 
-            // Usamos la vista de exploración para mostrar el evento
             const mainContent = document.getElementById('mainContent');
             const explorationView = new ExplorationView(mainContent, this);
             explorationView.render();
@@ -221,52 +220,30 @@ class Game {
                 }))
             );
         } catch (err) {
-            // Fallback en caso de que la API no responda
+            // Fallback genérico
             const mainContent = document.getElementById('mainContent');
             const explorationView = new ExplorationView(mainContent, this);
             explorationView.render();
-
             explorationView.setNarrative(
-                "Avanzas por un pasillo silencioso con antiguas antorchas parpadeantes en las paredes de piedra.",
-                [
-                    {
-                        text: "Avanzar con sigilo hacia la siguiente sala",
-                        callback: () => {
-                            this.dungeonLevel++;
-                            this.loadNextExplorationEvent();
-                        }
-                    }
-                ]
+                "Avanzas por un pasillo silencioso con antiguas antorchas parpadeantes.",
+                [{ text: "Continuar", callback: () => { this.dungeonLevel++; this.loadNextExplorationEvent(); } }]
             );
         }
     }
 
-   triggerNpcEvent(npcKey) {
+    triggerNpcEvent(npcKey) {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
-        // Renderizar la vista de exploración en el panel central
         const mainContent = document.getElementById('mainContent');
         const explorationView = new ExplorationView(mainContent, this);
         explorationView.render();
 
-        // --- CORRECCIÓN AQUÍ ---
-        // Buscamos específicamente la imagen de la escena central (o creamos un id único para ella)
-        // para que NUNCA toque la foto de la izquierda del héroe.
-        const sceneImg = document.getElementById('sceneImage'); 
-        
-        // Si tienes la estructura de ExplorationView, podemos asegurarnos de cambiar la imagen central así:
-        const explorationSceneImg = document.querySelector('#rpgSceneView img') || sceneImg;
-        
-        if (explorationSceneImg) {
-            explorationSceneImg.src = npc.img;
-            explorationSceneImg.onerror = () => { explorationSceneImg.src = 'img/guerrero.png'; };
-        }
-
-        // Restaurar la imagen del héroe en el panel izquierdo por si acaso
-        const leftHeroImg = document.querySelector('#leftSidebar #sceneImage');
-        if (leftHeroImg && this.player?.img) {
-            leftHeroImg.src = this.player.img;
+        // 1. Mostrar imagen amplia de la sala (Estilo Elvira) al inicio
+        const sceneImg = document.querySelector('#rpgSceneView img') || document.getElementById('sceneImage');
+        if (sceneImg) {
+            sceneImg.src = npc.images.room;
+            sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
         }
 
         const sceneBadge = document.getElementById('sceneBadgeOverlay');
@@ -274,20 +251,45 @@ class Game {
             sceneBadge.textContent = npc.name.toUpperCase();
         }
 
-        // Obtener interacción según la clase del jugador ('mage', 'warrior', 'rogue')
         const playerClassKey = this.player.classKey || 'warrior';
         const interaction = npc.interactions[playerClassKey] || npc.interactions['warrior'];
 
-        // Inyectar la narrativa y las opciones de respuesta personalizadas
         explorationView.setNarrative(
             interaction.greeting,
             interaction.choices.map(choice => ({
                 text: choice.text,
-                callback: () => this.handleNpcChoice(npc, choice.action, interaction)
+                callback: async () => {
+                    // 2. Al pulsar una opción, cambiamos al primer plano elegante de charla
+                    if (sceneImg) sceneImg.src = npc.images.talk;
+
+                    // 3. Generar respuesta arrogante de Groq para el cuadro de diálogo flotante
+                    const arrogantReply = await this.groq.generateVampireDialogue(this.player.className, choice.text);
+
+                    // Mostrar el bocadillo de diálogo flotante estilo Monkey Island
+                    this.showDialogueOverlay(npc.name, arrogantReply);
+
+                    // Procesar la acción tras una breve pausa dramática
+                    setTimeout(() => {
+                        this.handleNpcChoice(npc, choice.action, interaction);
+                    }, 2200);
+                }
             }))
         );
 
         this.ui.logEvent(`👁️ Te encuentras cara a cara con ${npc.name}.`);
+    }
+
+    // Método auxiliar para pintar el cuadro de diálogo flotante tipo Monkey Island
+    showDialogueOverlay(speakerName, text) {
+        let existingBox = document.getElementById('monkeyIslandDialogue');
+        if (existingBox) existingBox.remove();
+
+        const box = document.createElement('div');
+        box.id = 'monkeyIslandDialogue';
+        box.className = 'monkey-dialogue-box';
+        box.innerHTML = `<b>${speakerName.toUpperCase()}:</b> "${text}"`;
+
+        document.getElementById('mainContent').appendChild(box);
     }
 
     handleNpcChoice(npc, action, interaction) {

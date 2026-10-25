@@ -39,4 +39,18 @@ export class GroqAI {
             return "Las sombras ocultan la respuesta de tu interlocutor.";
         }
     }
+
+    async generateVampireDialogue(playerClass, actionChosen) {
+        try {
+            const prompt = `Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante de un juego de rol gótico oscuro. 
+        El jugador es un ${playerClass} que ha tomado la siguiente acción o postura: "${actionChosen}".
+        Responde brevemente (máximo 2 líneas) con una frase llena de desdén, superioridad y toque gótico, manteniendo su personalidad altiva. Devuélvelo en un tono teatral tipo aventura gráfica clásica.`;
+
+            // Llamada a tu API de Groq configurada
+            const response = await this.queryGroq(prompt);
+            return response || "¡Insensato! Tu osadía sella tu destino en mis dominios.";
+        } catch (err) {
+            return "Tu presencia aquí es un insulto a la eternidad.";
+        }
+    }
 }
