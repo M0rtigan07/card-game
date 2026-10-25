@@ -29,7 +29,7 @@ body {
     position: relative;
 }
 
-/* FILTRO VISUAL RETRO 16-BITS (OVERLAY CRT GLOBAL) */
+/* OVERLAY CRT GLOBAL */
 body::after {
     content: "";
     position: fixed;
@@ -64,7 +64,7 @@ body::after {
     display: flex !important;
 }
 
-/* PANTALLA DE CARGA RETRO */
+/* PANTALLA DE CARGA */
 #loadingScreen {
     background: radial-gradient(circle, #1a0b2e 0%, #05020a 100%);
     z-index: 999;
@@ -87,7 +87,6 @@ body::after {
     font-size: 0.85em;
     color: var(--gold);
     text-shadow: 2px 2px #000;
-    letter-spacing: 1px;
 }
 
 .loading-bar-container {
@@ -118,16 +117,11 @@ body::after {
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-/* 1. PANTALLA DE TÍTULO */
+/* PANTALLA DE TÍTULO */
 #titleScreen {
     background: linear-gradient(rgba(10, 5, 20, 0.25), rgba(10, 5, 20, 0.65)),
         url('../img/intro.jpg') no-repeat center center / cover;
@@ -156,7 +150,6 @@ body::after {
     color: #fff;
     text-shadow: 3px 3px var(--sega-blue), -3px -3px var(--sega-red);
     letter-spacing: 3px;
-    animation: pulseGlow 1.5s infinite alternate;
 }
 
 .game-title-retro {
@@ -178,33 +171,14 @@ body::after {
     background: rgba(255, 215, 0, 0.15);
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-    margin-top: 10px;
 }
 
 @keyframes blink {
-
-    0%,
-    49% {
-        opacity: 1;
-    }
-
-    50%,
-    100% {
-        opacity: 0;
-    }
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
 }
 
-@keyframes pulseGlow {
-    0% {
-        transform: scale(0.98);
-    }
-
-    100% {
-        transform: scale(1.02);
-    }
-}
-
-/* 2. SELECCIÓN DE PERSONAJE */
+/* SELECCIÓN DE PERSONAJE */
 #charScreen {
     background: radial-gradient(circle, #201035 0%, #08040d 100%);
     padding: 20px;
@@ -284,53 +258,7 @@ body::after {
     text-align: left;
 }
 
-/* MARCO DORADO ESTILO CARTA PARA EL RETRATO DEL HÉROE */
-.hero-card-frame {
-    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
-    border: 2px solid var(--gold);
-    border-radius: 10px;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(255, 215, 0, 0.2);
-    margin-bottom: 12px;
-}
-
-.hero-card-image-box {
-    width: 100%;
-    height: 150px;
-    background: #000;
-    border: 1px solid var(--gold-border);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.hero-card-image-box img {
-    max-height: 100%;
-    width: auto;
-    object-fit: contain;
-    image-rendering: pixelated;
-}
-
-/* ETIQUETA INFERIOR DE CLASE */
-.hero-card-frame .character-tag {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.6em;
-    color: var(--gold);
-    background: rgba(0, 0, 0, 0.8);
-    padding: 3px 10px;
-    border-radius: 4px;
-    border: 1px solid var(--gold-border);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* 3. PANTALLA DE HISTORIA / LORE */
+/* INTRO / LORE */
 #introScreen {
     background: linear-gradient(rgba(10, 5, 20, 0.55), rgba(10, 5, 20, 0.85)),
         url('../img/dungeon_intro_bg.png') no-repeat center center / cover;
@@ -361,9 +289,6 @@ body::after {
     border-radius: 8px;
     overflow: hidden;
     background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .intro-hero-portrait img {
@@ -384,7 +309,6 @@ body::after {
     font-family: 'Press Start 2P', cursive;
     color: var(--gold);
     font-size: 0.9em;
-    text-shadow: 2px 2px 0px #000;
 }
 
 .typewriter-box {
@@ -399,20 +323,16 @@ body::after {
     border-radius: 6px;
     padding: 15px;
     box-sizing: border-box;
-    text-shadow: 0 0 5px rgba(74, 222, 128, 0.4);
 }
 
-
-/* --- PANTALLA DE INGRESO DE NOMBRE ESTILO CASTLEVANIA GÓTICO --- */
+/* TECLADO INGRESO DE NOMBRE GÓTICO */
 #nameEntryScreen {
     background: linear-gradient(rgba(3, 8, 5, 0.65), rgba(3, 8, 5, 0.85)),
-        url('../img/introNombre.jpg') no-repeat center center / cover; /* La imagen de la cripta */
+        url('../img/introNombre.jpg') no-repeat center center / cover;
     padding: 20px;
     position: relative;
-    overflow: hidden;
 }
 
-/* MARCO PRINCIPAL DE PIEDRA TALLADA CON GÁRGOLAS */
 .castlevania-name-box {
     background: linear-gradient(180deg, #18221c 0%, #0c140f 100%);
     border: 4px solid #3e5045;
@@ -424,26 +344,19 @@ body::after {
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 
-        0 0 35px rgba(22, 60, 42, 0.8), 
-        0 0 15px rgba(0, 0, 0, 0.9),
-        inset 0 0 25px rgba(0, 0, 0, 0.95);
-    position: relative;
+    box-shadow: 0 0 35px rgba(22, 60, 42, 0.8), inset 0 0 25px rgba(0, 0, 0, 0.95);
 }
 
-/* TITULO "NAME ENTRY" EN LETRA GÓTICA TALLADA */
 .castlevania-title {
     font-family: 'Cinzel', serif;
     font-size: 1.1em;
     font-weight: 700;
     color: #92ab9d;
-    text-shadow: 1px 1px 2px #000;
     letter-spacing: 4px;
     margin-bottom: 8px;
     text-transform: uppercase;
 }
 
-/* CAMPO DISPLAY DEL NOMBRE */
 .castlevania-display-name {
     width: 100%;
     max-width: 380px;
@@ -458,10 +371,8 @@ body::after {
     letter-spacing: 4px;
     margin-bottom: 18px;
     box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9);
-    text-shadow: 0 0 8px rgba(146, 171, 157, 0.6);
 }
 
-/* CONTENEDOR DE TECLAS ESTILO TEJADO/BLOQUE DE PIEDRA */
 .castlevania-keyboard {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
@@ -471,22 +382,18 @@ body::after {
     padding: 16px;
     border: 2px solid #28382e;
     border-radius: 8px;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
 }
 
-/* BOTONES/TECLAS TIPO PIEDRA TALLADA */
 .cv-key {
     background: linear-gradient(180deg, #2c3831 0%, #161e19 100%);
     border: 1px solid #4a5d51;
-    border-bottom: 2px solid #0d1310;
     color: #c0d4c8;
-    font-family: 'UnifrakturCook', cursive; /* Tipografía gótica para cada letra */
+    font-family: 'UnifrakturCook', cursive;
     font-size: 1.3em;
     padding: 8px 0;
     text-align: center;
     cursor: pointer;
     border-radius: 5px;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.7);
     transition: all 0.12s ease;
 }
 
@@ -494,53 +401,20 @@ body::after {
     background: linear-gradient(180deg, #3f5247 0%, #223027 100%);
     color: #ffffff;
     border-color: #728c7d;
-    box-shadow: 0 0 12px rgba(74, 180, 120, 0.4);
-    transform: translateY(-2px);
 }
 
-.cv-key:active {
-    background: #101713;
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+/* MAQUETACIÓN PRINCIPAL DEL JUEGO */
+#gameScreen {
+    padding: 10px;
 }
 
-/* BOTÓN CONFIRMAR NOMBRE EN ORO ENVEJECIDO Y MARCO DE HIERRO */
-#btnConfirmName {
-    margin-top: 20px;
-    width: 100%;
-    max-width: 320px;
-    background: linear-gradient(180deg, #3a3223 0%, #1f1a11 100%);
-    border: 2px solid #8c764d;
-    border-radius: 6px;
-    color: #d4af37;
-    font-family: 'Cinzel', serif;
-    font-size: 0.9em;
-    font-weight: 700;
-    letter-spacing: 2px;
-    padding: 12px 20px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 10px rgba(140, 118, 77, 0.3);
-    transition: all 0.2s ease;
-}
-
-#btnConfirmName:hover {
-    background: linear-gradient(180deg, #544933 0%, #2d2618 100%);
-    border-color: #ffd700;
-    color: #fff;
-    box-shadow: 0 0 18px rgba(255, 215, 0, 0.5);
-    transform: scale(1.03);
-}
-
-
-/* 4. TABLERO DE JUEGO PRINCIPAL Y EXPLORACIÓN */
 .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
     gap: 15px;
     width: 100%;
-    max-width: 1250px;
-    height: 92vh;
+    max-width: 1350px;
+    height: 94vh;
     background: rgba(20, 15, 30, 0.95);
     border: 3px solid var(--gold-border);
     border-radius: 16px;
@@ -551,83 +425,104 @@ body::after {
 
 #leftSidebar,
 #rightSidebar {
-    flex: 1.1;
     background: var(--panel-bg);
-    padding: 16px;
+    padding: 14px;
     border-radius: 12px;
     border: 2px solid var(--gold-border);
     display: flex;
     flex-direction: column;
     gap: 10px;
     overflow-y: auto;
+    min-width: 0;
+}
+
+/* BARRA DE SCROLL ESTILIZADA RETRO */
+#leftSidebar::-webkit-scrollbar,
+#rightSidebar::-webkit-scrollbar,
+#playerInventory::-webkit-scrollbar {
+    width: 6px;
+}
+
+#leftSidebar::-webkit-scrollbar-thumb,
+#rightSidebar::-webkit-scrollbar-thumb,
+#playerInventory::-webkit-scrollbar-thumb {
+    background: var(--gold-border);
+    border-radius: 4px;
 }
 
 #leftSidebar h2,
 #rightSidebar h2 {
     color: var(--gold);
-    font-size: 1.1em;
+    font-size: 1em;
     letter-spacing: 1px;
     border-bottom: 1px solid var(--gold-border);
-    padding-bottom: 5px;
+    padding-bottom: 4px;
 }
 
-/* --- CRUZ SEGA D-PAD --- */
-.dpad-container {
-    background: rgba(10, 6, 20, 0.8);
-    border: 2px solid var(--gold-border);
-    border-radius: 8px;
-    padding: 10px;
+/* HOJA DE HÉROE (SIDEBAR IZQUIERDO) */
+.sidebar-header-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-class-subtitle {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold-light);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--gold-border);
+}
+
+.hero-card-frame {
+    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
-    margin-top: 15px;
 }
 
-.dpad-title {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.55em;
-    color: var(--gold);
-    text-shadow: 1px 1px #000;
-}
-
-.dpad-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 30px);
-    grid-template-rows: repeat(3, 30px);
-    gap: 2px;
-}
-
-.dpad-btn {
-    background: linear-gradient(135deg, #2a2a3a 0%, #15151a 100%);
+.hero-card-image-box {
+    width: 100%;
+    height: 140px;
+    background: #000;
     border: 1px solid var(--gold-border);
-    color: var(--gold);
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8em;
-    cursor: pointer;
-    border-radius: 3px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
 }
 
-.dpad-btn:active {
-    background: var(--gold);
-    color: #000;
+.hero-card-image-box img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+    image-rendering: pixelated;
 }
 
-.dpad-center {
-    background: #111;
-    border-radius: 50%;
-    border: 1px solid #333;
+.character-tag {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6em;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--gold-border);
+    text-transform: uppercase;
 }
 
 .stat-item {
-    font-size: 0.9em;
+    font-size: 0.85em;
     background: rgba(30, 10, 50, 0.4);
     border-left: 4px solid var(--gold);
     border-radius: 6px;
-    padding: 6px 10px;
+    padding: 5px 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -637,64 +532,54 @@ body::after {
     width: 100%;
     background-color: #111;
     border: 1px solid var(--gold-border);
-    height: 10px;
-    border-radius: 5px;
+    height: 8px;
+    border-radius: 4px;
     overflow: hidden;
-    margin-top: 2px;
 }
 
 .xp-bar {
     width: 0%;
     height: 100%;
     background: linear-gradient(90deg, #4caf50, #8bc34a);
-    transition: width 0.4s ease;
 }
 
 #playerInventory {
     list-style: none;
-    max-height: 120px;
+    max-height: 100px;
     overflow-y: auto;
     background: rgba(10, 5, 20, 0.5);
     border: 1px solid var(--gold-border);
     border-radius: 6px;
-    padding: 5px;
+    padding: 4px;
 }
 
 #playerInventory li {
-    font-size: 0.85em;
-    padding: 4px 6px;
-    margin-bottom: 4px;
+    font-size: 0.8em;
+    padding: 3px 5px;
+    margin-bottom: 3px;
     background: rgba(255, 255, 255, 0.06);
     border-radius: 4px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
 }
 
-/* --- CRUZ SEGA D-PAD (BAJO EL INVENTARIO EN EL PANEL IZQUIERDO) --- */
+/* D-PAD SEGA */
 .dpad-container {
     background: rgba(10, 6, 20, 0.8);
     border: 2px solid var(--gold-border);
     border-radius: 8px;
-    padding: 10px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     margin-top: auto;
-}
-
-.dpad-title {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.55em;
-    color: var(--gold);
-    text-shadow: 1px 1px #000;
 }
 
 .dpad-grid {
     display: grid;
-    grid-template-columns: repeat(3, 30px);
-    grid-template-rows: repeat(3, 30px);
+    grid-template-columns: repeat(3, 28px);
+    grid-template-rows: repeat(3, 28px);
     gap: 2px;
 }
 
@@ -708,7 +593,6 @@ body::after {
     font-size: 0.8em;
     cursor: pointer;
     border-radius: 3px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .dpad-btn:active {
@@ -722,84 +606,126 @@ body::after {
     border: 1px solid #333;
 }
 
-
-
-h1 {
-    font-family: 'UnifrakturCook', cursive;
-    font-size: 2.2em;
-    color: var(--gold);
-}
-
-/* PANEL NARRATIVO Y DECISIONES ESTRATÉGICAS */
-/* ORDENACIÓN DEL PANEL CENTRAL ESTILO ELVIRA */
+/* PANEL CENTRAL (ESTILO ELVIRA) */
 #mainContent {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    padding: 10px;
+    padding: 4px 10px;
     text-align: center;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
 }
 
-/* Panel de narrativa superior */
+h1 {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 2em;
+    color: var(--gold);
+}
+
+/* 1. TEXTO DEL MASTER (ARRIBA) */
 .exploration-panel {
     background: linear-gradient(135deg, rgba(27, 18, 38, 0.95), rgba(15, 10, 24, 0.95));
     border: 2px solid var(--gold);
     border-radius: 10px;
-    padding: 14px 18px;
+    padding: 12px 16px;
     width: 100%;
-    min-height: 95px;
+    min-height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
-    margin-bottom: 10px;
 }
 
 #explorationText {
     font-family: 'Cinzel', serif;
     font-size: 0.95em;
     color: var(--gold-light);
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
-/* Marco de la escena en pixel art inferior */
+/* 2. ESCENA PIXEL ART (DEBAJO) */
 .elvira-scene-frame {
     position: relative;
     width: 100%;
-    height: 210px;
+    height: 200px;
     background: #040806;
     border: 3px solid var(--gold);
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.15);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
 }
 
-#explorationText {
-    font-family: 'Cinzel', serif;
-    font-size: 1.05em;
-    color: var(--gold-light);
-    line-height: 1.6;
+.elvira-scene-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+}
+
+.vs-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.character-portrait {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.character-portrait img {
+    max-height: 120px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.vs-badge {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.3em;
+    color: #ef4444;
+}
+
+/* ENEMIGO Y ACCIONES */
+.enemy-card-status {
+    width: 100%;
+    background: linear-gradient(135deg, #370606 0%, #170303 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+.enemy-stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    font-size: 0.8em;
+    color: #fca5a5;
+    margin-top: 2px;
 }
 
 .choices-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
-    margin-bottom: 10px;
 }
 
 .choice-btn {
     width: 100%;
     text-align: left;
-    padding: 12px 18px;
-    font-size: 0.9em;
+    padding: 10px 14px;
+    font-size: 0.85em;
     background: linear-gradient(90deg, #1f132e 0%, #2a1b3d 100%);
     color: var(--gold);
     border: 2px solid var(--gold-border);
@@ -811,7 +737,6 @@ h1 {
 .choice-btn:hover {
     border-color: var(--gold);
     background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
-    transform: translateX(4px);
 }
 
 .fantasy-btn {
@@ -821,18 +746,89 @@ h1 {
     color: #2c1602;
     font-family: 'Cinzel', serif;
     font-weight: bold;
-    font-size: 0.95em;
-    padding: 10px 22px;
+    font-size: 0.9em;
+    padding: 8px 18px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-    transition: all 0.2s ease;
 }
 
-.fantasy-btn:hover {
-    transform: scale(1.05);
-    background: linear-gradient(90deg, #d4af37 0%, #fef08a 100%);
+/* TABLERO DE CARTAS TCG */
+.tcg-hand {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+    min-height: 160px;
+    padding: 10px;
+    background: rgba(10, 5, 20, 0.6);
+    border: 2px solid var(--gold-border);
+    border-radius: 12px;
+    overflow-x: auto;
 }
 
+.tcg-card {
+    width: 100px;
+    height: 145px;
+    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.tcg-card:hover {
+    transform: translateY(-12px) scale(1.1) !important;
+    border-color: #fff176;
+}
+
+.tcg-card .cost-gem {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
+    border: 1px solid #93c5fd;
+    border-radius: 50%;
+    color: white;
+    font-size: 0.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tcg-card-img {
+    width: 100%;
+    height: 55px;
+    object-fit: cover;
+    border: 1px solid #d4af37;
+    border-radius: 4px;
+}
+
+.tcg-card .title {
+    font-size: 0.65em;
+    color: #fef08a;
+    font-weight: bold;
+}
+
+.tcg-card .desc {
+    font-size: 0.55em;
+    color: #cbd5e1;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px;
+    border-radius: 3px;
+    width: 100%;
+}
+
+/* DIARIO Y DRAGÓN */
 #eventList {
     list-style: none;
     display: flex;
@@ -841,20 +837,29 @@ h1 {
 }
 
 #eventList li {
-    font-size: 0.8em;
+    font-size: 0.78em;
     background: rgba(0, 0, 0, 0.3);
-    padding: 6px 8px;
+    padding: 5px 7px;
     border-radius: 6px;
     border-left: 3px solid var(--gold-border);
-    color: #e2e8f0;
 }
 
-#eventList li.last-event {
-    border-left-color: #a855f7;
-    font-weight: bold;
-    background: rgba(168, 85, 247, 0.15);
+.sidebar-dragon-box {
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid var(--gold-border);
+    display: flex;
+    justify-content: center;
 }
 
+.sidebar-dragon-img {
+    width: 100%;
+    max-height: 130px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* MODALES */
 .modal {
     position: fixed;
     top: 0;
@@ -876,385 +881,45 @@ h1 {
     width: 90%;
     max-width: 440px;
     text-align: center;
-    box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
 }
 
-.fantasy-modal h2 {
-    font-family: 'UnifrakturCook', cursive;
-    color: var(--gold);
-    font-size: 2em;
-    margin-bottom: 12px;
-}
-
-/* VISOR DE ESCENA VISUAL D&D */
-.scene-frame {
-    position: relative;
-    width: 100%;
-    height: 180px;
-    background: radial-gradient(circle, #201035 0%, #08040d 100%);
-    border: 3px solid var(--gold);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
-}
-
-.scene-frame img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
-    transition: all 0.4s ease;
-}
-
-/* OVERLAY DADO D20 */
-.d20-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(12, 8, 24, 0.9);
-    border: 2px solid var(--gold);
-    border-radius: 50%;
-    width: 65px;
-    height: 65px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.d20-label {
-    font-size: 0.5em;
-    font-family: 'Press Start 2P', cursive;
-    color: var(--gold-border);
-}
-
-.d20-value {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1.2em;
-    color: var(--gold);
-    text-shadow: 0 0 5px var(--gold);
-}
-
-@keyframes popIn {
-    0% {
-        transform: scale(0);
+/* 📱 ADAPTABILIDAD RESPONSIVA PARA TABLETS Y PANTALLAS PEQUEÑAS */
+@media screen and (max-width: 1024px) {
+    body {
+        overflow-y: auto;
     }
 
-    100% {
-        transform: scale(1);
+    .container {
+        grid-template-columns: 240px 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    #rightSidebar {
+        grid-column: 1 / -1;
+        max-height: 200px;
+    }
+
+    .char-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .char-card {
+        width: 100%;
+        max-width: 380px;
     }
 }
 
-/* CONTENEDOR HORIZONTAL DE CARTAS (ESTILO HEARTHSTONE / MAGIC) */
-.tcg-hand {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-end;
-    gap: -15px;
-    width: 100%;
-    min-height: 180px;
-    padding: 15px 10px;
-    background: rgba(10, 5, 20, 0.6);
-    border: 2px solid var(--gold-border);
-    border-radius: 12px;
-    overflow-x: auto;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
-}
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
 
-/* CARTA INDIVIDUAL ESTILO TCG PREMIUM */
-.tcg-card {
-    width: 110px;
-    height: 160px;
-    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
-    border: 2px solid #d4af37;
-    border-radius: 10px;
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
-    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
-    flex-shrink: 0;
-}
-
-.tcg-card:hover {
-    transform: translateY(-20px) scale(1.15) rotate(0deg) !important;
-    z-index: 10;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 10px 20px rgba(0, 0, 0, 0.9);
-    border-color: #fff176;
-}
-
-.tcg-card .cost-gem {
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    width: 26px;
-    height: 26px;
-    background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
-    border: 2px solid #93c5fd;
-    border-radius: 50%;
-    color: white;
-    font-size: 0.65em;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
-}
-
-.tcg-card-img {
-    width: 100%;
-    height: 65px;
-    object-fit: cover;
-    border: 1px solid #d4af37;
-    border-radius: 5px;
-    margin-top: 8px;
-    image-rendering: pixelated;
-}
-
-.tcg-card .title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.72em;
-    color: #fef08a;
-    font-weight: bold;
-    text-align: center;
-    margin: 2px 0;
-}
-
-.tcg-card .desc {
-    font-size: 0.58em;
-    color: #cbd5e1;
-    text-align: center;
-    line-height: 1.1;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 3px;
-    border-radius: 4px;
-    width: 100%;
-}
-
-/* RETRATOS EN VISOR VS */
-.vs-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-    height: 100%;
-}
-
-.character-portrait {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.character-portrait img {
-    max-height: 140px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
-}
-
-.character-tag {
-    font-size: 0.6em;
-    font-family: 'Press Start 2P', cursive;
-    color: var(--gold);
-    background: rgba(0, 0, 0, 0.7);
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid var(--gold-border);
-    margin-top: 4px;
-}
-
-.character-tag.enemy-tag {
-    color: #ef4444;
-    border-color: #ef4444;
-}
-
-.vs-badge {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1.2em;
-    color: #ef4444;
-    text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
-    animation: pulse 1.5s infinite alternate;
-}
-
-/* ATRIBUTOS DEL ENEMIGO */
-.enemy-card-status {
-    background: linear-gradient(135deg, #370606 0%, #170303 100%);
-    border: 2px solid #ef4444;
-    border-radius: 8px;
-    padding: 8px 16px;
-    margin: 8px 0;
-    text-align: center;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
-}
-
-.enemy-stats-row {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    font-size: 0.85em;
-    color: #fca5a5;
-    margin-top: 4px;
-    font-weight: bold;
-}
-
-/* ILUSTRACIÓN DEL DRAGÓN EN LA PARTE INFERIOR DEL DIARIO DE AVENTURA */
-.sidebar-dragon-box {
-    margin-top: auto;
-    padding-top: 10px;
-    border-top: 1px solid var(--gold-border);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.sidebar-dragon-img {
-    width: 100%;
-    max-height: 160px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
-    transition: transform 0.3s ease;
-}
-
-.sidebar-dragon-img:hover {
-    transform: scale(1.05);
-}
-
-/* ESTILOS PARA EL MODAL Y GIF DE VICTORIA */
-.victory-modal-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    border: 3px solid var(--gold);
-    background: radial-gradient(circle, #2a1642 0%, #0d0617 100%);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.pixel-gif-container {
-    width: 200px;
-    height: 140px;
-    border: 2px solid var(--gold-border);
-    border-radius: 8px;
-    background: #000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.victory-pixel-gif {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    image-rendering: pixelated;
-}
-
-/* --- ESTILO ELVIRA PARA EL VISOR CENTRAL --- */
-.elvira-scene-frame {
-    position: relative;
-    width: 100%;
-    height: 240px; /* Ampliamos un poco la altura para mayor protagonismo visual */
-    background: #040806;
-    border: 3px solid var(--gold);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.15);
-}
-
-.elvira-scene-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    image-rendering: pixelated;
-    filter: contrast(110%) brightness(95%);
-}
-
-.elvira-scene-badge {
-    position: absolute;
-    bottom: 10px;
-    left: 12px;
-    background: rgba(12, 8, 24, 0.85);
-    border: 1px solid var(--gold-border);
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.55em;
-    color: var(--gold);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* Ajuste del panel de texto narrativo para que combine con el marco */
-.exploration-panel {
-    background: linear-gradient(135deg, rgba(27, 18, 38, 0.95), rgba(15, 10, 24, 0.95));
-    border: 2px solid var(--gold-border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    width: 100%;
-    min-height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
-    margin-bottom: 12px;
-}
-
-#explorationText {
-    font-family: 'Cinzel', serif;
-    font-size: 1em;
-    color: var(--gold-light);
-    line-height: 1.5;
-}
-
-/* CONTENEDOR DE RETRATOS ENFRENTADOS (VS) */
-.vs-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-    width: 100%;
-    height: 100%;
-}
-
-.character-portrait {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.character-portrait img {
-    max-height: 130px;
-    width: auto;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.8));
-}
-
-.vs-badge {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 1.4em;
-    color: #ef4444;
-    text-shadow: 0 0 10px rgba(239, 68, 68, 0.9);
+    .elvira-scene-frame {
+        height: 160px;
+    }
 }
