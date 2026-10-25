@@ -224,6 +224,7 @@ class Game {
     }
 
     // INICIAR COMBATE TCG
+    // INICIAR COMBATE TCG
     startTcgCombat(enemyData) {
         const levelMultiplier = this.dungeonLevel;
 
@@ -256,6 +257,7 @@ class Game {
 
         this.playerShield = 0;
 
+        // Elementos visuales del visor VS y estados
         const enemyPortraitContainer = document.getElementById('enemyPortraitContainer');
         const vsBadge = document.getElementById('vsBadge');
         const enemyStatus = document.getElementById('enemyStatus');
@@ -271,12 +273,13 @@ class Game {
         }
         if (enemyPortraitName) enemyPortraitName.textContent = this.currentEnemy.name;
 
-        // Ocultar opciones de exploración y mostrar el tablero de cartas TCG
-        const choicesEl = document.getElementById('actionChoices');
-        if (choicesEl) choicesEl.style.display = 'none';
+        // --- CAMBIO CLAVE: OCULTAR OPCIONES DE EXPLORACIÓN Y MOSTRAR TCG ---
+        const actionChoices = document.getElementById('actionChoices');
+        if (actionChoices) actionChoices.style.display = 'none';
 
-        const tcgCombatView = document.getElementById('tcgCombatView');
-        if (tcgCombatView) tcgCombatView.style.display = 'flex';
+        const tcgView = document.getElementById('tcgCombatView');
+        if (tcgView) tcgView.style.display = 'flex';
+        // -----------------------------------------------------------------
 
         const endTurnBtn = document.getElementById('endTurnTcgBtn');
         if (endTurnBtn) {
@@ -416,7 +419,6 @@ class Game {
         this.audio.play('sega');
         this.ui.logEvent(`🏆 ¡Has derrotado a ${this.currentEnemy.name}!`);
 
-        // Recompensas RPG
         this.player.addGold(100 + (this.dungeonLevel * 15));
         const leveledUp = this.player.addXp(60);
 
@@ -424,27 +426,27 @@ class Game {
             this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
-        // Ocultar visuales del combate de cartas
+        // Ocultar elementos de combate
         document.getElementById('enemyPortraitContainer').style.display = 'none';
         document.getElementById('vsBadge').style.display = 'none';
         document.getElementById('enemyStatus').style.display = 'none';
         document.getElementById('tcgCombatView').style.display = 'none';
 
-        // MOSTRAR MODAL CON EL GIF ANIMADO DE VICTORIA
+        // Mostrar botones de exploración de nuevo
+        const actionChoices = document.getElementById('actionChoices');
+        if (actionChoices) actionChoices.style.display = 'flex';
+
         const victoryModal = document.getElementById('victoryAnimationModal');
         if (victoryModal) {
             victoryModal.style.display = 'flex';
         }
 
-        // Esperar 3 segundos viendo la animación del GIF y luego avanzar
         await new Promise(r => setTimeout(r, 3000));
 
         if (victoryModal) {
             victoryModal.style.display = 'none';
         }
 
-        // Volver al modo exploración RPG y subir de planta
-        document.getElementById('actionChoices').style.display = 'flex';
         this.dungeonLevel++;
         this.loadNextExplorationEvent();
     }
