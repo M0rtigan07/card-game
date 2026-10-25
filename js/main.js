@@ -395,12 +395,15 @@ class Game {
             { name: '🔥 Fulgor Oscuro', type: 'atk', val: this.currentEnemy.atk + 8, desc: 'Ataque pesado' }
         ];
 
+
+
+
         // La IA elige una carta aleatoria de su baraja
         const chosenCard = enemyCards[Math.floor(Math.random() * enemyCards.length)];
 
         let announcementEl = document.getElementById('enemyActionAnnouncement');
         if (announcementEl) {
-            announcementEl.textContent = `⚡ ${this.currentEnemy.name} juega: [${chosenCard.name}] (${chosenCard.desc})`;
+            announcementEl.innerHTML = `⚡ <b>${this.currentEnemy.name}</b> despliega su carta: <span style="color:#ffd700;">[${chosenCard.name}]</span> - <i>${chosenCard.desc}</i>`;
         }
 
         this.ui.logEvent(`⏳ Fin de tu turno. ¡${this.currentEnemy.name} usa ${chosenCard.name}!`);
