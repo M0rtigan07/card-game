@@ -137,16 +137,21 @@
         <div class="container">
             <!-- PANEL IZQUIERDO: HOJA DE PERSONAJE -->
             <div id="leftSidebar">
-                <h2>Hoja de Héroe</h2>
+                <!-- TÍTULO Y CLASE ARRIBA -->
+                <div class="sidebar-header-box">
+                    <h2>Hoja de Héroe</h2>
+                    <span id="heroClass" class="sidebar-class-subtitle">GUERRERO</span>
+                </div>
 
-                <!-- RETRATO DEL HÉROE CON MARCO DORADO -->
+                <!-- RETRATO DEL HÉROE CON SU NOMBRE EN EL PIE -->
                 <div class="hero-card-frame">
                     <div class="hero-card-image-box">
                         <img id="sceneImage" src="img/guerrero.png" alt="Héroe">
                         <canvas id="renderCanvas"
                             style="display:none; width: 100%; height: 100%; outline: none;"></canvas>
                     </div>
-                    <span class="character-tag" id="heroClassTag">HÉROE</span>
+                    <!-- AQUÍ APARECERÁ EL NOMBRE PERSONALIZADO -->
+                    <span class="character-tag" id="heroClassTag">ALUCARD</span>
                 </div>
 
                 <div class="stat-item"><span id="heroClass">Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>

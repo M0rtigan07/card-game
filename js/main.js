@@ -23,6 +23,36 @@ class Game {
     initEvents() {
         document.getElementById('btnPressStart').addEventListener('click', () => {
             this.audio.play('sega');
+
+            // Comprobamos si ya tenemos un nombre guardado en LocalStorage
+            const savedHeroName = localStorage.getItem('mazo_hero_name');
+
+            if (savedHeroName) {
+                // Si ya existe, nos saltamos el teclado y vamos a la selección de héroe
+                this.playerName = savedHeroName;
+                this.ui.showScreen('charScreen');
+            } else {
+                // Si es la primera vez, mostramos el teclado estilo Castlevania
+                this.ui.showScreen('nameEntryScreen');
+                this.initNameKeyboard(); // <-- Llamamos a la función del teclado
+            }
+
+
+            // 2. Al pulsar CONFIRMAR NOMBRE en la pantalla de Castlevania
+            const confirmBtn = document.getElementById('btnConfirmName');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    const nameDisplay = document.getElementById('typedHeroName').textContent.trim();
+                    if (nameDisplay.length > 0) {
+                        this.playerName = nameDisplay;
+                        // Guardamos en la memoria del navegador
+                        localStorage.setItem('mazo_hero_name', this.playerName);
+                        this.audio.play('card');
+                        this.ui.showScreen('charScreen');
+                    }
+                });
+            }
+
             this.ui.showScreen('charScreen');
         });
 
@@ -37,6 +67,29 @@ class Game {
             this.audio.play('sega');
             this.ui.showScreen('gameScreen');
             this.startMainGame();
+        });
+    }
+
+    initNameKeyboard() {
+        const display = document.getElementById('typedHeroName');
+        let currentName = "HERO";
+        display.textContent = currentName;
+
+        // Le damos funcionalidad a cada letra del teclado gótico
+        document.querySelectorAll('.cv-key').forEach(key => {
+            key.onclick = (e) => {
+                this.audio.play('card');
+                const val = e.target.textContent;
+
+                if (val === '⌫') {
+                    currentName = currentName.slice(0, -1);
+                } else {
+                    if (currentName.length < 10) {
+                        currentName += val;
+                    }
+                }
+                display.textContent = currentName || "_";
+            };
         });
     }
 

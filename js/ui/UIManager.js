@@ -44,12 +44,21 @@ export class UIManager {
 
     updateStats(player, dungeonLevel) {
 
-        const heroTag = document.getElementById('heroClassTag');
-        if (heroTag && player.className) {
-            heroTag.textContent = player.className.toUpperCase();
+        // 1. Mostrar la clase arriba junto al título de la hoja
+        const classEl = document.getElementById('heroClass');
+        if (classEl && player.className) {
+            classEl.textContent = player.className.toUpperCase();
         }
 
-        document.getElementById('heroClass').textContent = player.className;
+        // 2. Mostrar el nombre personalizado en el pie de la foto (en la tarjeta)
+        const heroTag = document.getElementById('heroClassTag');
+        if (heroTag && window.game?.playerName) {
+            heroTag.textContent = window.game.playerName.toUpperCase();
+        }
+
+        // 3. Actualizar el resto de estadísticas
+
+
         document.getElementById('lvlVal').textContent = player.level;
         document.getElementById('hpVal').textContent = `${player.health}/${player.maxHealth}`;
         document.getElementById('manaVal').textContent = `${player.mana}/${player.maxMana}`;

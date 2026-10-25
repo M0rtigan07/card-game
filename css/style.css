@@ -481,6 +481,32 @@ body::after {
     color: #000;
 }
 
+/* SUBTÍTULO DE CLASE ARRIBA EN LA HOJA DE HÉROE */
+.sidebar-header-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--gold-border);
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.sidebar-header-box h2 {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.sidebar-class-subtitle {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold-light);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--gold-border);
+}
+
 /* 4. TABLERO DE JUEGO PRINCIPAL Y EXPLORACIÓN */
 .container {
     display: flex;
