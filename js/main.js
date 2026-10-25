@@ -103,42 +103,42 @@ class Game {
         this.ui.showScreen('titleScreen');
     }
 
-    async selectCharacter(classKey) {
+   async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
 
-        // Si por lo que sea recargó y saltó el teclado, recuperamos de localStorage
-        if (!this.playerName) {
-            this.playerName = localStorage.getItem('mazo_hero_name') || "HÉROE";
-        }
+        // Recuperar el nombre personalizado de la memoria del navegador
+        this.playerName = localStorage.getItem('mazo_hero_name') || "HÉROE";
 
-        // Actualizar la etiqueta debajo de la carta del panel izquierdo
+        // Asignar el nombre personalizado a la instancia del jugador si tu modelo lo soporta
+        this.player.name = this.playerName;
+
+        // Actualizar la tarjeta con el nombre en el pie
         const heroTag = document.getElementById('heroClassTag');
         if (heroTag) {
-            heroTag.textContent = this.player.className.toUpperCase();
+            heroTag.textContent = this.playerName.toUpperCase();
         }
 
-        // Mapeo dinámico de retratos según la clase
         const heroImages = {
             'warrior': 'img/guerrero.png',
             'mage': 'img/maga.png',
             'rogue': 'img/picaro.png'
         };
 
-        // Guardamos la imagen de clase en la instancia del jugador
         this.player.img = heroImages[classKey] || heroImages['warrior'];
 
-        // Actualizamos tanto la pantalla de intro como el visor principal del juego
         const heroImgEl = document.getElementById('introHeroImg');
         const sceneImg = document.getElementById('sceneImage');
         if (heroImgEl) heroImgEl.src = this.player.img;
         if (sceneImg) sceneImg.src = this.player.img;
 
-        document.getElementById('introHeroTitle').textContent = `CLASE: ${this.player.className.toUpperCase()}`;
+        // Mostrar la clase y el nombre personalizado en la pantalla de historia
+        document.getElementById('introHeroTitle').textContent = `${this.playerName} - ${this.player.className.toUpperCase()}`;
         this.ui.showScreen('introScreen');
-        this.ui.typewriterIntro(`CONSULTANDO A LOS DIOSES DEL DESTINO...`);
+        this.ui.typewriterIntro(`LOS DESTINOS SE ALINEAN PARA ${this.playerName}...`);
 
-        const story = await this.groq.generateCharacterLore(this.player.className);
+        // Llamada a la IA pasando también el nombre personalizado para el lore
+        const story = await this.groq.generateCharacterLore(this.player.className, this.playerName);
         this.ui.typewriterIntro(story.toUpperCase());
     }
 

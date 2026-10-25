@@ -42,23 +42,21 @@ export class UIManager {
         if (txt) txt.textContent = message;
     }
 
-    updateStats(player, dungeonLevel) {
-
+   updateStats(player, dungeonLevel) {
         // 1. Mostrar la clase arriba junto al título de la hoja
         const classEl = document.getElementById('heroClass');
         if (classEl && player.className) {
             classEl.textContent = player.className.toUpperCase();
         }
 
-        // 2. Mostrar el nombre personalizado en el pie de la foto (en la tarjeta)
+        // 2. Mostrar el nombre personalizado en el pie de la foto de la carta
         const heroTag = document.getElementById('heroClassTag');
-        if (heroTag && window.game?.playerName) {
-            heroTag.textContent = window.game.playerName.toUpperCase();
+        const savedName = localStorage.getItem('mazo_hero_name') || window.game?.playerName;
+        if (heroTag && savedName) {
+            heroTag.textContent = savedName.toUpperCase();
         }
 
-        // 3. Actualizar el resto de estadísticas
-
-
+        // 3. Resto de estadísticas del panel
         document.getElementById('lvlVal').textContent = player.level;
         document.getElementById('hpVal').textContent = `${player.health}/${player.maxHealth}`;
         document.getElementById('manaVal').textContent = `${player.mana}/${player.maxMana}`;
@@ -70,12 +68,14 @@ export class UIManager {
         document.getElementById('xpText').textContent = `${player.xp} / ${player.maxXp} XP`;
 
         const invList = document.getElementById('playerInventory');
-        invList.innerHTML = '';
-        player.inventory.forEach(item => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${item.name}</span><small style="color:#d8b4fe;">${item.effect}</small>`;
-            invList.appendChild(li);
-        });
+        if (invList) {
+            invList.innerHTML = '';
+            player.inventory.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${item.name}</span><small style="color:#d8b4fe;">${item.effect}</small>`;
+                invList.appendChild(li);
+            });
+        }
     }
 
     logEvent(msg) {
