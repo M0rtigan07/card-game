@@ -103,11 +103,17 @@
             <!-- PANEL IZQUIERDO: HOJA DE PERSONAJE -->
             <div id="leftSidebar">
                 <h2>Hoja de Héroe</h2>
-                <div class="character-portrait">
-                    <img id="sceneImage" src="img/guerrero.png" alt="Héroe">
-                    <span class="character-tag">HÉROE</span>
-                    <canvas id="renderCanvas" style="width: 100%; height: 100%; outline: none;"></canvas>
+
+                <!-- RETRATO DEL HÉROE CON MARCO DORADO -->
+                <div class="hero-card-frame">
+                    <div class="hero-card-image-box">
+                        <img id="sceneImage" src="img/guerrero.png" alt="Héroe">
+                        <canvas id="renderCanvas"
+                            style="display:none; width: 100%; height: 100%; outline: none;"></canvas>
+                    </div>
+                    <span class="character-tag" id="heroClassTag">HÉROE</span>
                 </div>
+
                 <div class="stat-item"><span id="heroClass">Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>
                 <div class="stat-item">❤️ Salud <span id="hpVal">100/100</span></div>
                 <div class="stat-item">🔮 Maná <span id="manaVal">50/50</span></div>
@@ -125,6 +131,7 @@
                 <h2>Inventario</h2>
                 <ul id="playerInventory"></ul>
             </div>
+
 
             <!-- PANEL CENTRAL: EXPLORACIÓN O COMBATE TCG -->
             <div id="mainContent">
