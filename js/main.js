@@ -20,7 +20,7 @@ class Game {
         this.initEvents();
     }
 
-   initEvents() {
+    initEvents() {
         document.getElementById('btnPressStart').addEventListener('click', () => {
             this.audio.play('sega');
 
@@ -65,6 +65,13 @@ class Game {
             this.ui.showScreen('gameScreen');
             this.startMainGame();
         });
+
+        // Cruceta de navegación RPG
+        document.getElementById('btnUp')?.addEventListener('click', () => this.navigate('forward'));
+        document.getElementById('btnLeft')?.addEventListener('click', () => this.navigate('turn_left'));
+        document.getElementById('btnRight')?.addEventListener('click', () => this.navigate('turn_right'));
+        document.getElementById('btnDown')?.addEventListener('click', () => this.navigate('back'));
+
     }
 
     initNameKeyboard() {
@@ -103,7 +110,7 @@ class Game {
         this.ui.showScreen('titleScreen');
     }
 
-   async selectCharacter(classKey) {
+    async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
 
