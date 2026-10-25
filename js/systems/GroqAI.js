@@ -20,4 +20,23 @@ export class GroqAI {
             return fallbacks[className] || fallbacks["Guerrero"];
         }
     }
+
+    // Añade este método en tu clase GroqAI si no lo tienes:
+    async generateNpcDialogue(npcKey, playerChoice) {
+        try {
+            const response = await fetch("/api/generate-lore", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: 'npc_interaction',
+                    npc: npcKey,
+                    action: playerChoice
+                })
+            });
+            const data = await response.json();
+            return data.description || "El personaje te mira fijamente en la penumbra sin pronunciar palabra...";
+        } catch (err) {
+            return "Las sombras ocultan la respuesta de tu interlocutor.";
+        }
+    }
 }

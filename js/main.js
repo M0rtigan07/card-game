@@ -2,6 +2,7 @@ import { AudioManager } from './audio.js';
 import { Player } from './models/Player.js';
 import { UIManager } from './ui/UIManager.js';
 import { GroqAI } from './systems/GroqAI.js';
+import { NPC_DATABASE } from './data/npcs.js';
 import { ExplorationView } from './views/ExplorationView.js';
 import { TcgCombatView } from './views/TcgCombatView.js';
 
@@ -187,14 +188,14 @@ class Game {
 
     async loadNextExplorationEvent() {
         document.getElementById('explorationText').textContent = "Escuchando los pasos en la penumbra...";
-        document.getElementById('d20Overlay').style.display = 'none';
 
-        // Asegurar que el marco del héroe muestre la imagen del Pícaro/Maga/Guerrero
-        const sceneImg = document.getElementById('sceneImage');
-        if (sceneImg && this.player?.img) {
-            sceneImg.src = this.player.img;
+        // Si estamos en la Planta 2 o si salta el evento del Conde Valerius
+        if (this.dungeonLevel === 2) {
+            this.triggerNpcEvent('valerius');
+            return;
         }
 
+        // Lógica estándar para el resto de plantas (llamada a la API o eventos genéricos)
         try {
             const response = await fetch("/api/generate-lore", {
                 method: "POST",
@@ -207,20 +208,165 @@ class Game {
             });
             const eventData = await response.json();
 
-            document.getElementById('explorationText').textContent = eventData.description;
+            // Usamos la vista de exploración para mostrar el evento
+            const mainContent = document.getElementById('mainContent');
+            const explorationView = new ExplorationView(mainContent, this);
+            explorationView.render();
 
-            const choicesContainer = document.getElementById('actionChoices');
-            choicesContainer.innerHTML = '';
-
-            eventData.choices.forEach(choice => {
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.textContent = choice.text;
-                btn.addEventListener('click', () => this.handleExplorationChoice(choice.action, eventData));
-                choicesContainer.appendChild(btn);
-            });
+            explorationView.setNarrative(
+                eventData.description,
+                eventData.choices.map(c => ({
+                    text: c.text,
+                    callback: () => this.handleExplorationChoice(c.action, eventData)
+                }))
+            );
         } catch (err) {
-            document.getElementById('explorationText').textContent = "Avanzas por un pasillo silencioso sin amenazas a la vista.";
+            // Fallback en caso de que la API no responda
+            const mainContent = document.getElementById('mainContent');
+            const explorationView = new ExplorationView(mainContent, this);
+            explorationView.render();
+
+            explorationView.setNarrative(
+                "Avanzas por un pasillo silencioso con antiguas antorchas parpadeantes en las paredes de piedra.",
+                [
+                    {
+                        text: "Avanzar con sigilo hacia la siguiente sala",
+                        callback: () => {
+                            this.dungeonLevel++;
+                            this.loadNextExplorationEvent();
+                        }
+                    }
+                ]
+            );
+        }
+    }
+
+    triggerNpcEvent(npcKey) {
+        const npc = NPC_DATABASE[npcKey];
+        if (!npc) return;
+
+        // Renderizar la vista de exploración con el marco de Elvira
+        const mainContent = document.getElementById('mainContent');
+        const explorationView = new ExplorationView(mainContent, this);
+        explorationView.render();
+
+        // Cambiar la imagen del visor al retrato del PNJ
+        const sceneImg = document.getElementById('sceneImage');
+        if (sceneImg) {
+            sceneImg.src = npc.img;
+            sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
+        }
+
+        const sceneBadge = document.getElementById('sceneBadgeOverlay');
+        if (sceneBadge) {
+            sceneBadge.textContent = npc.name.toUpperCase();
+        }
+
+        // Obtener interacción según la clase del jugador ('mage', 'warrior', 'rogue')
+        const playerClassKey = this.player.classKey || 'warrior';
+        const interaction = npc.interactions[playerClassKey] || npc.interactions['warrior'];
+
+        // Inyectar la narrativa y las opciones de respuesta personalizadas
+        explorationView.setNarrative(
+            interaction.greeting,
+            interaction.choices.map(choice => ({
+                text: choice.text,
+                callback: () => this.handleNpcChoice(npc, choice.action, interaction)
+            }))
+        );
+
+        this.ui.logEvent(`👁️ Te encuentras cara a cara con ${npc.name}.`);
+    }
+
+    handleNpcChoice(npc, action, interaction) {
+        this.audio.play('card');
+
+        // 1. ACEPTPAR EL ROMANCE / COQUETEO (MAGA ARCANA)
+        if (action === 'romance_accept') {
+            this.ui.logEvent(`🌹 ${this.playerName} acepta la copa del Conde Valerius. Se sella un pacto de sangre y fascinación.`);
+            this.player.addGold(150);
+            this.player.health = this.player.maxHealth; // Recuperación total por el elixir vampírico
+
+            // Añadir objeto especial al inventario
+            this.player.inventory.push({ name: '🍷 Elixir del Conde', effect: '+15 MP Permanente' });
+            this.player.maxMana += 15;
+            this.player.mana = this.player.maxMana;
+
+            this.ui.updateStats(this.player, this.dungeonLevel);
+
+            // Continuar exploración tras el encuentro romántico
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1800);
+            return;
+        }
+
+        // 2. RETAR CON COQUETEO (MAGA ARCANA)
+        if (action === 'flirt_challenge') {
+            this.ui.logEvent(`✨ ${this.playerName} deslumbra al Conde con un despliegue de magia arcana. Valerius sonríe fascinado.`);
+            const xpGain = 80;
+            const leveledUp = this.player.addXp(xpGain);
+            if (leveledUp) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
+
+            this.ui.updateStats(this.player, this.dungeonLevel);
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1800);
+            return;
+        }
+
+        // 3. ACEPTAR PACTO SOMBRÍO (PÍCARO)
+        if (action === 'pact_accept') {
+            this.ui.logEvent(`🤝 Sellas un acuerdo de sombras con ${npc.name}. Obtienes información y riquezas.`);
+            this.player.addGold(200);
+            this.ui.updateStats(this.player, this.dungeonLevel);
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1800);
+            return;
+        }
+
+        // 4. COMBATE TCG CONTRA EL CONDE
+        if (action === 'combat') {
+            this.ui.logEvent(`⚔️ ¡Desafías al ${npc.name}! Desenfundan sus cartas.`);
+
+            // Iniciar combate cargando las estadísticas y mazo de Valerius
+            this.startTcgCombat({
+                name: npc.name,
+                hp: npc.baseHp + (this.dungeonLevel * 10),
+                maxHp: npc.baseHp + (this.dungeonLevel * 10),
+                atk: npc.baseAtk,
+                shield: 0,
+                img: npc.img,
+                deck: npc.deck
+            });
+            return;
+        }
+
+        // 5. COMPRA / SOBORNO (GUERRERO)
+        if (action === 'buy') {
+            if (this.player.gold >= 50) {
+                this.player.gold -= 50;
+                this.ui.logEvent(`💰 Entregas 50 GP al Conde Valerius. Te permite el paso sin sangre.`);
+                this.ui.updateStats(this.player, this.dungeonLevel);
+                this.dungeonLevel++;
+                setTimeout(() => this.loadNextExplorationEvent(), 1400);
+            } else {
+                this.ui.logEvent(`❌ No tienes suficiente oro. ¡El Conde se impacienta!`);
+                this.startTcgCombat({
+                    name: npc.name,
+                    hp: npc.baseHp,
+                    maxHp: npc.baseHp,
+                    atk: npc.baseAtk,
+                    shield: 0,
+                    img: npc.img
+                });
+            }
+            return;
+        }
+
+        // 6. HUIR / PASAR
+        if (action === 'pass') {
+            this.ui.logEvent(`🏃 Te retiras con cautela antes de que el Conde decida atacarte.`);
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1200);
         }
     }
 
