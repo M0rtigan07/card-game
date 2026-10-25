@@ -1,50 +1,120 @@
 // js/data/npcs.js
 export const NPC_DATABASE = {
+    // --- PLANTA 2: EL CONDE ---
     valerius: {
         id: 'valerius',
         name: 'Conde Valerius',
-        // Rutas de las imágenes según el estado de la interacción
         images: {
-            room: 'img/conde_pasillo.png',       // Imagen amplia de la sala (estilo Elvira)
-            talk: 'img/conde_charla.png',       // Primer plano elegante de charla (estilo Monkey Island)
-            enraged: 'img/conde_enojado.png'  // Primer plano furioso antes del combate TCG
+            room: 'img/valerius_room.png',
+            talk: 'img/valerius_talk.png',
+            enraged: 'img/valerius_enraged.png'
         },
         type: 'vampire_lord',
-        description: 'Un aristócrata inmortal de la noche, soberbio y dueño absoluto de estas criptas.',
+        dungeonLevel: 2, // <-- Asignado estrictamente a la planta 2
         baseHp: 70,
         baseAtk: 16,
-        
         deck: [
             { name: '🍷 Mordisco Noblesse', type: 'atk', val: 18, desc: 'Ataque vampírico pesado' },
             { name: '🦇 Capa de Sombras', type: 'def', val: 12, desc: 'Gana 12 de escudo' },
             { name: '🔮 Seducción Oscura', type: 'atk', val: 24, desc: 'Daño mental/arcano' }
         ],
-
         interactions: {
             'mage': {
-                type: 'romance',
-                greeting: "Vaya... Una hechicera de sangre pura recorre mi cripta. Siento el fuego arcano latiendo en tus venas, mi dama. Sería una lástima manchar de sangre una presencia tan fascinante... Acepta mi copa o demuestra si tu magia rivaliza con la mía.",
+                greeting: "Vaya... Una hechicera de sangre pura recorre mi cripta...",
                 choices: [
-                    { text: "🍷 \"Acepto tu copa, Conde. Hablemos de poder... y de sombras.\"", action: 'romance_accept' },
-                    { text: "✨ \"Guarda tus halagos, vampiro. Mi magia no se vende tan fácil.\"", action: 'flirt_challenge' },
-                    { text: "🗡️ \"Tu encanto no funciona conmigo. ¡Desenfunda!\"", action: 'combat' }
+                    { text: "🍷 \"Acepto tu copa, Conde.\"", action: 'romance_accept' },
+                    { text: "🗡️ \"¡Desenfunda!\"", action: 'combat' }
                 ]
             },
             'warrior': {
-                type: 'rivalry',
-                greeting: "Un patético bulto de acero profana mis aposentos. ¿Crees que tu espada mellada me asusta, mortal? Hincaras la rodilla ante el verdadero señor de estas tierras.",
+                greeting: "Un patético bulto de acero profana mis aposentos...",
                 choices: [
-                    { text: "🗡️ [FUERZA] \"Mi acero acabará con tu soberbia. ¡Lucha!\"", action: 'combat' },
-                    { text: "💰 \"Acepta este tributo de oro y abre paso, chupasangre.\"", action: 'buy' },
-                    { text: "🏃 \"Me largo de este apestoso salón.\"", action: 'pass' }
+                    { text: "🗡️ [FUERZA] \"¡Lucha!\"", action: 'combat' },
+                    { text: "💰 \"Acepta este tributo de oro.\"", action: 'buy' }
                 ]
             },
             'rogue': {
-                type: 'pact',
-                greeting: "Un ratón sigiloso acecha en mis dominios... Interesante. Los ladrones astutos pueden ser útiles antes de ser devorados.",
+                greeting: "Un ratón sigiloso acecha en mis dominios...",
                 choices: [
-                    { text: "🤝 \"Hagamos un trato: información y oro a cambio de mi silencio.\"", action: 'pact_accept' },
-                    { text: "🗡️ \"No pacto con monstruos. ¡A las armas!\"", action: 'combat' }
+                    { text: "🤝 \"Hagamos un trato.\"", action: 'pact_accept' },
+                    { text: "🗡️ \"A las armas!\"", action: 'combat' }
+                ]
+            }
+        }
+    },
+
+    // --- PLANTA 1: EL MERCADER ESCAPADO ---
+    barnaby: {
+        id: 'barnaby',
+        name: 'Barnaby el Buhonero',
+        images: {
+            room: 'img/barnaby_room.png',
+            talk: 'img/barnaby_talk.png'
+        },
+        type: 'merchant',
+        dungeonLevel: 1, // <-- Aparece en la planta 1
+        baseHp: 40,
+        baseAtk: 8,
+        interactions: {
+            'warrior': {
+                greeting: "¡Psst! ¿Buscas equipamiento, viajero? Los pasillos de aquí abajo no perdonan a los imprudentes.",
+                choices: [
+                    { text: "💰 Comprar poción de salud (-30 Oro)", action: 'buy_potion' },
+                    { text: "🏃 Ignorarlo y seguir avanzando", action: 'pass' }
+                ]
+            },
+            'mage': {
+                greeting: "Saludos, erudita de lo arcano. Tengo pergaminos que podrían interesarte.",
+                choices: [
+                    { text: "🔮 Comprar grimorio (+10 Maná max, -40 Oro)", action: 'buy_mana' },
+                    { text: "🏃 Seguir mi camino", action: 'pass' }
+                ]
+            },
+            'rogue': {
+                greeting: "He visto cosas en la sombra que te encantaría saber... a buen precio.",
+                choices: [
+                    { text: "🗡️ Robarle la mercancía con sigilo (Tirada D20)", action: 'steal' },
+                    { text: "🏃 Pasar de largo", action: 'pass' }
+                ]
+            }
+        }
+    },
+
+    // --- PLANTA 3: LA BRUJA DE LOS PANTANOS ---
+    morgana: {
+        id: 'morgana',
+        name: 'Bruja Morgana',
+        images: {
+            room: 'img/morgana_room.png',
+            talk: 'img/morgana_talk.png'
+        },
+        type: 'witch',
+        dungeonLevel: 3, // <-- Aparece en la planta 3
+        baseHp: 60,
+        baseAtk: 14,
+        deck: [
+            { name: '🧪 Pócima Cáustica', type: 'atk', val: 20, desc: 'Daño de ácido' }
+        ],
+        interactions: {
+            'mage': {
+                greeting: "¡Jejeje! Veo el brillo de la verdadera magia en tus ojos. ¿Intercambiamos secretos?",
+                choices: [
+                    { text: "✨ Intercambiar conocimiento (+50 XP)", action: 'witch_knowledge' },
+                    { text: "🔮 Atacar a la bruja", action: 'combat' }
+                ]
+            },
+            'warrior': {
+                greeting: "Hueles a metal y sudor. Tu carne servirá para mis calderos, guerrero.",
+                choices: [
+                    { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
+                    { text: "💰 Pagar peaje para cruzar (-60 Oro)", action: 'buy' }
+                ]
+            },
+            'rogue': {
+                greeting: "Un alma corrupta... Me agradas. ¿Quieres comprar un veneno letal?",
+                choices: [
+                    { text: "🧪 Comprar veneno para las cartas", action: 'buy_poison' },
+                    { text: "🗡️ Amenazarla", action: 'combat' }
                 ]
             }
         }

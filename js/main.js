@@ -186,16 +186,18 @@ class Game {
         await this.loadNextExplorationEvent();
     }
 
-    async loadNextExplorationEvent() {
+   async loadNextExplorationEvent() {
         document.getElementById('explorationText').textContent = "Escuchando los pasos en la penumbra...";
 
-        // El Conde Valerius SOLO aparece de forma exclusiva en la Planta 2
-        if (this.dungeonLevel === 2) {
-            this.triggerNpcEvent('valerius');
+        // Buscar si hay algún PNJ registrado exactamente para esta planta
+        const npcKey = Object.keys(NPC_DATABASE).find(key => NPC_DATABASE[key].dungeonLevel === this.dungeonLevel);
+
+        if (npcKey) {
+            this.triggerNpcEvent(npcKey);
             return;
         }
 
-        // Resto de la exploración normal para otras plantas...
+        // Si no hay PNJ en esta planta, continúa con la exploración procedural o por API
         try {
             const response = await fetch("/api/generate-lore", {
                 method: "POST",
@@ -220,13 +222,21 @@ class Game {
                 }))
             );
         } catch (err) {
-            // Fallback genérico
             const mainContent = document.getElementById('mainContent');
             const explorationView = new ExplorationView(mainContent, this);
             explorationView.render();
+
             explorationView.setNarrative(
-                "Avanzas por un pasillo silencioso con antiguas antorchas parpadeantes.",
-                [{ text: "Continuar", callback: () => { this.dungeonLevel++; this.loadNextExplorationEvent(); } }]
+                `Avanzas con cautela por los oscuros corredores de la Planta ${this.dungeonLevel}.`,
+                [
+                    {
+                        text: "Avanzar hacia la siguiente sala",
+                        callback: () => {
+                            this.dungeonLevel++;
+                            this.loadNextExplorationEvent();
+                        }
+                    }
+                ]
             );
         }
     }
