@@ -698,8 +698,8 @@ h1 {
 .elvira-scene-frame {
     position: relative;
     width: 100%;
-    max-width: 520px;
-    height: 260px;
+    max-width: 720px;
+    height: 460px;
     background: #000;
     border: 3px solid #ffd700;
     margin: 10px auto;
