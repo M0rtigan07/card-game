@@ -960,27 +960,68 @@ h1 {
         min-width: 0;
     }
 
+    #rightSidebar {
+        background: var(--panel-bg);
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px solid var(--gold-border);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+        /* Fija el alto al contenedor principal */
+        max-height: 86vh;
+        /* Límite máximo para que no se desborde */
+        overflow: hidden;
+        /* Impide que el panel entero haga scroll global */
+        min-width: 0;
+    }
+
     #eventList {
         list-style: none;
         display: flex;
         flex-direction: column;
         gap: 6px;
         flex: 1;
-        /* Ocupa todo el espacio intermedio disponible */
+        /* Toma estrictamente el espacio sobrante entre el título y el dragón */
         overflow-y: auto;
-        /* El scroll vertical ocurre SOLO dentro de la lista */
+        /* El scroll vertical ocurre ÚNICAMENTE aquí */
         padding-right: 4px;
+    }
+
+    #eventList::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    #eventList::-webkit-scrollbar-thumb {
+        background: var(--gold-border);
+        border-radius: 4px;
+    }
+
+    #eventList li {
+        font-size: 0.78em;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 5px 7px;
+        border-radius: 6px;
+        border-left: 3px solid var(--gold-border);
     }
 
     .sidebar-dragon-box {
         margin-top: auto;
-        /* Empuja la caja del dragón estrictamente al fondo */
+        /* Lo empuja y ancla rígidamente al fondo del panel */
         padding-top: 6px;
         border-top: 1px solid var(--gold-border);
         display: flex;
         justify-content: center;
         flex-shrink: 0;
-        /* Evita que el dragón se comprima o se mueva */
+        /* Evita que el dragón se comprima o desaparezca */
+    }
+
+    .sidebar-dragon-img {
+        width: 100%;
+        max-height: 130px;
+        object-fit: contain;
+        image-rendering: pixelated;
     }
 
     .char-grid {
