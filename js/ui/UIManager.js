@@ -42,7 +42,7 @@ export class UIManager {
         if (txt) txt.textContent = message;
     }
 
-   updateStats(player, dungeonLevel) {
+    updateStats(player, dungeonLevel) {
         // 1. Mostrar la clase arriba junto al título de la hoja
         const classEl = document.getElementById('heroClass');
         if (classEl && player.className) {
@@ -80,11 +80,23 @@ export class UIManager {
 
     logEvent(msg) {
         const list = document.getElementById('eventList');
+        if (!list) return;
+
+        // Quitar la clase 'last-event' de los elementos anteriores
         document.querySelectorAll('#eventList li').forEach(el => el.classList.remove('last-event'));
+
         const li = document.createElement('li');
         li.textContent = msg;
         li.classList.add('last-event');
+
+        // Insertar el nuevo evento arriba del todo
         list.insertBefore(li, list.firstChild);
+
+        // Limitar el número máximo de acciones guardadas (ejemplo: máximo 6 u 7 visibles)
+        const maxLogs = 7;
+        while (list.children.length > maxLogs) {
+            list.removeChild(list.lastChild); // Elimina el evento más antiguo que se sale por abajo
+        }
     }
 
     showGameOver() {
