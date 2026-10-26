@@ -14,12 +14,11 @@ export default async function handler(req, res) {
         }
         body = body || {};
 
-        const { type, className = "Guerrero", dungeonLevel = 1 } = body;
+        const { type, className = "Guerrero", dungeonLevel = 1, npc, npcName, npcArchetype, action } = body;
         const apiKey = process.env.GROQ_API_KEY;
 
         // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
         const dndEncounterDatabase = {
-            // ENCUENTROS PARA GUERRERO
             "Guerrero": [
                 {
                     npcType: "warrior",
@@ -40,7 +39,6 @@ export default async function handler(req, res) {
                     ]
                 }
             ],
-            // ENCUENTROS PARA MAGA ARCANA
             "Maga Arcana": [
                 {
                     npcType: "mage",
@@ -50,18 +48,8 @@ export default async function handler(req, res) {
                         { text: "🗣️ \"Dime qué secretos esconde la orden a cambio de ayudarte.\"", action: "strength" },
                         { text: "⚔️ \"Ese nexo alberga una criatura sombría. ¡A prepararse!\"", action: "combat" }
                     ]
-                },
-                {
-                    npcType: "mage",
-                    description: "Un demonio encuadernado en un libro parlante sobre un pedestal te llama: \"Libérame del sello de plata y te otorgaré un hechizo olvidado...\"",
-                    choices: [
-                        { text: "✨ [CONOCIMIENTO] \"Descifraré el sello sin romper la prisión.\"", action: "magic" },
-                        { text: "🚪 \"Un demonio encarcelado debe permanecer así. Me retiro.\"", action: "pass" },
-                        { text: "⚔️ \"¡Destruyo el tomo para extinguir tu maldad!\"", action: "combat" }
-                    ]
                 }
             ],
-            // ENCUENTROS PARA PÍCARO
             "Pícaro": [
                 {
                     npcType: "rogue",
@@ -71,20 +59,10 @@ export default async function handler(req, res) {
                         { text: "🗡️ [INMERCENARIO] \"Te quitaré las llaves y el saco ahora mismo.\"", action: "strength" },
                         { text: "🚪 \"No me mezclo en asuntos de ladrones torpes.\"", action: "pass" }
                     ]
-                },
-                {
-                    npcType: "rogue",
-                    description: "Una estatua de gárgola con ojos de rubí susurra: \"Un paso en falso y activarás las cuchillas del techo... Resuelve mi acertijo o sangra.\"",
-                    choices: [
-                        { text: "🗣️ [PERSPICACIA] \"Escucho tu acertijo, criatura de piedra.\"", action: "magic" },
-                        { text: "🗡️ [AGILIDAD] \"Inhabilito el mecanismo de trampa con mis ganzúas.\"", action: "strength" },
-                        { text: "⚔️ \"¡Rompo la estatua a golpes antes de que se mueva!\"", action: "combat" }
-                    ]
                 }
             ]
         };
 
-        // ENCUENTROS PROFUNDOS PARA PLANTAS AVANZADAS (Planta > 3)
         const deepDungeonEncounters = [
             {
                 npcType: "mage",
@@ -94,19 +72,9 @@ export default async function handler(req, res) {
                     { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
                     { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
                 ]
-            },
-            {
-                npcType: "warrior",
-                description: "Un Caballero de la Muerte en armadura oxidada te corta el paso: \"Nadie ha salido con vida de la Planta " + dungeonLevel + ". Tu aventura termina aquí.\"",
-                choices: [
-                    { text: "⚔️ \"¡Defiéndete, monstruo! El Mazo del Destino me guía.\"", action: "combat" },
-                    { text: "🗡️ [DIPLOMACIA DE ACERO] \"Probemos la resistencia de tu armadura.\"", action: "strength" },
-                    { text: "💰 \"Ofrezco mi oro si me permites buscar el altar de luz.\"", action: "buy" }
-                ]
             }
         ];
 
-        // SELECCIÓN INTELIGENTE DE FALLBACK
         function getSmartFallback() {
             if (dungeonLevel > 3 && Math.random() > 0.4) {
                 return deepDungeonEncounters[Math.floor(Math.random() * deepDungeonEncounters.length)];
@@ -116,27 +84,30 @@ export default async function handler(req, res) {
         }
 
         const fallbackEvent = getSmartFallback();
-
         const fallbackIntro = {
             story: `EL DESTINO DE ${className.toUpperCase()} ESTÁ FORJADO EN SANGRE Y MANÁ. ADÉNTRATE EN LA PLANTA ${dungeonLevel}.`
         };
 
-        // 💬 MANEJADOR DE DIÁLOGOS ESPECÍFICOS PARA PNJS
+        // 💬 MANEJADOR DE DIÁLOGOS DINÁMICOS PARA PNJS (FIJOS Y NUEVOS ARQUETIPOS)
         if (type === 'npc_interaction') {
             if (!apiKey) {
                 return res.status(200).json({ description: "El personaje te observa en silencio en la penumbra..." });
             }
 
             try {
-                // Definir la personalidad según el PNJ recibido
                 let personaPrompt = "Actúa como un habitante misterioso de una mazmorra gótica oscura.";
 
+                // PNJs Fijos
                 if (npc === 'valerius') {
                     personaPrompt = "Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante. Responde con desdén y superioridad.";
                 } else if (npc === 'barnaby') {
                     personaPrompt = "Actúa como Barnaby el Buhonero, un mercader callejero astuto, precavido y hablador. Responde con un tono comercial y pícaro.";
                 } else if (npc === 'morgana') {
                     personaPrompt = "Actúa como la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática. Responde con un toque mágico y provocador.";
+                } 
+                // Nuevos PNJs dinámicos basados en arquetipos de carpetas
+                else if (npcName && npcArchetype) {
+                    personaPrompt = `Actúa como ${npcName}, que es ${npcArchetype}.`;
                 }
 
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -149,12 +120,12 @@ export default async function handler(req, res) {
                         model: "llama-3.3-70b-versatile",
                         messages: [{
                             role: "system",
-                            content: `${personaPrompt} El jugador ha dicho o hecho: "${action}". Responde brevemente (máximo 2 líneas) con una frase directa en español, metida en el personaje, ideal para una aventura gráfica clásica.`
+                            content: `${personaPrompt} El jugador de clase ${className} le ha dicho o hecho: "${action || 'Se acerca a observar'}". Responde brevemente (máximo 2 líneas) con una frase directa en español, metida en el personaje, ideal para una aventura gráfica clásica.`
                         }, {
                             role: "user",
                             content: `Responde a la acción del héroe.`
                         }],
-                        temperature: 0.8,
+                        temperature: 0.82,
                         max_tokens: 100
                     })
                 });
@@ -171,6 +142,7 @@ export default async function handler(req, res) {
             }
         }
 
+        // EXPLORACIÓN PROCEDURAL
         if (type === 'exploration') {
             if (!apiKey) return res.status(200).json(fallbackEvent);
 
@@ -220,7 +192,7 @@ export default async function handler(req, res) {
                     model: "openai/gpt-oss-120b",
                     messages: [{
                         role: "system",
-                        content: "Eres un narrador de D&D. Genera introducciones épicas  en español sin markdown."
+                        content: "Eres un narrador de D&D. Genera introducciones épicas en español sin markdown."
                     }, {
                         role: "user",
                         content: `Escribe una frase epica narrativa de inicio para un héroe ${className}.`

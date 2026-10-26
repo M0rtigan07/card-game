@@ -43,6 +43,59 @@ export const NPC_DATABASE = {
         }
     },
 
+    // --- PLANTA 4: LA VIKINGA DE LAS CRYPTAS ---
+    vikinga: {
+        id: 'vikinga',
+        name: 'Astrid la Escudera',
+        images: {
+            room: 'img/npcs/vikinga.jpg',
+            talk: 'img/npcs/vikinga_hablando.jpg',
+            enraged: 'img/npcs/vikinga_enojada.jpg'
+        },
+        type: 'warrior_viking',
+        archetype: 'una guerrera vikinga feroz, orgullosa, de pocas palabras y sedienta de honor y batallas en el Valhalla',
+        dungeonLevel: 4,
+        baseHp: 60,
+        baseAtk: 15,
+        deck: [
+            { name: '🪓 Hacha Nórdica', type: 'atk', val: 20, desc: 'Corte pesado de Berserker' }
+        ],
+        interactions: {
+            // Opciones genéricas o adaptables donde la IA genera la charla
+            choices: [
+                { text: "⚔️ Desafiarla a un duelo de acero", action: 'combat' },
+                { text: "🤝 Invitarla a beber y sellar una alianza", action: 'pact_accept' },
+                { text: "🏃 Ignorarla y seguir tu camino", action: 'pass' }
+            ]
+        }
+    },
+
+    // --- PLANTA 5: EL MONGOL DE LAS ESTEPAS OSCURAS ---
+    mongol: {
+        id: 'mongol',
+        name: 'Batu Jan el Nómada',
+        images: {
+            room: 'img/npcs/mongol.jpg',
+            talk: 'img/npcs/mongol_habla.jpg',
+            action: 'img/npcs/mongol_arco.jpg'
+        },
+        type: 'nomad_archer',
+        archetype: 'un arquero nómada de las estepas, sabio, curtido en tormentas de arena y misterioso',
+        dungeonLevel: 5,
+        baseHp: 50,
+        baseAtk: 14,
+        deck: [
+            { name: '🏹 Flecha de la Estepa', type: 'atk', val: 18, desc: 'Disparo preciso' }
+        ],
+        interactions: {
+            choices: [
+                { text: "🏹 Pedirle consejo sobre los peligros de la mazmorra", action: 'witch_knowledge' },
+                { text: "💰 Comprar flechas envenenadas (-40 Oro)", action: 'buy_poison' },
+                { text: "⚔️ Atacar al nómada", action: 'combat' }
+            ]
+        }
+    },
+
     // --- PLANTA 1: EL MERCADER ESCAPADO ---
     barnaby: {
         id: 'barnaby',

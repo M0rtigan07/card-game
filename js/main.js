@@ -263,55 +263,73 @@ class Game {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
-        // Renderizar la vista modular de exploración en el panel central
         const mainContent = document.getElementById('mainContent');
         const explorationView = new ExplorationView(mainContent, this);
         explorationView.render();
 
-        // Apuntamos exclusivamente a la imagen grande del visor central
         const sceneImg = document.getElementById('centralSceneImage');
         if (sceneImg) {
-            // Usamos la imagen de la sala por defecto (room)
-            sceneImg.src = npc.images?.room || npc.img;
+            sceneImg.src = npc.images.room;
             sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
         }
 
-        // Actualizar la placa de identificación superior de la escena
         const sceneBadge = document.getElementById('sceneBadgeOverlay');
-        if (sceneBadge) {
-            sceneBadge.textContent = npc.name.toUpperCase();
+        if (sceneBadge) sceneBadge.textContent = npc.name.toUpperCase();
+
+        // 🤖 Pedir a Groq un saludo dinámico y único para este PNJ
+        let dynamicGreeting = `Te encuentras con ${npc.name} en la penumbra de la planta.`;
+        try {
+            const res = await fetch("/api/generate-lore", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    type: 'npc_interaction',
+                    npcName: npc.name,
+                    npcArchetype: npc.archetype,
+                    className: this.player.className,
+                    action: "Se acerca con cautela y cruza su mirada."
+                })
+            });
+            const data = await res.json();
+            if (data.description) dynamicGreeting = data.description;
+        } catch (e) {
+            console.error("Error generando saludo IA", e);
         }
 
-        // Obtener interacción según la clase del jugador ('mage', 'warrior', 'rogue')
-        const playerClassKey = this.player.classKey || 'warrior';
-        const interaction = npc.interactions[playerClassKey] || npc.interactions['warrior'];
-
-        // Inyectar la narrativa de saludo y las opciones de respuesta personalizadas
+        // Renderizar opciones y manejar diálogos interactivos con Groq
         explorationView.setNarrative(
-            interaction.greeting,
-            interaction.choices.map(choice => ({
+            dynamicGreeting,
+            npc.interactions.choices.map(choice => ({
                 text: choice.text,
                 callback: async () => {
-                    // 1. Cambiar a la imagen de charla en primer plano si está disponible
-                    if (sceneImg && npc.images?.talk) {
+                    if (sceneImg && npc.images.talk) {
                         sceneImg.src = npc.images.talk;
                     }
 
-                    // 2. Generar respuesta interactiva con la personalidad correcta usando Groq
-                    const npcReply = await this.groq.generateNpcDialogue(npc.name, this.player.className, choice.text);
+                    // Respuesta de la IA ante la elección del jugador
+                    const response = await fetch("/api/generate-lore", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            type: 'npc_interaction',
+                            npcName: npc.name,
+                            npcArchetype: npc.archetype,
+                            className: this.player.className,
+                            action: choice.text
+                        })
+                    });
+                    const replyData = await response.json();
+                    
+                    this.showDialogueOverlay(npc.name, replyData.description);
 
-                    // 3. Mostrar el bocadillo de diálogo flotante estilo Monkey Island
-                    this.showDialogueOverlay(npc.name, npcReply);
-
-                    // 4. Ejecutar la acción correspondiente tras una breve pausa dramática
                     setTimeout(() => {
-                        this.handleNpcChoice(npc, choice.action, interaction);
-                    }, 2200);
+                        this.handleNpcChoice(npc, choice.action);
+                    }, 2500);
                 }
             }))
         );
 
-        this.ui.logEvent(`👁️ Te encuentras cara a cara con ${npc.name}.`);
+        this.ui.logEvent(`👁️ Te encuentras con ${npc.name} en la planta ${this.dungeonLevel}.`);
     }
 
     // Método auxiliar para pintar el cuadro de diálogo flotante tipo Monkey Island
