@@ -86,13 +86,15 @@ export const NPC_DATABASE = {
         name: 'Bruja Morgana',
         images: {
             room: 'img/morgana_room.png',
-            talk: 'img/morgana_talk.png'
+            talk: 'img/morgana_talk.png',
+            romance: 'img/morgana_romance.png' // Primer plano de seducción / romance oscuro
         },
         type: 'witch',
         dungeonLevel: 3, // <-- Aparece en la planta 3
         baseHp: 60,
         baseAtk: 14,
         deck: [
+            { name: '🧪 Pócima Cáustica', type: 'atk', val: 20, desc: 'Daño de ácido' },
             { name: '🧪 Pócima Cáustica', type: 'atk', val: 20, desc: 'Daño de ácido' }
         ],
         interactions: {
@@ -104,8 +106,11 @@ export const NPC_DATABASE = {
                 ]
             },
             'warrior': {
+                type: 'romance',
                 greeting: "Hueles a metal y sudor. Tu carne servirá para mis calderos, guerrero.",
                 choices: [
+                    { text: "🌹 \"Una belleza tan salvaje merece algo mejor que pelear. Hablemos...\"", action: 'morgana_romance_warrior' },
+                    { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
                     { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
                     { text: "💰 Pagar peaje para cruzar (-60 Oro)", action: 'buy' }
                 ]
@@ -113,6 +118,8 @@ export const NPC_DATABASE = {
             'rogue': {
                 greeting: "Un alma corrupta... Me agradas. ¿Quieres comprar un veneno letal?",
                 choices: [
+                    { text: "💋 \"Contigo siempre apetece un buen trato bajo la luz de la luna...\"", action: 'morgana_romance' },
+                    { text: "🗡️ Amenazarla", action: 'combat' },
                     { text: "🧪 Comprar veneno para las cartas", action: 'buy_poison' },
                     { text: "🗡️ Amenazarla", action: 'combat' }
                 ]

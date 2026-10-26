@@ -347,6 +347,24 @@ class Game {
             return;
         }
 
+        // 7. ROMANCE / PACTO CON LA BRUJA MORGANA
+        if (action === 'morgana_romance' || action === 'morgana_romance_warrior') {
+            this.ui.logEvent(`🖤 Sellar un vínculo oscuro con la Bruja Morgana llena tu espíritu de un poder prohibido.`);
+            this.player.addGold(100);
+            this.player.health = this.player.maxHealth;
+            
+            // Recompensa única de la bruja
+            this.player.inventory.push({ name: '🧪 Poción de Subsistencia', effect: '+20 HP Máximo' });
+            this.player.maxHealth += 20;
+            this.player.health = this.player.maxHealth;
+
+            this.ui.updateStats(this.player, this.dungeonLevel);
+            
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1800);
+            return;
+        }
+
         // 4. COMBATE TCG CONTRA EL CONDE
         if (action === 'combat') {
             this.ui.logEvent(`⚔️ ¡Desafías al ${npc.name}! Desenfundan sus cartas.`);

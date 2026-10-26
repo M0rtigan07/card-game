@@ -698,22 +698,22 @@ h1 {
 .elvira-scene-frame {
     position: relative;
     width: 100%;
-    height: 200px;
-    background: #040806;
-    border: 3px solid var(--gold);
-    border-radius: 10px;
-    overflow: hidden;
+    max-width: 520px;
+    height: 260px;
+    background: #000;
+    border: 3px solid #ffd700;
+    margin: 10px auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
 }
 
 .elvira-scene-frame img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    image-rendering: pixelated;
+    object-fit: cover; /* Hace que la imagen cubra todo el marco sin verse pequeña */
 }
 
 .vs-container {
