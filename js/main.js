@@ -269,49 +269,39 @@ class Game {
 
         const sceneImg = document.getElementById('centralSceneImage');
         if (sceneImg) {
-            sceneImg.src = npc.images.room;
+            sceneImg.src = npc.images?.room || npc.img;
             sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
         }
 
         const sceneBadge = document.getElementById('sceneBadgeOverlay');
-        if (sceneBadge) sceneBadge.textContent = npc.name.toUpperCase();
-
-        // 🤖 Pedir a Groq un saludo dinámico y único para este PNJ
-        let dynamicGreeting = `Te encuentras con ${npc.name} en la penumbra de la planta.`;
-        try {
-            const res = await fetch("/api/generate-lore", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type: 'npc_interaction',
-                    npcName: npc.name,
-                    npcArchetype: npc.archetype,
-                    className: this.player.className,
-                    action: "Se acerca con cautela y cruza su mirada."
-                })
-            });
-            const data = await res.json();
-            if (data.description) dynamicGreeting = data.description;
-        } catch (e) {
-            console.error("Error generando saludo IA", e);
+        if (sceneBadge) {
+            sceneBadge.textContent = npc.name.toUpperCase();
         }
 
-        // Renderizar opciones y manejar diálogos interactivos con Groq
+        const playerClassKey = this.player.classKey || 'warrior';
+        const interaction = npc.interactions[playerClassKey] || npc.interactions['warrior'];
+
+        // Usamos el saludo fijo que ya tenías bien definido en el npcs.js (o un texto base seguro)
+        const greetingText = interaction.greeting || `Te encuentras con ${npc.name} en la penumbra.`;
+
+        // Inyectamos la narrativa y los botones de opción obligatorios
         explorationView.setNarrative(
-            dynamicGreeting,
-            npc.interactions.choices.map(choice => ({
+            greetingText,
+            interaction.choices.map(choice => ({
                 text: choice.text,
                 callback: async () => {
-                    if (sceneImg && npc.images.talk) {
+                    // Cambiar a la imagen de charla en primer plano
+                    if (sceneImg && npc.images?.talk) {
                         sceneImg.src = npc.images.talk;
                     }
 
-                    // Respuesta de la IA ante la elección del jugador
+                    // Llamada a la IA para que responda a la opción elegida
                     const response = await fetch("/api/generate-lore", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             type: 'npc_interaction',
+                            npc: npc.id,
                             npcName: npc.name,
                             npcArchetype: npc.archetype,
                             className: this.player.className,
@@ -319,17 +309,19 @@ class Game {
                         })
                     });
                     const replyData = await response.json();
-                    
+
+                    // Mostrar bocadillo de diálogo flotante con la respuesta de la IA
                     this.showDialogueOverlay(npc.name, replyData.description);
 
+                    // Ejecutar la acción tras una breve pausa dramática
                     setTimeout(() => {
-                        this.handleNpcChoice(npc, choice.action);
-                    }, 2500);
+                        this.handleNpcChoice(npc, choice.action, interaction);
+                    }, 2200);
                 }
             }))
         );
 
-        this.ui.logEvent(`👁️ Te encuentras con ${npc.name} en la planta ${this.dungeonLevel}.`);
+        this.ui.logEvent(`👁️ Te encuentras cara a cara con ${npc.name}.`);
     }
 
     // Método auxiliar para pintar el cuadro de diálogo flotante tipo Monkey Island
