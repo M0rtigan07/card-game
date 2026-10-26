@@ -31,7 +31,7 @@ export default async function handler(req, res) {
                     ]
                 },
                 {
-                    npcType: "warrior",
+                    npcType: "automata",
                     description: "Un autómata de bronce guardián bloquea el puente de piedra: \"Solo aquellos dignos en el arte del combate atravesarán los portones del rey.\"",
                     choices: [
                         { text: "🗡️ [FUERZA] \"Demostraré mi valía en un duelo honorable.\"", action: "strength" },
