@@ -186,18 +186,17 @@ class Game {
         await this.loadNextExplorationEvent();
     }
 
-   async loadNextExplorationEvent() {
+    async loadNextExplorationEvent() {
         document.getElementById('explorationText').textContent = "Escuchando los pasos en la penumbra...";
 
-        // Buscar si hay algún PNJ registrado exactamente para esta planta
+        // 1. Comprobar si hay un PNJ fijo de planta (Valerius, Barnaby, Morgana)
         const npcKey = Object.keys(NPC_DATABASE).find(key => NPC_DATABASE[key].dungeonLevel === this.dungeonLevel);
-
         if (npcKey) {
             this.triggerNpcEvent(npcKey);
             return;
         }
 
-        // Si no hay PNJ en esta planta, continúa con la exploración procedural o por API
+        // 2. Si no es un jefe de planta, pedimos el encuentro procedural al backend
         try {
             const response = await fetch("/api/generate-lore", {
                 method: "POST",
@@ -213,6 +212,25 @@ class Game {
             const mainContent = document.getElementById('mainContent');
             const explorationView = new ExplorationView(mainContent, this);
             explorationView.render();
+
+            // --- AQUÍ ESTÁ EL TRUCO PARA LOS ENEMIGOS BÁSICOS ---
+            const centralSceneImg = document.getElementById('centralSceneImage');
+            if (centralSceneImg) {
+                // Mapeamos el npcType que viene del dndEncounterDatabase a su imagen correspondiente
+                const basicImages = {
+                    'warrior': 'img/veterano.jpg',
+                    'mage': 'img/mage.jpg',
+                    'rogue': 'img/gargola.png'
+                };
+                centralSceneImg.src = basicImages[eventData.npcType] || 'img/guerreroCorrupto.png';
+                centralSceneImg.onerror = () => { centralSceneImg.src = 'img/guerrero.png'; };
+            }
+
+            const sceneBadge = document.getElementById('sceneBadgeOverlay');
+            if (sceneBadge) {
+                sceneBadge.textContent = `ENCUENTRO - PLANTA ${this.dungeonLevel}`;
+            }
+            // -----------------------------------------------------
 
             explorationView.setNarrative(
                 eventData.description,
@@ -241,44 +259,51 @@ class Game {
         }
     }
 
-    triggerNpcEvent(npcKey) {
+    async triggerNpcEvent(npcKey) {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
+        // Renderizar la vista modular de exploración en el panel central
         const mainContent = document.getElementById('mainContent');
         const explorationView = new ExplorationView(mainContent, this);
         explorationView.render();
 
-        // 1. Mostrar imagen amplia de la sala (Estilo Elvira) al inicio
-        const sceneImg = document.querySelector('#rpgSceneView img') || document.getElementById('sceneImage');
+        // Apuntamos exclusivamente a la imagen grande del visor central
+        const sceneImg = document.getElementById('centralSceneImage');
         if (sceneImg) {
-            sceneImg.src = npc.images.room;
+            // Usamos la imagen de la sala por defecto (room)
+            sceneImg.src = npc.images?.room || npc.img;
             sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
         }
 
+        // Actualizar la placa de identificación superior de la escena
         const sceneBadge = document.getElementById('sceneBadgeOverlay');
         if (sceneBadge) {
             sceneBadge.textContent = npc.name.toUpperCase();
         }
 
+        // Obtener interacción según la clase del jugador ('mage', 'warrior', 'rogue')
         const playerClassKey = this.player.classKey || 'warrior';
         const interaction = npc.interactions[playerClassKey] || npc.interactions['warrior'];
 
+        // Inyectar la narrativa de saludo y las opciones de respuesta personalizadas
         explorationView.setNarrative(
             interaction.greeting,
             interaction.choices.map(choice => ({
                 text: choice.text,
                 callback: async () => {
-                    // 2. Al pulsar una opción, cambiamos al primer plano elegante de charla
-                    if (sceneImg) sceneImg.src = npc.images.talk;
+                    // 1. Cambiar a la imagen de charla en primer plano si está disponible
+                    if (sceneImg && npc.images?.talk) {
+                        sceneImg.src = npc.images.talk;
+                    }
 
-                    // 3. Generar respuesta arrogante de Groq para el cuadro de diálogo flotante
-                    const arrogantReply = await this.groq.generateVampireDialogue(this.player.className, choice.text);
+                    // 2. Generar respuesta interactiva con la personalidad correcta usando Groq
+                    const npcReply = await this.groq.generateNpcDialogue(npc.name, this.player.className, choice.text);
 
-                    // Mostrar el bocadillo de diálogo flotante estilo Monkey Island
-                    this.showDialogueOverlay(npc.name, arrogantReply);
+                    // 3. Mostrar el bocadillo de diálogo flotante estilo Monkey Island
+                    this.showDialogueOverlay(npc.name, npcReply);
 
-                    // Procesar la acción tras una breve pausa dramática
+                    // 4. Ejecutar la acción correspondiente tras una breve pausa dramática
                     setTimeout(() => {
                         this.handleNpcChoice(npc, choice.action, interaction);
                     }, 2200);
@@ -347,19 +372,56 @@ class Game {
             return;
         }
 
+        // 8. ACCIONES DE BARNABY EL BUHONERO (PLANTA 1)
+        if (action === 'buy_potion') {
+            if (this.player.gold >= 30) {
+                this.player.gold -= 30;
+                this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
+                this.ui.logEvent(`🧪 Compras una poción a Barnaby (-30 Oro). Recuperas 40 HP.`);
+            } else {
+                this.ui.logEvent(`❌ No tienes suficiente oro para comprar la poción.`);
+            }
+            this.ui.updateStats(this.player, this.dungeonLevel);
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1400);
+            return;
+        }
+
+        if (action === 'buy_mana') {
+            if (this.player.gold >= 40) {
+                this.player.gold -= 40;
+                this.player.maxMana += 10;
+                this.player.mana = this.player.maxMana;
+                this.ui.logEvent(`🔮 Compras un grimorio a Barnaby (-40 Oro). ¡Maná máximo aumentado!`);
+            } else {
+                this.ui.logEvent(`❌ No tienes suficiente oro.`);
+            }
+            this.ui.updateStats(this.player, this.dungeonLevel);
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1400);
+            return;
+        }
+
+        if (action === 'pass') {
+            this.ui.logEvent(`🏃 Ignoras a Barnaby y sigues adentrándote en la mazmorra.`);
+            this.dungeonLevel++;
+            setTimeout(() => this.loadNextExplorationEvent(), 1200);
+            return;
+        }
+
         // 7. ROMANCE / PACTO CON LA BRUJA MORGANA
         if (action === 'morgana_romance' || action === 'morgana_romance_warrior') {
             this.ui.logEvent(`🖤 Sellar un vínculo oscuro con la Bruja Morgana llena tu espíritu de un poder prohibido.`);
             this.player.addGold(100);
             this.player.health = this.player.maxHealth;
-            
+
             // Recompensa única de la bruja
             this.player.inventory.push({ name: '🧪 Poción de Subsistencia', effect: '+20 HP Máximo' });
             this.player.maxHealth += 20;
             this.player.health = this.player.maxHealth;
 
             this.ui.updateStats(this.player, this.dungeonLevel);
-            
+
             this.dungeonLevel++;
             setTimeout(() => this.loadNextExplorationEvent(), 1800);
             return;

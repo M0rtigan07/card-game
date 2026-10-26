@@ -121,6 +121,56 @@ export default async function handler(req, res) {
             story: `EL DESTINO DE ${className.toUpperCase()} ESTÁ FORJADO EN SANGRE Y MANÁ. ADÉNTRATE EN LA PLANTA ${dungeonLevel}.`
         };
 
+        // 💬 MANEJADOR DE DIÁLOGOS ESPECÍFICOS PARA PNJS
+        if (type === 'npc_interaction') {
+            if (!apiKey) {
+                return res.status(200).json({ description: "El personaje te observa en silencio en la penumbra..." });
+            }
+
+            try {
+                // Definir la personalidad según el PNJ recibido
+                let personaPrompt = "Actúa como un habitante misterioso de una mazmorra gótica oscura.";
+
+                if (npc === 'valerius') {
+                    personaPrompt = "Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante. Responde con desdén y superioridad.";
+                } else if (npc === 'barnaby') {
+                    personaPrompt = "Actúa como Barnaby el Buhonero, un mercader callejero astuto, precavido y hablador. Responde con un tono comercial y pícaro.";
+                } else if (npc === 'morgana') {
+                    personaPrompt = "Actúa como la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática. Responde con un toque mágico y provocador.";
+                }
+
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [{
+                            role: "system",
+                            content: `${personaPrompt} El jugador ha dicho o hecho: "${action}". Responde brevemente (máximo 2 líneas) con una frase directa en español, metida en el personaje, ideal para una aventura gráfica clásica.`
+                        }, {
+                            role: "user",
+                            content: `Responde a la acción del héroe.`
+                        }],
+                        temperature: 0.8,
+                        max_tokens: 100
+                    })
+                });
+
+                if (!response.ok) {
+                    return res.status(200).json({ description: "El personaje cruza los brazos sin dignarse a responder." });
+                }
+
+                const data = await response.json();
+                const description = data.choices?.[0]?.message?.content?.trim() || "Las sombras ocultan la respuesta de tu interlocutor.";
+                return res.status(200).json({ description });
+            } catch (err) {
+                return res.status(200).json({ description: "Un eco sordo ahoga las palabras de tu interlocutor." });
+            }
+        }
+
         if (type === 'exploration') {
             if (!apiKey) return res.status(200).json(fallbackEvent);
 
