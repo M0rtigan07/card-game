@@ -302,11 +302,20 @@ class Game {
             interaction.choices.map(choice => ({
                 text: choice.text,
                 callback: async () => {
-                    if (sceneImg && npc.images?.talk) {
-                        sceneImg.src = npc.images.talk;
+                    // COMPROBAMOS SI LA ACCIÓN ES DE PASAR/IGNORAR
+                    if (choice.action === 'pass') {
+                        // Si pasa de largo, cambiamos directo a ENFADO (sin sonrisa previa)
+                        if (sceneImg) {
+                            sceneImg.src = 'img/barnaby_enfado.png';
+                        }
+                    } else {
+                        // Si va a comprar o interactuar, sí ponemos la de hablar/sonreír
+                        if (sceneImg && npc.images?.talk) {
+                            sceneImg.src = npc.images.talk;
+                        }
                     }
 
-                    // Llamada segura a Groq para que responda a la opción elegida
+                    // Llamada segura a Groq para la respuesta
                     const response = await fetch("/api/generate-lore", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -391,12 +400,12 @@ class Game {
             return;
         }
 
-       // 8. ACCIONES DE BARNABY EL BUHONERO (PLANTA 1)
+        // 8. ACCIONES DE BARNABY EL BUHONERO (PLANTA 1)
         if (action === 'buy_potion') {
             if (this.player.gold >= 30) {
                 this.player.gold -= 30;
                 this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
-                
+
                 // Imagen de contento / venta exitosa
                 const sceneImg = document.getElementById('centralSceneImage');
                 if (sceneImg && npc.images?.talk) {
@@ -409,7 +418,7 @@ class Game {
                 this.ui.logEvent(`❌ No tienes suficiente oro para comprar la poción.`);
             }
             this.ui.updateStats(this.player, this.dungeonLevel);
-            
+
             // TIEMPO AMPLIADO (3.5 segundos para que dé tiempo a ver la imagen y leer)
             this.dungeonLevel++;
             setTimeout(() => this.loadNextExplorationEvent(), 3500);
@@ -453,12 +462,12 @@ class Game {
             }
 
             this.dungeonLevel++;
-            
+
             // TIEMPO AMPLIADO (3.5 segundos para saborear el enfado del buhonero)
             setTimeout(() => this.loadNextExplorationEvent(), 3500);
             return;
         }
-      
+
 
         // 7. ROMANCE / PACTO CON LA BRUJA MORGANA
         if (action === 'morgana_romance' || action === 'morgana_romance_warrior') {
