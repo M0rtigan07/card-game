@@ -128,9 +128,9 @@ export default async function handler(req, res) {
                     })
                 });
 
-                if (!response.ok) {
+               /*  if (!response.ok) {
                     return res.status(200).json({ description: "El personaje te mira de reojo sin decir nada." });
-                }
+                } */
 
                 const data = await response.json();
                 const description = data.choices?.[0]?.message?.content?.trim() || "Las sombras ocultan la respuesta de tu interlocutor.";
