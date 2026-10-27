@@ -89,6 +89,7 @@ export default async function handler(req, res) {
         };
 
         // 💬 MANEJADOR DE DIÁLOGOS DINÁMICOS PARA PNJS (FIJOS Y NUEVOS ARQUETIPOS)
+        // 💬 MANEJADOR DE DIÁLOGOS DINÁMICOS PARA PNJS
         if (type === 'npc_interaction') {
             if (!apiKey) {
                 return res.status(200).json({ description: "El personaje te observa en silencio en la penumbra..." });
@@ -97,16 +98,13 @@ export default async function handler(req, res) {
             try {
                 let personaPrompt = "Actúa como un habitante misterioso de una mazmorra gótica oscura.";
 
-                // PNJs Fijos
                 if (npc === 'valerius') {
-                    personaPrompt = "Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante. Responde con desdén y superioridad.";
+                    personaPrompt = "Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante.";
                 } else if (npc === 'barnaby') {
-                    personaPrompt = "Actúa como Barnaby el Buhonero, un mercader callejero astuto, precavido y hablador. Responde con un tono comercial y pícaro.";
+                    personaPrompt = "Actúa como Barnaby el Buhonero, un mercader callejero astuto, precavido, cotilla y un poco cascarrabias.";
                 } else if (npc === 'morgana') {
-                    personaPrompt = "Actúa como la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática. Responde con un toque mágico y provocador.";
-                } 
-                // Nuevos PNJs dinámicos basados en arquetipos de carpetas
-                else if (npcName && npcArchetype) {
+                    personaPrompt = "Actúa como la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática.";
+                } else if (npcName && npcArchetype) {
                     personaPrompt = `Actúa como ${npcName}, que es ${npcArchetype}.`;
                 }
 
@@ -120,18 +118,18 @@ export default async function handler(req, res) {
                         model: "llama-3.3-70b-versatile",
                         messages: [{
                             role: "system",
-                            content: `${personaPrompt} El jugador de clase ${className} le ha dicho o hecho: "${action || 'Se acerca a observar'}". Responde brevemente (máximo 2 líneas) con una frase directa en español, metida en el personaje, ideal para una aventura gráfica clásica.`
+                            content: `${personaPrompt} El jugador de clase ${className} ha realizado la siguiente acción o dicho esto: "${action}". Responde brevemente (máximo 2 líneas) con una frase directa en español metida en el personaje, reaccionando específicamente a lo que acaba de hacer el héroe.`
                         }, {
                             role: "user",
-                            content: `Responde a la acción del héroe.`
+                            content: "Reacciona a la acción del héroe."
                         }],
-                        temperature: 0.82,
+                        temperature: 0.9, // Subimos un poco la temperatura para que varíe más las respuestas
                         max_tokens: 100
                     })
                 });
 
                 if (!response.ok) {
-                    return res.status(200).json({ description: "El personaje cruza los brazos sin dignarse a responder." });
+                    return res.status(200).json({ description: "El personaje te mira de reojo sin decir nada." });
                 }
 
                 const data = await response.json();

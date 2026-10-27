@@ -259,7 +259,7 @@ class Game {
         }
     }
 
-   async triggerNpcEvent(npcKey) {
+    async triggerNpcEvent(npcKey) {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
@@ -279,10 +279,10 @@ class Game {
         }
 
         const playerClassKey = this.player.classKey || 'warrior';
-        
+
         // --- BLINDAJE DE OPCIONES: Si no tiene interacciones específicas, usamos unas universales ---
         let interaction = npc.interactions?.[playerClassKey] || npc.interactions?.['warrior'];
-        
+
         if (!interaction || !interaction.choices) {
             interaction = {
                 greeting: `Te encuentras cara a cara con ${npc.name}. Su mirada atraviesa tu alma en la penumbra.`,
@@ -320,7 +320,7 @@ class Game {
                         })
                     });
                     const replyData = await response.json();
-                    
+
                     this.showDialogueOverlay(npc.name, replyData.description);
 
                     setTimeout(() => {
@@ -422,9 +422,20 @@ class Game {
         }
 
         if (action === 'pass') {
-            this.ui.logEvent(`🏃 Ignoras a Barnaby y sigues adentrándote en la mazmorra.`);
+            // SI ES BARNABY Y PASAS DE LARGO, SE ENFADA
+            if (npc.id === 'barnaby') {
+                const sceneImg = document.getElementById('centralSceneImage');
+                if (sceneImg) {
+                    sceneImg.src = 'img/barnaby_enfado.png'; // O la ruta de tu imagen de enfado
+                }
+                this.showDialogueOverlay(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
+                this.ui.logEvent(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
+            } else {
+                this.ui.logEvent(`🏃 Te retiras con cautela sin llamar la atención.`);
+            }
+
             this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1200);
+            setTimeout(() => this.loadNextExplorationEvent(), 2200);
             return;
         }
 
