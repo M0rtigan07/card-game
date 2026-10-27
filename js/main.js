@@ -391,18 +391,28 @@ class Game {
             return;
         }
 
-        // 8. ACCIONES DE BARNABY EL BUHONERO (PLANTA 1)
+       // 8. ACCIONES DE BARNABY EL BUHONERO (PLANTA 1)
         if (action === 'buy_potion') {
             if (this.player.gold >= 30) {
                 this.player.gold -= 30;
                 this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
+                
+                // Imagen de contento / venta exitosa
+                const sceneImg = document.getElementById('centralSceneImage');
+                if (sceneImg && npc.images?.talk) {
+                    sceneImg.src = npc.images.talk; // Su imagen sonriente con pociones
+                }
+                this.showDialogueOverlay(npc.name, "¡Excelente elección, viajero! Volverás a visitarme.");
                 this.ui.logEvent(`🧪 Compras una poción a Barnaby (-30 Oro). Recuperas 40 HP.`);
             } else {
+                this.showDialogueOverlay(npc.name, "¿pretendes engañarme? ¡No tienes suficiente oro!");
                 this.ui.logEvent(`❌ No tienes suficiente oro para comprar la poción.`);
             }
             this.ui.updateStats(this.player, this.dungeonLevel);
+            
+            // TIEMPO AMPLIADO (3.5 segundos para que dé tiempo a ver la imagen y leer)
             this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1400);
+            setTimeout(() => this.loadNextExplorationEvent(), 3500);
             return;
         }
 
@@ -411,22 +421,30 @@ class Game {
                 this.player.gold -= 40;
                 this.player.maxMana += 10;
                 this.player.mana = this.player.maxMana;
+
+                const sceneImg = document.getElementById('centralSceneImage');
+                if (sceneImg && npc.images?.talk) {
+                    sceneImg.src = npc.images.talk;
+                }
+                this.showDialogueOverlay(npc.name, "Un grimorio de poder... Que la magia te proteja.");
                 this.ui.logEvent(`🔮 Compras un grimorio a Barnaby (-40 Oro). ¡Maná máximo aumentado!`);
             } else {
+                this.showDialogueOverlay(npc.name, "Tus bolsillos están tan vacíos como tusconjuros.");
                 this.ui.logEvent(`❌ No tienes suficiente oro.`);
             }
             this.ui.updateStats(this.player, this.dungeonLevel);
+
+            // TIEMPO AMPLIADO (3.5 segundos)
             this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1400);
+            setTimeout(() => this.loadNextExplorationEvent(), 3500);
             return;
         }
 
         if (action === 'pass') {
-            // SI ES BARNABY Y PASAS DE LARGO, SE ENFADA
             if (npc.id === 'barnaby') {
                 const sceneImg = document.getElementById('centralSceneImage');
                 if (sceneImg) {
-                    sceneImg.src = 'img/barnaby_enfado.png'; // O la ruta de tu imagen de enfado
+                    sceneImg.src = 'img/barnaby_enfado.png'; // Cara de enfado al pasar de largo
                 }
                 this.showDialogueOverlay(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
                 this.ui.logEvent(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
@@ -435,9 +453,12 @@ class Game {
             }
 
             this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 2200);
+            
+            // TIEMPO AMPLIADO (3.5 segundos para saborear el enfado del buhonero)
+            setTimeout(() => this.loadNextExplorationEvent(), 3500);
             return;
         }
+      
 
         // 7. ROMANCE / PACTO CON LA BRUJA MORGANA
         if (action === 'morgana_romance' || action === 'morgana_romance_warrior') {
