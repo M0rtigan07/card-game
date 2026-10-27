@@ -259,7 +259,7 @@ class Game {
         }
     }
 
-    async triggerNpcEvent(npcKey) {
+   async triggerNpcEvent(npcKey) {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
@@ -279,23 +279,34 @@ class Game {
         }
 
         const playerClassKey = this.player.classKey || 'warrior';
-        const interaction = npc.interactions[playerClassKey] || npc.interactions['warrior'];
+        
+        // --- BLINDAJE DE OPCIONES: Si no tiene interacciones específicas, usamos unas universales ---
+        let interaction = npc.interactions?.[playerClassKey] || npc.interactions?.['warrior'];
+        
+        if (!interaction || !interaction.choices) {
+            interaction = {
+                greeting: `Te encuentras cara a cara con ${npc.name}. Su mirada atraviesa tu alma en la penumbra.`,
+                choices: [
+                    { text: "⚔️ \"Desenvaina tu acero, esto se va a resolver por las malas.\"", action: "combat" },
+                    { text: "🤝 \"Hagamos un pacto o intercambiemos información.\"", action: "pact_accept" },
+                    { text: "🚪 \"Retrocedo con sigilo y evito problemas.\"", action: "pass" }
+                ]
+            };
+        }
+        // ------------------------------------------------------------------------------------------
 
-        // Usamos el saludo fijo que ya tenías bien definido en el npcs.js (o un texto base seguro)
-        const greetingText = interaction.greeting || `Te encuentras con ${npc.name} en la penumbra.`;
+        const greetingText = interaction.greeting || `Te encuentras con ${npc.name}.`;
 
-        // Inyectamos la narrativa y los botones de opción obligatorios
         explorationView.setNarrative(
             greetingText,
             interaction.choices.map(choice => ({
                 text: choice.text,
                 callback: async () => {
-                    // Cambiar a la imagen de charla en primer plano
                     if (sceneImg && npc.images?.talk) {
                         sceneImg.src = npc.images.talk;
                     }
 
-                    // Llamada a la IA para que responda a la opción elegida
+                    // Llamada segura a Groq para que responda a la opción elegida
                     const response = await fetch("/api/generate-lore", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -303,17 +314,15 @@ class Game {
                             type: 'npc_interaction',
                             npc: npc.id,
                             npcName: npc.name,
-                            npcArchetype: npc.archetype,
+                            npcArchetype: npc.archetype || "un misterioso habitante de las mazmorras",
                             className: this.player.className,
                             action: choice.text
                         })
                     });
                     const replyData = await response.json();
-
-                    // Mostrar bocadillo de diálogo flotante con la respuesta de la IA
+                    
                     this.showDialogueOverlay(npc.name, replyData.description);
 
-                    // Ejecutar la acción tras una breve pausa dramática
                     setTimeout(() => {
                         this.handleNpcChoice(npc, choice.action, interaction);
                     }, 2200);
