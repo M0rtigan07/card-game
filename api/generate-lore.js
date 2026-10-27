@@ -132,9 +132,9 @@ export default async function handler(req, res) {
                     return res.status(200).json({ description: "El personaje te mira de reojo sin decir nada." });
                 } */
 
-               /*  const data = await response.json();
-                const description = data.choices?.[0]?.message?.content?.trim() || "Las sombras ocultan la respuesta de tu interlocutor.";
-                return res.status(200).json({ description }); */
+                const data = await response.json();
+                const description = data.choices?.[0]?.message?.content?.trim() || "Viajero ....";
+                return res.status(200).json({ description });
             } catch (err) {
                 return res.status(200).json({ description: "Un eco sordo ahoga las palabras de tu interlocutor." });
             }
