@@ -233,12 +233,56 @@ class Game {
             // -----------------------------------------------------
 
             explorationView.setNarrative(
-                eventData.description,
-                eventData.choices.map(c => ({
-                    text: c.text,
-                    callback: () => this.handleExplorationChoice(c.action, eventData)
+                greetingText,
+                interaction.choices.map(choice => ({
+                    text: choice.text,
+                    callback: async () => {
+                        // SI ES EL BUHONERO Y DECIDES PASAR DE LARGO
+                        if (npc.id === 'barnaby' && choice.action === 'pass') {
+                            // 1. Poner imagen de enfado al instante
+                            if (sceneImg) {
+                                sceneImg.src = 'img/barnaby_enfado.png';
+                            }
+
+                            // 2. Mostrar su frase malhumorada localmente sin pasar por la IA
+                            this.showDialogueOverlay(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
+                            this.ui.logEvent(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
+
+                            // 3. Esperar el tiempo prudencial antes de avanzar de planta
+                            setTimeout(() => {
+                                this.handleNpcChoice(npc, choice.action, interaction);
+                            }, 3500);
+                            return; // Cortamos el flujo aquí para que no llame a Groq
+                        }
+
+                        // --- FLUJO NORMAL PARA COMPRAS U OTROS PNJS ---
+                        if (sceneImg && npc.images?.talk) {
+                            sceneImg.src = npc.images.talk;
+                        }
+
+                        const response = await fetch("/api/generate-lore", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                type: 'npc_interaction',
+                                npc: npc.id,
+                                npcName: npc.name,
+                                npcArchetype: npc.archetype || "un misterioso habitante de las mazmorras",
+                                className: this.player.className,
+                                action: choice.text
+                            })
+                        });
+                        const replyData = await response.json();
+
+                        this.showDialogueOverlay(npc.name, replyData.description);
+
+                        setTimeout(() => {
+                            this.handleNpcChoice(npc, choice.action, interaction);
+                        }, 2200);
+                    }
                 }))
             );
+
         } catch (err) {
             const mainContent = document.getElementById('mainContent');
             const explorationView = new ExplorationView(mainContent, this);
