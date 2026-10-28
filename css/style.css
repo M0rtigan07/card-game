@@ -21,6 +21,7 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-main);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -37,6 +38,7 @@ body::after {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
         radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
     background-size: 100% 4px, 100% 100%;
@@ -49,6 +51,7 @@ body::after {
     display: none !important;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -428,6 +431,7 @@ body::after {
     width: 100%;
     max-width: 1350px;
     height: 94vh;
+    height: 94dvh;
     background: rgba(20, 15, 30, 0.95);
     border: 3px solid var(--gold-border);
     border-radius: 16px;
@@ -621,6 +625,7 @@ body::after {
 
 /* PANEL CENTRAL (ESTILO ELVIRA) */
 #mainContent {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -662,9 +667,9 @@ h1 {
 
 .monkey-dialogue-box {
     position: absolute;
-    bottom: 80px;
-    left: 20px;
-    right: 20px;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
     background: rgba(10, 5, 15, 0.95);
     border: 2px solid #ffd700;
     color: #f3e8ff;
@@ -784,9 +789,14 @@ h1 {
     transition: all 0.2s ease;
 }
 
-.choice-btn:hover {
+.choice-btn:hover:not(:disabled) {
     border-color: var(--gold);
     background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
+}
+
+.choice-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 .fantasy-btn {
@@ -916,6 +926,7 @@ h1 {
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(10, 5, 20, 0.88);
     display: none;
     align-items: center;
@@ -945,21 +956,6 @@ h1 {
         height: auto;
         max-height: none;
         overflow: visible;
-    }
-
-    #rightSidebar {
-        background: var(--panel-bg);
-        padding: 14px;
-        border-radius: 12px;
-        border: 2px solid var(--gold-border);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        height: 100%;
-        /* Fija la altura al 100% del contenedor padre */
-        overflow: hidden;
-        /* Evita que el panel entero cree scroll global */
-        min-width: 0;
     }
 
     #rightSidebar {
