@@ -17,9 +17,6 @@ export const NPC_DATABASE = {
         dungeonLevel: 2, // O la planta en la que aparezca
         baseHp: 80,
         baseAtk: 18,
-        deck: [
-            { name: '🦇 Colmillo de Sombra', type: 'atk', val: 22, desc: 'Duro mordisco vampírico' }
-        ],
         interactions: {
             'warrior': {
                 greeting: "Un patético bulto de acero profana mis aposentos...",
@@ -62,9 +59,6 @@ export const NPC_DATABASE = {
         dungeonLevel: 4,
         baseHp: 60,
         baseAtk: 15,
-        deck: [
-            { name: '🪓 Hacha Nórdica', type: 'atk', val: 20, desc: 'Corte pesado de Berserker' }
-        ],
         interactions: {
             // Opciones genéricas o adaptables donde la IA genera la charla
             choices: [
@@ -89,9 +83,6 @@ export const NPC_DATABASE = {
         dungeonLevel: 5,
         baseHp: 50,
         baseAtk: 14,
-        deck: [
-            { name: '🏹 Flecha de la Estepa', type: 'atk', val: 18, desc: 'Disparo preciso' }
-        ],
         interactions: {
             choices: [
                 { text: "🏹 Pedirle consejo sobre los peligros de la mazmorra", action: 'witch_knowledge' },
@@ -152,10 +143,6 @@ export const NPC_DATABASE = {
         dungeonLevel: 3, // <-- Aparece en la planta 3
         baseHp: 60,
         baseAtk: 14,
-        deck: [
-            { name: '🧪 Pócima Cáustica', type: 'atk', val: 20, desc: 'Daño de ácido' },
-            { name: '🧪 Pócima Cáustica', type: 'atk', val: 20, desc: 'Daño de ácido' }
-        ],
         interactions: {
             'mage': {
                 greeting: "¡Jejeje! Veo el brillo de la verdadera magia en tus ojos. ¿Intercambiamos secretos?",

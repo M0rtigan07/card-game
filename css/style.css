@@ -718,8 +718,10 @@ h1 {
 .elvira-scene-frame img {
     width: 100%;
     height: 100%;
-    object-fit: contain;      /* Mantiene la proporción de la imagen completa sin recortarla */
-    background-color: #000;   /* Fondo negro lateral si la foto es más estrecha */
+    object-fit: contain;
+    /* Mantiene la proporción de la imagen completa sin recortarla */
+    background-color: #000;
+    /* Fondo negro lateral si la foto es más estrecha */
     image-rendering: pixelated;
     /* Hace que la imagen cubra todo el marco sin verse pequeña */
 }
@@ -1042,4 +1044,193 @@ h1 {
     .elvira-scene-frame {
         height: 160px;
     }
+}
+
+/* ═══════════ COMBATE TCG: JUGADA ENEMIGA VISIBLE ═══════════ */
+
+.enemy-intent {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.enemy-intent-card {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    max-width: 440px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.intent-head {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.5em;
+    color: #fca5a5;
+}
+
+.intent-name {
+    color: var(--gold);
+    font-size: 1em;
+}
+
+.intent-desc {
+    color: var(--text-main);
+    font-size: 0.8em;
+}
+
+/* Color del borde según el tipo de jugada */
+.intent-def {
+    border-color: #60a5fa;
+}
+
+.intent-heal {
+    border-color: #4ade80;
+}
+
+.intent-poison {
+    border-color: #c084fc;
+}
+
+.intent-buff {
+    border-color: #fb923c;
+}
+
+.intent-drain {
+    border-color: #f43f5e;
+}
+
+.enemy-intent-card.playing {
+    animation: intentPlay 0.9s ease-out;
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.7);
+}
+
+.combat-status-line {
+    min-height: 1.2em;
+    margin-top: 6px;
+    font-size: 0.75em;
+    color: #e9d5ff;
+    text-align: center;
+}
+
+/* Números flotantes sobre los retratos */
+.character-portrait {
+    position: relative;
+}
+
+.float-text {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    z-index: 5;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1em;
+    text-shadow: 2px 2px 0 #000;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: floatUp 1s ease-out forwards;
+}
+
+.float-dmg {
+    color: #ef4444;
+}
+
+.float-heal {
+    color: #4ade80;
+}
+
+.float-shield {
+    color: #60a5fa;
+}
+
+.float-poison {
+    color: #c084fc;
+}
+
+.float-buff {
+    color: #fb923c;
+}
+
+.hit-shake {
+    animation: hitShake 0.4s;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -55px);
+    }
+}
+
+@keyframes hitShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-7px);
+    }
+
+    75% {
+        transform: translateX(7px);
+    }
+}
+
+@keyframes intentPlay {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Mientras juega el enemigo */
+.tcg-hand.locked {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.fantasy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.6);
+}
+
+/* Etiqueta de la escena (ZONA DE DUELO, nombre del PNJ...): estaba sin estilo */
+.elvira-scene-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    padding: 4px 8px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid var(--gold-border);
+    border-radius: 4px;
 }

@@ -5,9 +5,12 @@ import { GroqAI } from './systems/GroqAI.js';
 import { NPC_DATABASE } from './data/npcs.js';
 import { ExplorationView } from './views/ExplorationView.js';
 import { TcgCombatView } from './views/TcgCombatView.js';
+import { EnemyBrain, describeCard, effectiveAtk } from './systems/EnemyAI.js';
 
 const FALLBACK_IMG = 'img/guerrero.png';
 const MAX_NAME_LENGTH = 10;
+const ENEMY_REVEAL_MS = 900;   // pausa enseñando la carta enemiga
+const ENEMY_RESOLVE_MS = 900;  // pausa viendo su efecto antes de tu turno
 
 const HERO_IMAGES = {
     warrior: 'img/guerrero.png',
@@ -26,13 +29,13 @@ const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
 
 // Enemigos genéricos: se elige el primero cuyo texto clave aparezca en la descripción
 const GENERIC_ENEMIES = [
-    { keys: ['autómata', 'automata'], name: 'Autómata de Bronce', img: 'img/automata.jpg' },
-    { keys: ['orco'], name: 'Capitán Orco', img: 'img/jefe_orco_hacha.jpg' },
-    { keys: ['gárgola', 'gargola', 'estatua'], name: 'Estatua de Gárgola', img: 'img/gargola.png' },
-    { keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], name: 'Hechicero Oscuro', img: 'img/hechicero.jpg' },
-    { keys: ['dragón', 'dragon'], name: 'Dragón Anciano', img: 'img/dragon.png' }
+    { keys: ['autómata', 'automata'], name: 'Autómata de Bronce', img: 'img/automata.jpg', deckId: 'automata' },
+    { keys: ['orco'], name: 'Capitán Orco', img: 'img/jefe_orco_hacha.jpg', deckId: 'orco' },
+    { keys: ['gárgola', 'gargola', 'estatua'], name: 'Estatua de Gárgola', img: 'img/gargola.png', deckId: 'gargola' },
+    { keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], name: 'Hechicero Oscuro', img: 'img/hechicero.jpg', deckId: 'hechicero' },
+    { keys: ['dragón', 'dragon'], name: 'Dragón Anciano', img: 'img/dragon.png', deckId: 'dragon' }
 ];
-const DEFAULT_ENEMY = { name: 'Guerrero Corrupto', img: 'img/guerreroCorrupto.png' };
+const DEFAULT_ENEMY = { name: 'Guerrero Corrupto', img: 'img/guerreroCorrupto.png', deckId: 'corrupto' };
 
 // Qué imagen del NPC se muestra según la acción elegida
 const NPC_MOOD_BY_ACTION = {
@@ -56,6 +59,9 @@ class Game {
         this.currentEnemy = null;
         this.playerHand = [];
         this.playerShield = 0;
+        this.playerPoison = null;   // { dmg, turns } mientras estés envenenado
+        this.brain = null;          // mazo e intención del enemigo actual
+        this.turnBusy = false;      // true mientras juega el enemigo
 
         this.player = null;
         this.playerName = 'HÉROE';
@@ -473,7 +479,7 @@ class Game {
             maxHp: hp,
             atk: npc.baseAtk,
             img: npc.images?.enraged || npc.images?.room,
-            deck: npc.deck
+            deckId: npc.id
         });
     }
 
@@ -491,7 +497,7 @@ class Game {
                 atk: enemyData.atk,
                 shield: 0,
                 img: enemyData.img || FALLBACK_IMG,
-                deck: enemyData.deck || []
+                deckId: enemyData.deckId
             };
         } else {
             // Enemigo genérico: se deduce por la descripción del encuentro
@@ -505,11 +511,15 @@ class Game {
                 atk: 10 + (lvl * 2),
                 shield: 0,
                 img: template.img,
-                deck: []
+                deckId: template.deckId
             };
         }
 
         this.playerShield = 0;
+        this.playerPoison = null;
+        this.turnBusy = false;
+        this.brain = new EnemyBrain(this.currentEnemy.deckId);
+        this.brain.drawIntent(this.currentEnemy, { poison: null });
 
         const tcgView = new TcgCombatView(document.getElementById('mainContent'), this);
         tcgView.render(this.currentEnemy, this.player);
@@ -518,6 +528,7 @@ class Game {
         if (endTurnBtn) endTurnBtn.onclick = () => this.executeEnemyTurn();
 
         this.ui.logEvent(`⚔️ ¡ENTRAS EN COMBATE contra ${this.currentEnemy.name}!`);
+        this.renderEnemyIntent();
         this.updateTcgUI();
         this.drawTcgHand();
     }
@@ -581,7 +592,7 @@ class Game {
     }
 
     playTcgCard(card, index) {
-        if (!this.currentEnemy || this.currentEnemy.hp <= 0 || this.player.health <= 0) return;
+        if (this.turnBusy || !this.currentEnemy || this.currentEnemy.hp <= 0 || this.player.health <= 0) return;
         if (this.player.mana < card.cost) {
             this.ui.logEvent(`❌ ¡Maná insuficiente para jugar ${card.name}!`);
             return;
@@ -589,94 +600,221 @@ class Game {
 
         this.audio.play('card');
         this.player.mana -= card.cost;
+        const enemy = this.currentEnemy;
 
         if (card.type === 'atk') {
-            const totalAtk = card.val + (this.player.attackBonus || 0);
-            let remainingAtk = totalAtk;
-            if (this.currentEnemy.shield > 0) {
-                const absorbed = Math.min(this.currentEnemy.shield, remainingAtk);
-                this.currentEnemy.shield -= absorbed;
-                remainingAtk -= absorbed;
-            }
-            this.currentEnemy.hp -= remainingAtk;
-            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${totalAtk} de daño a ${this.currentEnemy.name}.`);
+            const total = card.val + (this.player.attackBonus || 0);
+            const absorbed = Math.min(enemy.shield, total);
+            const dealt = total - absorbed;
+            enemy.shield -= absorbed;
+            enemy.hp -= dealt;
+
+            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${dealt} de daño a ${enemy.name}.`);
+            if (absorbed > 0) this.ui.logEvent(`🛡️ El escudo de ${enemy.name} absorbe ${absorbed}.`);
+            this.floatText('enemyPortraitContainer', dealt > 0 ? `-${dealt}` : '🛡️', dealt > 0 ? 'dmg' : 'shield');
+            this.shake('enemyPortraitContainer');
         } else if (card.type === 'def') {
             this.playerShield += card.val;
             this.ui.logEvent(`🛡️ Usas ${card.name} y obtienes ${card.val} de escudo.`);
+            this.floatText('heroPortraitContainer', `+${card.val}`, 'shield');
         } else if (card.type === 'heal') {
-            this.player.health = Math.min(this.player.maxHealth, this.player.health + card.val);
-            this.ui.logEvent(`✨ Usas ${card.name} y restauras ${card.val} HP.`);
+            const healed = Math.min(card.val, this.player.maxHealth - this.player.health);
+            this.player.health += healed;
+            this.ui.logEvent(`✨ Usas ${card.name} y restauras ${healed} HP.`);
+            this.floatText('heroPortraitContainer', `+${healed}`, 'heal');
         }
 
         this.playerHand.splice(index, 1);
         this.renderHand();
         this.updateTcgUI();
 
-        if (this.currentEnemy.hp <= 0) {
+        if (enemy.hp <= 0) {
             this.winTcgCombat();
         }
     }
 
-    executeEnemyTurn() {
-        if (!this.currentEnemy || this.currentEnemy.hp <= 0) return;
+    // ───────────── TURNO ENEMIGO ─────────────
 
-        this.audio.play('hit');
+    wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
-        // Definir baraja de cartas del enemigo según el tipo
-        const blockCard = { name: '🛡️ Bloqueo Sombrío', type: 'def', val: 8, desc: 'Gana 8 de escudo' };
-        const enemyCards = this.currentEnemy.deck?.length
-            ? [...this.currentEnemy.deck, blockCard]
-            : [
-                { name: '🔪 Zarpazo Furtivo', type: 'atk', val: this.currentEnemy.atk + 4, desc: 'Ataque rápido' },
-                blockCard,
-                { name: '🔥 Fulgor Oscuro', type: 'atk', val: this.currentEnemy.atk + 8, desc: 'Ataque pesado' }
-            ];
+    // Bloquea o desbloquea el botón de fin de turno y la mano mientras juega el enemigo
+    setCombatControls(enabled) {
+        const btn = document.getElementById('endTurnTcgBtn');
+        if (btn) btn.disabled = !enabled;
+        document.getElementById('playerHand')?.classList.toggle('locked', !enabled);
+    }
 
-        // La IA elige una carta aleatoria de su baraja
-        const chosenCard = enemyCards[Math.floor(Math.random() * enemyCards.length)];
+    // Números flotantes sobre un retrato (-12, +8, 🛡️...)
+    floatText(containerId, text, kind) {
+        const host = document.getElementById(containerId);
+        if (!host) return;
+        const el = document.createElement('span');
+        el.className = `float-text float-${kind}`;
+        el.textContent = text;
+        host.appendChild(el);
+        setTimeout(() => el.remove(), 1100);
+    }
 
-        let announcementEl = document.getElementById('enemyActionAnnouncement');
-        if (announcementEl) {
-            announcementEl.innerHTML = `⚡ <b>${this.currentEnemy.name}</b> despliega su carta: <span style="color:#ffd700;">[${chosenCard.name}]</span> - <i>${chosenCard.desc}</i>`;
+    shake(containerId) {
+        const host = document.getElementById(containerId);
+        if (!host) return;
+        host.classList.remove('hit-shake');
+        void host.offsetWidth; // reinicia la animación si se repite
+        host.classList.add('hit-shake');
+        setTimeout(() => host.classList.remove('hit-shake'), 450);
+    }
+
+    // Muestra la carta que el enemigo jugará (o está jugando) con sus números reales
+    renderEnemyIntent(playing = false) {
+        const host = document.getElementById('enemyIntent');
+        if (!host) return;
+        host.replaceChildren();
+
+        const card = this.brain?.intent;
+        if (!card) return;
+
+        const box = document.createElement('div');
+        box.className = `enemy-intent-card intent-${card.type}${playing ? ' playing' : ''}`;
+
+        const head = document.createElement('div');
+        head.className = 'intent-head';
+        const label = document.createElement('span');
+        label.textContent = playing ? '¡JUEGA!' : 'PRÓXIMA JUGADA';
+        const deckLeft = document.createElement('span');
+        deckLeft.textContent = `🃏 ${this.brain.cardsLeft}`;
+        head.append(label, deckLeft);
+
+        const name = document.createElement('b');
+        name.className = 'intent-name';
+        name.textContent = card.name;
+
+        const desc = document.createElement('span');
+        desc.className = 'intent-desc';
+        desc.textContent = describeCard(card, this.currentEnemy);
+
+        box.append(head, name, desc);
+        host.appendChild(box);
+    }
+
+    // Estados del jugador en combate: guardia y veneno
+    renderCombatStatus() {
+        const host = document.getElementById('combatStatusLine');
+        if (!host) return;
+
+        const parts = [];
+        if (this.playerShield > 0) parts.push(`🛡️ Guardia ${this.playerShield}`);
+        if (this.playerPoison) parts.push(`☠️ Veneno ${this.playerPoison.dmg} x ${this.playerPoison.turns} turnos`);
+        host.textContent = parts.join('   ·   ');
+    }
+
+    // Cuenta al jugador qué ha hecho la carta enemiga (diario, sonido y números flotantes)
+    narrateEnemyEvents(events) {
+        const enemy = this.currentEnemy;
+
+        for (const ev of events) {
+            switch (ev.kind) {
+                case 'damage': {
+                    const hits = ev.hits > 1 ? ` en ${ev.hits} golpes` : '';
+                    if (ev.absorbed > 0) this.ui.logEvent(`🛡️ Tu guardia absorbe ${ev.absorbed} de daño.`);
+                    if (ev.dealt > 0) {
+                        this.audio.play('hit');
+                        this.ui.logEvent(`💥 Recibes ${ev.dealt} de daño${hits}.`);
+                        this.floatText('heroPortraitContainer', `-${ev.dealt}`, 'dmg');
+                        this.shake('heroPortraitContainer');
+                    } else {
+                        this.ui.logEvent(`🛡️ ¡Bloqueas todo el daño!`);
+                        this.floatText('heroPortraitContainer', '🛡️', 'shield');
+                    }
+                    break;
+                }
+                case 'shield':
+                    this.ui.logEvent(`🛡️ ${enemy.name} se protege con ${ev.amount} de escudo.`);
+                    this.floatText('enemyPortraitContainer', `+${ev.amount}`, 'shield');
+                    break;
+                case 'heal':
+                    this.ui.logEvent(`💚 ${enemy.name} recupera ${ev.amount} de vida.`);
+                    this.floatText('enemyPortraitContainer', `+${ev.amount}`, 'heal');
+                    break;
+                case 'poison':
+                    this.ui.logEvent(`☠️ ¡Te envenena! ${ev.dmg} de daño durante ${ev.turns} turnos.`);
+                    this.floatText('heroPortraitContainer', '☠️', 'poison');
+                    break;
+                case 'buff':
+                    this.ui.logEvent(`🔥 El ataque de ${enemy.name} sube +${ev.amount}.`);
+                    this.floatText('enemyPortraitContainer', `ATK +${ev.amount}`, 'buff');
+                    break;
+            }
         }
+    }
 
-        this.ui.logEvent(`⏳ Fin de tu turno. ¡${this.currentEnemy.name} usa ${chosenCard.name}!`);
+    async executeEnemyTurn() {
+        const enemy = this.currentEnemy;
+        if (this.turnBusy || !enemy || !this.brain || enemy.hp <= 0 || this.player.health <= 0) return;
 
-        let incomingDmg = 0;
-        if (chosenCard.type === 'atk') {
-            incomingDmg = chosenCard.val;
-        } else if (chosenCard.type === 'def') {
-            this.currentEnemy.shield += chosenCard.val;
-            this.ui.logEvent(`🛡️ ${this.currentEnemy.name} se protege con ${chosenCard.val} de escudo.`);
-        }
+        this.turnBusy = true;
+        this.setCombatControls(false);
 
-        // Aplicar escudo del jugador
-        if (this.playerShield > 0 && incomingDmg > 0) {
-            const absorbed = Math.min(this.playerShield, incomingDmg);
-            this.playerShield -= absorbed;
-            incomingDmg -= absorbed;
-            this.ui.logEvent(`🛡️ Tu guardia absorbió ${absorbed} de daño.`);
-        }
+        enemy.shield = 0; // su escudo solo dura hasta que le toca jugar otra vez
+        this.updateTcgUI();
 
-        if (incomingDmg > 0) {
-            this.player.health -= incomingDmg;
-            this.ui.logEvent(`💥 Recibes ${incomingDmg} de daño.`);
-        }
+        const card = this.brain.intent;
+        this.ui.logEvent(`⏳ Fin de tu turno. ¡${enemy.name} juega ${card.name}!`);
+        this.audio.play('card');
+        this.renderEnemyIntent(true);
+        await this.wait(ENEMY_REVEAL_MS);
 
-        // Reiniciar maná y escudo del jugador para el nuevo turno
-        this.player.mana = this.player.maxMana;
-        this.playerShield = 0;
+        const hero = { health: this.player.health, shield: this.playerShield, poison: this.playerPoison };
+        const { events } = this.brain.play(enemy, hero);
+        this.player.health = hero.health;
+        this.playerShield = hero.shield;
+        this.playerPoison = hero.poison;
+
+        this.narrateEnemyEvents(events);
+        this.updateTcgUI();
+        await this.wait(ENEMY_RESOLVE_MS);
 
         if (this.player.health <= 0) {
             this.ui.showGameOver();
             return;
         }
+        this.startPlayerTurn();
+    }
 
+    startPlayerTurn() {
+        this.playerShield = 0;
+
+        if (this.playerPoison) {
+            const { dmg } = this.playerPoison;
+            this.player.health -= dmg;
+            this.playerPoison.turns -= 1;
+            if (this.playerPoison.turns <= 0) this.playerPoison = null;
+
+            this.audio.play('hit');
+            this.ui.logEvent(`☠️ El veneno te causa ${dmg} de daño.`);
+            this.floatText('heroPortraitContainer', `-${dmg}`, 'poison');
+            this.shake('heroPortraitContainer');
+
+            if (this.player.health <= 0) {
+                this.updateTcgUI();
+                this.ui.showGameOver();
+                return;
+            }
+        }
+
+        this.player.mana = this.player.maxMana;
+        this.brain.drawIntent(this.currentEnemy, { poison: this.playerPoison });
+        this.renderEnemyIntent();
         this.drawTcgHand();
         this.updateTcgUI();
+
+        this.turnBusy = false;
+        this.setCombatControls(true);
     }
 
     async winTcgCombat() {
+        this.turnBusy = true; // bloquea clics mientras dura la animación de victoria
         this.audio.play('sega');
         this.ui.logEvent(`🏆 ¡Has derrotado a ${this.currentEnemy.name}!`);
 
@@ -711,8 +849,10 @@ class Game {
     updateTcgUI() {
         document.getElementById('enemyName').textContent = this.currentEnemy.name;
         document.getElementById('enemyHp').textContent = `❤️ HP: ${Math.max(0, this.currentEnemy.hp)}/${this.currentEnemy.maxHp}`;
-        document.getElementById('enemyAtk').textContent = `⚔️ ATK: ${this.currentEnemy.atk}`;
+        const bonus = this.currentEnemy.atkBonus ? ` (+${this.currentEnemy.atkBonus})` : '';
+        document.getElementById('enemyAtk').textContent = `⚔️ ATK: ${effectiveAtk(this.currentEnemy)}${bonus}`;
         document.getElementById('enemyShield').textContent = `🛡️ DEF: ${this.currentEnemy.shield}`;
+        this.renderCombatStatus();
         this.ui.updateStats(this.player, this.dungeonLevel);
     }
 
