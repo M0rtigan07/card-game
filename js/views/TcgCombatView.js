@@ -38,9 +38,8 @@ export class TcgCombatView {
                     <span id="enemyAtk">⚔️ ATK: ${enemyData.atk}</span>
                     <span id="enemyShield">🛡️ DEF: ${enemyData.shield}</span>
                 </div>
-                <div id="enemyActionAnnouncement" style="font-family: 'Press Start 2P', cursive; font-size: 0.6em; color: #fca5a5; margin-top: 6px;">
-                    👁️ El enemigo se prepara...
-                </div>
+                <div id="enemyIntent" class="enemy-intent"></div>
+                <div id="combatStatusLine" class="combat-status-line"></div>
             </div>
 
             <!-- TABLERO DE CARTAS TCG (BAJADO Y ESPACIADO) -->
