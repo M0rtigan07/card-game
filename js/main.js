@@ -6,6 +6,47 @@ import { NPC_DATABASE } from './data/npcs.js';
 import { ExplorationView } from './views/ExplorationView.js';
 import { TcgCombatView } from './views/TcgCombatView.js';
 
+const FALLBACK_IMG = 'img/guerrero.png';
+const MAX_NAME_LENGTH = 10;
+
+const HERO_IMAGES = {
+    warrior: 'img/guerrero.png',
+    mage: 'img/maga.png',
+    rogue: 'img/picaro.png'
+};
+
+// Imagen de escena según el npcType que devuelve el backend
+const ENCOUNTER_IMAGES = {
+    warrior: 'img/veterano.jpg',
+    mage: 'img/mage.jpg',
+    rogue: 'img/gargola.png',
+    automata: 'img/automata.jpg'
+};
+const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
+
+// Enemigos genéricos: se elige el primero cuyo texto clave aparezca en la descripción
+const GENERIC_ENEMIES = [
+    { keys: ['autómata', 'automata'], name: 'Autómata de Bronce', img: 'img/automata.jpg' },
+    { keys: ['orco'], name: 'Capitán Orco', img: 'img/jefe_orco_hacha.jpg' },
+    { keys: ['gárgola', 'gargola', 'estatua'], name: 'Estatua de Gárgola', img: 'img/gargola.png' },
+    { keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], name: 'Hechicero Oscuro', img: 'img/hechicero.jpg' },
+    { keys: ['dragón', 'dragon'], name: 'Dragón Anciano', img: 'img/dragon.png' }
+];
+const DEFAULT_ENEMY = { name: 'Guerrero Corrupto', img: 'img/guerreroCorrupto.png' };
+
+// Qué imagen del NPC se muestra según la acción elegida
+const NPC_MOOD_BY_ACTION = {
+    combat: 'enraged',
+    pass: 'enraged',
+    flirt_challenge: 'seductive',
+    morgana_romance: 'romance',
+    morgana_romance_warrior: 'romance'
+};
+
+const NPC_TOLLS = { morgana: 60 };
+const DEFAULT_TOLL = 50;
+const POISON_COST = 40;
+
 class Game {
     constructor() {
         this.audio = new AudioManager();
@@ -17,48 +58,41 @@ class Game {
         this.playerShield = 0;
 
         this.player = null;
+        this.playerName = 'HÉROE';
+        this.nameDraft = '';
         this.dungeonLevel = 1;
 
         this.initEvents();
     }
 
+    // ───────────── ARRANQUE Y MENÚS ─────────────
+
     initEvents() {
         document.getElementById('btnPressStart').addEventListener('click', () => {
             this.audio.play('sega');
 
-            // Comprobamos si ya tenemos un nombre guardado en LocalStorage
             const savedHeroName = localStorage.getItem('mazo_hero_name');
-
             if (savedHeroName) {
-                // Si ya existe, nos saltamos el teclado y vamos a la selección de héroe
                 this.playerName = savedHeroName;
                 this.ui.showScreen('charScreen');
             } else {
-                // Si es la primera vez, mostramos el teclado estilo Castlevania
                 this.ui.showScreen('nameEntryScreen');
                 this.initNameKeyboard();
             }
         });
 
-        // Botón de confirmar nombre en la pantalla Castlevania
-        const confirmBtn = document.getElementById('btnConfirmName');
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', () => {
-                const nameDisplay = document.getElementById('typedHeroName').textContent.trim();
-                if (nameDisplay.length > 0) {
-                    this.playerName = nameDisplay;
-                    // Guardamos en la memoria del navegador
-                    localStorage.setItem('mazo_hero_name', this.playerName);
-                    this.audio.play('card');
-                    this.ui.showScreen('charScreen');
-                }
-            });
-        }
+        document.getElementById('btnConfirmName')?.addEventListener('click', () => {
+            const name = this.nameDraft.trim();
+            if (!name) return; // evita guardar un nombre vacío
+            this.playerName = name;
+            localStorage.setItem('mazo_hero_name', name);
+            this.audio.play('card');
+            this.ui.showScreen('charScreen');
+        });
 
         document.querySelectorAll('.char-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                const classKey = e.currentTarget.dataset.class;
-                this.selectCharacter(classKey).catch(err => console.error(err));
+                this.selectCharacter(e.currentTarget.dataset.class).catch(err => console.error(err));
             });
         });
 
@@ -67,34 +101,24 @@ class Game {
             this.ui.showScreen('gameScreen');
             this.startMainGame();
         });
-
-        // Cruceta de navegación RPG
-        document.getElementById('btnUp')?.addEventListener('click', () => this.navigate('forward'));
-        document.getElementById('btnLeft')?.addEventListener('click', () => this.navigate('turn_left'));
-        document.getElementById('btnRight')?.addEventListener('click', () => this.navigate('turn_right'));
-        document.getElementById('btnDown')?.addEventListener('click', () => this.navigate('back'));
-
     }
 
     initNameKeyboard() {
         const display = document.getElementById('typedHeroName');
-        let currentName = "HERO";
-        display.textContent = currentName;
+        this.nameDraft = 'HERO';
+        display.textContent = this.nameDraft;
 
-        // Le damos funcionalidad a cada letra del teclado gótico
         document.querySelectorAll('.cv-key').forEach(key => {
             key.onclick = (e) => {
                 this.audio.play('card');
-                const val = e.target.textContent;
+                const val = e.currentTarget.textContent;
 
                 if (val === '⌫') {
-                    currentName = currentName.slice(0, -1);
-                } else {
-                    if (currentName.length < 10) {
-                        currentName += val;
-                    }
+                    this.nameDraft = this.nameDraft.slice(0, -1);
+                } else if (this.nameDraft.length < MAX_NAME_LENGTH) {
+                    this.nameDraft += val;
                 }
-                display.textContent = currentName || "_";
+                display.textContent = this.nameDraft || '_';
             };
         });
     }
@@ -116,218 +140,142 @@ class Game {
         this.audio.play('card');
         this.player = new Player(classKey);
 
-        // Recuperar el nombre personalizado de la memoria del navegador
-        this.playerName = localStorage.getItem('mazo_hero_name') || "HÉROE";
-
-        // Asignar el nombre personalizado a la instancia del jugador si tu modelo lo soporta
+        this.playerName = localStorage.getItem('mazo_hero_name') || this.playerName;
         this.player.name = this.playerName;
+        this.player.img = HERO_IMAGES[classKey] || HERO_IMAGES.warrior;
 
-        // Actualizar la tarjeta con el nombre en el pie
-        const heroTag = document.getElementById('heroClassTag');
-        if (heroTag) {
-            heroTag.textContent = this.playerName.toUpperCase();
-        }
+        this.setText('heroClassTag', this.playerName.toUpperCase());
+        this.setText('introHeroTitle', `${this.playerName} - ${this.player.className.toUpperCase()}`);
 
-        const heroImages = {
-            'warrior': 'img/guerrero.png',
-            'mage': 'img/maga.png',
-            'rogue': 'img/picaro.png'
-        };
+        // 'introHeroImg' = pantalla de historia, 'sidebarHeroImg' = hoja de héroe
+        ['introHeroImg', 'sidebarHeroImg'].forEach(id => {
+            const img = document.getElementById(id);
+            if (img) img.src = this.player.img;
+        });
 
-        this.player.img = heroImages[classKey] || heroImages['warrior'];
-
-        const heroImgEl = document.getElementById('introHeroImg');
-        const sceneImg = document.getElementById('sceneImage');
-        if (heroImgEl) heroImgEl.src = this.player.img;
-        if (sceneImg) sceneImg.src = this.player.img;
-
-        // Mostrar la clase y el nombre personalizado en la pantalla de historia
-        document.getElementById('introHeroTitle').textContent = `${this.playerName} - ${this.player.className.toUpperCase()}`;
         this.ui.showScreen('introScreen');
         this.ui.typewriterIntro(`LOS DESTINOS SE ALINEAN PARA ${this.playerName}...`);
 
-        // Llamada a la IA pasando también el nombre personalizado para el lore
-        const story = await this.groq.generateCharacterLore(this.player.className, this.playerName);
+        const story = await this.groq.generateCharacterLore(this.player.className);
         this.ui.typewriterIntro(story.toUpperCase());
     }
 
     async startMainGame() {
         this.dungeonLevel = 1;
-
-        // Garantizar que el visor muestra la imagen del héroe seleccionado
-        const sceneImg = document.getElementById('sceneImage');
-        if (sceneImg && this.player?.img) {
-            sceneImg.src = this.player.img;
-        } const mainContent = document.getElementById('mainContent');
-        const explorationView = new ExplorationView(mainContent, this);
-
-        // Renderizamos la vista modular en el centro
-        explorationView.render();
-
-        // Establecemos el primer evento de la mazmorra
-        explorationView.setNarrative(
-            "Te adentras en la fría oscuridad de la primera planta. Una estatua de gárgola parece observar cada uno de tus movimientos.",
-            [
-                {
-                    text: "Examinar la estatua con cautela",
-                    callback: () => console.log("Inspeccionando estatua...")
-                },
-                {
-                    text: "Avanzar por el pasillo de la izquierda",
-                    callback: () => console.log("Avanzando por el pasillo...")
-                }
-            ]
-        );
-
-
-
         this.ui.updateStats(this.player, this.dungeonLevel);
         this.ui.logEvent(`🐉 ¡${this.player.className} entra en la Planta ${this.dungeonLevel}!`);
         await this.loadNextExplorationEvent();
     }
 
-    async loadNextExplorationEvent() {
-        document.getElementById('explorationText').textContent = "Escuchando los pasos en la penumbra...";
+    // ───────────── HELPERS DE ESCENA ─────────────
 
-        // 1. Comprobar si hay un PNJ fijo de planta (Valerius, Barnaby, Morgana)
-        const npcKey = Object.keys(NPC_DATABASE).find(key => NPC_DATABASE[key].dungeonLevel === this.dungeonLevel);
+    setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    }
+
+    renderExploration() {
+        const view = new ExplorationView(document.getElementById('mainContent'), this);
+        view.render();
+        return view;
+    }
+
+    setSceneImage(src) {
+        const img = document.getElementById('centralSceneImage');
+        if (!img) return;
+        img.onerror = () => { img.onerror = null; img.src = FALLBACK_IMG; };
+        img.src = src || FALLBACK_IMG;
+    }
+
+    // Evita dobles clics: cada elección avanza la planta una sola vez
+    lockChoices() {
+        document.querySelectorAll('#actionChoices button').forEach(b => { b.disabled = true; });
+    }
+
+    // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
+    advanceFloor(delay = 1800) {
+        this.dungeonLevel++;
+        setTimeout(() => this.loadNextExplorationEvent(), delay);
+    }
+
+    // Cierre común de un encuentro: refresca stats, comprueba muerte y avanza
+    finishEncounter(delay) {
+        this.ui.updateStats(this.player, this.dungeonLevel);
+        if (this.player.health <= 0) {
+            this.ui.showGameOver();
+            return;
+        }
+        this.advanceFloor(delay);
+    }
+
+    rollD20() {
+        return Math.floor(Math.random() * 20) + 1;
+    }
+
+    // Cuadro de diálogo flotante tipo Monkey Island (textContent: el texto viene de la IA)
+    showDialogueOverlay(speakerName, text) {
+        document.getElementById('monkeyIslandDialogue')?.remove();
+
+        const box = document.createElement('div');
+        box.id = 'monkeyIslandDialogue';
+        box.className = 'monkey-dialogue-box';
+
+        const speaker = document.createElement('b');
+        speaker.textContent = `${speakerName.toUpperCase()}:`;
+        box.append(speaker, ` "${text}"`);
+
+        document.getElementById('mainContent').appendChild(box);
+    }
+
+    // ───────────── EXPLORACIÓN PROCEDURAL ─────────────
+
+    async loadNextExplorationEvent() {
+        // 1. PNJ fijo de planta (Barnaby, Valerius, Morgana, Astrid, Batu Jan)
+        const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === this.dungeonLevel);
         if (npcKey) {
-            this.triggerNpcEvent(npcKey);
+            return this.triggerNpcEvent(npcKey);
+        }
+
+        // 2. Encuentro procedural del backend (plantas sin PNJ fijo)
+        const view = this.renderExploration();
+        view.setNarrative("Escuchando los pasos en la penumbra...", []);
+
+        const eventData = await this.groq.generateExploration(this.player.className, this.dungeonLevel);
+
+        if (!eventData) {
+            view.setNarrative(
+                `Avanzas con cautela por los oscuros corredores de la Planta ${this.dungeonLevel}.`,
+                [{ text: "Avanzar hacia la siguiente sala", callback: () => { this.lockChoices(); this.advanceFloor(0); } }]
+            );
             return;
         }
 
-        // 2. Si no es un jefe de planta, pedimos el encuentro procedural al backend
-        try {
-            const response = await fetch("/api/generate-lore", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type: 'exploration',
-                    className: this.player.className,
-                    dungeonLevel: this.dungeonLevel
-                })
-            });
-            const eventData = await response.json();
+        this.setSceneImage(ENCOUNTER_IMAGES[eventData.npcType] || DEFAULT_ENCOUNTER_IMAGE);
+        this.setText('sceneBadgeOverlay', `ENCUENTRO - PLANTA ${this.dungeonLevel}`);
 
-            const mainContent = document.getElementById('mainContent');
-            const explorationView = new ExplorationView(mainContent, this);
-            explorationView.render();
-
-            // --- AQUÍ ESTÁ EL TRUCO PARA LOS ENEMIGOS BÁSICOS ---
-            const centralSceneImg = document.getElementById('centralSceneImage');
-            if (centralSceneImg) {
-                // Mapeamos el npcType que viene del dndEncounterDatabase a su imagen correspondiente
-                const basicImages = {
-                    'warrior': 'img/veterano.jpg',
-                    'mage': 'img/mage.jpg',
-                    'rogue': 'img/gargola.png'
-                };
-                centralSceneImg.src = basicImages[eventData.npcType] || 'img/guerreroCorrupto.png';
-                centralSceneImg.onerror = () => { centralSceneImg.src = 'img/guerrero.png'; };
-            }
-
-            const sceneBadge = document.getElementById('sceneBadgeOverlay');
-            if (sceneBadge) {
-                sceneBadge.textContent = `ENCUENTRO - PLANTA ${this.dungeonLevel}`;
-            }
-            // -----------------------------------------------------
-
-            explorationView.setNarrative(
-                greetingText,
-                interaction.choices.map(choice => ({
-                    text: choice.text,
-                    callback: async () => {
-                        // SI ES EL BUHONERO Y DECIDES PASAR DE LARGO
-                        if (npc.id === 'barnaby' && choice.action === 'pass') {
-                            // 1. Poner imagen de enfado al instante
-                            if (sceneImg) {
-                                sceneImg.src = 'img/barnaby_enfado.png';
-                            }
-
-                            // 2. Mostrar su frase malhumorada localmente sin pasar por la IA
-                            this.showDialogueOverlay(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
-                            this.ui.logEvent(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
-
-                            // 3. Esperar el tiempo prudencial antes de avanzar de planta
-                            setTimeout(() => {
-                                this.handleNpcChoice(npc, choice.action, interaction);
-                            }, 3500);
-                            return; // Cortamos el flujo aquí para que no llame a Groq
-                        }
-
-                        // --- FLUJO NORMAL PARA COMPRAS U OTROS PNJS ---
-                        if (sceneImg && npc.images?.talk) {
-                            sceneImg.src = npc.images.talk;
-                        }
-
-                        const response = await fetch("/api/generate-lore", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                type: 'npc_interaction',
-                                npc: npc.id,
-                                npcName: npc.name,
-                                npcArchetype: npc.archetype || "un misterioso habitante de las mazmorras",
-                                className: this.player.className,
-                                action: choice.text
-                            })
-                        });
-                        const replyData = await response.json();
-
-                        this.showDialogueOverlay(npc.name, replyData.description);
-
-                        setTimeout(() => {
-                            this.handleNpcChoice(npc, choice.action, interaction);
-                        }, 2200);
-                    }
-                }))
-            );
-
-        } catch (err) {
-            const mainContent = document.getElementById('mainContent');
-            const explorationView = new ExplorationView(mainContent, this);
-            explorationView.render();
-
-            explorationView.setNarrative(
-                `Avanzas con cautela por los oscuros corredores de la Planta ${this.dungeonLevel}.`,
-                [
-                    {
-                        text: "Avanzar hacia la siguiente sala",
-                        callback: () => {
-                            this.dungeonLevel++;
-                            this.loadNextExplorationEvent();
-                        }
-                    }
-                ]
-            );
-        }
+        view.setNarrative(
+            eventData.description,
+            eventData.choices.map(choice => ({
+                text: choice.text,
+                callback: () => {
+                    this.lockChoices();
+                    return this.handleExplorationChoice(choice.action, eventData);
+                }
+            }))
+        );
     }
 
-    async triggerNpcEvent(npcKey) {
-        const npc = NPC_DATABASE[npcKey];
-        if (!npc) return;
+    // ───────────── PNJ FIJOS ─────────────
 
-        const mainContent = document.getElementById('mainContent');
-        const explorationView = new ExplorationView(mainContent, this);
-        explorationView.render();
+    // Orden: opciones de tu clase → opciones generales del PNJ → opciones de guerrero → genéricas
+    getNpcInteraction(npc) {
+        const byClass = npc.interactions?.[this.player.classKey || 'warrior'];
+        const general = npc.interactions?.choices ? npc.interactions : null;
+        const warrior = npc.interactions?.warrior;
 
-        const sceneImg = document.getElementById('centralSceneImage');
-        if (sceneImg) {
-            sceneImg.src = npc.images?.room || npc.img;
-            sceneImg.onerror = () => { sceneImg.src = 'img/guerrero.png'; };
-        }
+        let interaction = [byClass, general, warrior].find(i => i?.choices?.length);
 
-        const sceneBadge = document.getElementById('sceneBadgeOverlay');
-        if (sceneBadge) {
-            sceneBadge.textContent = npc.name.toUpperCase();
-        }
-
-        const playerClassKey = this.player.classKey || 'warrior';
-
-        // --- BLINDAJE DE OPCIONES: Si no tiene interacciones específicas, usamos unas universales ---
-        let interaction = npc.interactions?.[playerClassKey] || npc.interactions?.['warrior'];
-
-        if (!interaction || !interaction.choices) {
+        if (!interaction) {
             interaction = {
                 greeting: `Te encuentras cara a cara con ${npc.name}. Su mirada atraviesa tu alma en la penumbra.`,
                 choices: [
@@ -337,307 +285,237 @@ class Game {
                 ]
             };
         }
-        // ------------------------------------------------------------------------------------------
 
-        const greetingText = interaction.greeting || `Te encuentras con ${npc.name}.`;
+        // Quita opciones repetidas (mismo texto)
+        const unique = [...new Map(interaction.choices.map(c => [c.text, c])).values()];
+        return { ...interaction, choices: unique };
+    }
 
-        explorationView.setNarrative(
-            greetingText,
+    triggerNpcEvent(npcKey) {
+        const npc = NPC_DATABASE[npcKey];
+        if (!npc) return;
+
+        const view = this.renderExploration();
+        this.setSceneImage(npc.images?.room);
+        this.setText('sceneBadgeOverlay', npc.name.toUpperCase());
+
+        const interaction = this.getNpcInteraction(npc);
+
+        view.setNarrative(
+            interaction.greeting || `Te encuentras con ${npc.name}.`,
             interaction.choices.map(choice => ({
                 text: choice.text,
-                callback: async () => {
-                    // COMPROBAMOS SI LA ACCIÓN ES DE PASAR/IGNORAR
-                    if (choice.action === 'pass') {
-                        // Si pasa de largo, cambiamos directo a ENFADO (sin sonrisa previa)
-                        if (sceneImg) {
-                            sceneImg.src = 'img/barnaby_enfado.png';
-                        }
-                    } else {
-                        // Si va a comprar o interactuar, sí ponemos la de hablar/sonreír
-                        if (sceneImg && npc.images?.talk) {
-                            sceneImg.src = npc.images.talk;
-                        }
-                    }
-
-                    // Llamada segura a Groq para la respuesta
-                    const response = await fetch("/api/generate-lore", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            type: 'npc_interaction',
-                            npc: npc.id,
-                            npcName: npc.name,
-                            npcArchetype: npc.archetype || "un misterioso habitante de las mazmorras",
-                            className: this.player.className,
-                            action: choice.text
-                        })
-                    });
-                    const replyData = await response.json();
-
-                    this.showDialogueOverlay(npc.name, replyData.description);
-
-                    setTimeout(() => {
-                        this.handleNpcChoice(npc, choice.action, interaction);
-                    }, 2200);
-                }
+                callback: () => this.onNpcChoice(npc, choice)
             }))
         );
 
         this.ui.logEvent(`👁️ Te encuentras cara a cara con ${npc.name}.`);
     }
 
-    // Método auxiliar para pintar el cuadro de diálogo flotante tipo Monkey Island
-    showDialogueOverlay(speakerName, text) {
-        let existingBox = document.getElementById('monkeyIslandDialogue');
-        if (existingBox) existingBox.remove();
+    async onNpcChoice(npc, choice) {
+        this.lockChoices();
 
-        const box = document.createElement('div');
-        box.id = 'monkeyIslandDialogue';
-        box.className = 'monkey-dialogue-box';
-        box.innerHTML = `<b>${speakerName.toUpperCase()}:</b> "${text}"`;
+        const mood = NPC_MOOD_BY_ACTION[choice.action] || 'talk';
+        this.setSceneImage(npc.images?.[mood] || npc.images?.talk || npc.images?.room);
 
-        document.getElementById('mainContent').appendChild(box);
+        // Barnaby ofendido responde con frase fija, sin gastar una llamada a la IA
+        if (npc.id === 'barnaby' && choice.action === 'pass') {
+            this.handleNpcChoice(npc, 'pass');
+            return;
+        }
+
+        const reply = await this.groq.generateNpcDialogue(npc, choice.text, this.player.className);
+        this.showDialogueOverlay(npc.name, reply);
+
+        setTimeout(() => this.handleNpcChoice(npc, choice.action), 2200);
     }
 
-    handleNpcChoice(npc, action, interaction) {
+    handleNpcChoice(npc, action) {
         this.audio.play('card');
 
-        // 1. ACEPTPAR EL ROMANCE / COQUETEO (MAGA ARCANA)
-        if (action === 'romance_accept') {
-            this.ui.logEvent(`🌹 ${this.playerName} acepta la copa del Conde Valerius. Se sella un pacto de sangre y fascinación.`);
-            this.player.addGold(150);
-            this.player.health = this.player.maxHealth; // Recuperación total por el elixir vampírico
+        const actions = {
+            combat: () => this.startNpcCombat(npc),
+            buy: () => this.payToll(npc),
+            pass: () => this.leaveNpc(npc),
 
-            // Añadir objeto especial al inventario
-            this.player.inventory.push({ name: '🍷 Elixir del Conde', effect: '+15 MP Permanente' });
-            this.player.maxMana += 15;
-            this.player.mana = this.player.maxMana;
+            pact_accept: () => {
+                this.ui.logEvent(`🤝 Sellas un pacto con ${npc.name}. Obtienes información y riquezas (+200 oro).`);
+                this.player.addGold(200);
+                this.finishEncounter(1800);
+            },
 
-            this.ui.updateStats(this.player, this.dungeonLevel);
+            flirt_challenge: () => {
+                this.ui.logEvent(`✨ ${this.playerName} deslumbra a ${npc.name} con un despliegue de magia arcana.`);
+                this.grantXp(80);
+                this.finishEncounter(1800);
+            },
 
-            // Continuar exploración tras el encuentro romántico
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1800);
-            return;
-        }
+            morgana_romance: () => this.morganaRomance(),
+            morgana_romance_warrior: () => this.morganaRomance(),
 
-        // 2. RETAR CON COQUETEO (MAGA ARCANA)
-        if (action === 'flirt_challenge') {
-            this.ui.logEvent(`✨ ${this.playerName} deslumbra al Conde con un despliegue de magia arcana. Valerius sonríe fascinado.`);
-            const xpGain = 80;
-            const leveledUp = this.player.addXp(xpGain);
-            if (leveledUp) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
+            witch_knowledge: () => {
+                this.ui.logEvent(`📖 ${npc.name} comparte un conocimiento prohibido contigo (+50 XP).`);
+                this.grantXp(50);
+                this.finishEncounter(1800);
+            },
 
-            this.ui.updateStats(this.player, this.dungeonLevel);
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1800);
-            return;
-        }
-
-        // 3. ACEPTAR PACTO SOMBRÍO (PÍCARO)
-        if (action === 'pact_accept') {
-            this.ui.logEvent(`🤝 Sellas un acuerdo de sombras con ${npc.name}. Obtienes información y riquezas.`);
-            this.player.addGold(200);
-            this.ui.updateStats(this.player, this.dungeonLevel);
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1800);
-            return;
-        }
-
-        // 8. ACCIONES DE BARNABY EL BUHONERO (PLANTA 1)
-        if (action === 'buy_potion') {
-            if (this.player.gold >= 30) {
-                this.player.gold -= 30;
-                this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
-
-                // Imagen de contento / venta exitosa
-                const sceneImg = document.getElementById('centralSceneImage');
-                if (sceneImg && npc.images?.talk) {
-                    sceneImg.src = npc.images.talk; // Su imagen sonriente con pociones
+            buy_poison: () => {
+                if (this.player.gold >= POISON_COST) {
+                    this.player.gold -= POISON_COST;
+                    this.player.attackBonus = (this.player.attackBonus || 0) + 5;
+                    this.player.inventory.push({ name: '🧪 Veneno de Filo', effect: '+5 daño en ataques' });
+                    this.ui.logEvent(`🧪 Compras veneno (-${POISON_COST} Oro). Tus ataques hacen +5 de daño.`);
+                } else {
+                    this.ui.logEvent(`❌ No tienes suficiente oro para el veneno.`);
                 }
-                this.showDialogueOverlay(npc.name, "¡Excelente elección, viajero! Volverás a visitarme.");
-                this.ui.logEvent(`🧪 Compras una poción a Barnaby (-30 Oro). Recuperas 40 HP.`);
-            } else {
-                this.showDialogueOverlay(npc.name, "¿pretendes engañarme? ¡No tienes suficiente oro!");
-                this.ui.logEvent(`❌ No tienes suficiente oro para comprar la poción.`);
-            }
-            this.ui.updateStats(this.player, this.dungeonLevel);
+                this.finishEncounter(2000);
+            },
 
-            // TIEMPO AMPLIADO (3.5 segundos para que dé tiempo a ver la imagen y leer)
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 3500);
-            return;
-        }
-
-        if (action === 'buy_mana') {
-            if (this.player.gold >= 40) {
-                this.player.gold -= 40;
-                this.player.maxMana += 10;
-                this.player.mana = this.player.maxMana;
-
-                const sceneImg = document.getElementById('centralSceneImage');
-                if (sceneImg && npc.images?.talk) {
-                    sceneImg.src = npc.images.talk;
+            buy_potion: () => {
+                if (this.player.gold >= 30) {
+                    this.player.gold -= 30;
+                    this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
+                    this.showDialogueOverlay(npc.name, "¡Excelente elección, viajero! Volverás a visitarme.");
+                    this.ui.logEvent(`🧪 Compras una poción a ${npc.name} (-30 Oro). Recuperas 40 HP.`);
+                } else {
+                    this.showDialogueOverlay(npc.name, "¿Pretendes engañarme? ¡No tienes suficiente oro!");
+                    this.ui.logEvent(`❌ No tienes suficiente oro para comprar la poción.`);
                 }
-                this.showDialogueOverlay(npc.name, "Un grimorio de poder... Que la magia te proteja.");
-                this.ui.logEvent(`🔮 Compras un grimorio a Barnaby (-40 Oro). ¡Maná máximo aumentado!`);
-            } else {
-                this.showDialogueOverlay(npc.name, "Tus bolsillos están tan vacíos como tusconjuros.");
-                this.ui.logEvent(`❌ No tienes suficiente oro.`);
-            }
-            this.ui.updateStats(this.player, this.dungeonLevel);
+                this.finishEncounter(3500);
+            },
 
-            // TIEMPO AMPLIADO (3.5 segundos)
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 3500);
-            return;
-        }
-
-        if (action === 'pass') {
-            if (npc.id === 'barnaby') {
-                const sceneImg = document.getElementById('centralSceneImage');
-                if (sceneImg) {
-                    sceneImg.src = 'img/barnaby_enfado.png'; // Cara de enfado al pasar de largo
+            buy_mana: () => {
+                if (this.player.gold >= 40) {
+                    this.player.gold -= 40;
+                    this.player.maxMana += 10;
+                    this.player.mana = this.player.maxMana;
+                    this.showDialogueOverlay(npc.name, "Un grimorio de poder... Que la magia te proteja.");
+                    this.ui.logEvent(`🔮 Compras un grimorio a ${npc.name} (-40 Oro). ¡Maná máximo aumentado!`);
+                } else {
+                    this.showDialogueOverlay(npc.name, "Tus bolsillos están tan vacíos como tus conjuros.");
+                    this.ui.logEvent(`❌ No tienes suficiente oro.`);
                 }
-                this.showDialogueOverlay(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
-                this.ui.logEvent(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
-            } else {
-                this.ui.logEvent(`🏃 Te retiras con cautela sin llamar la atención.`);
+                this.finishEncounter(3500);
+            },
+
+            steal: () => {
+                const d20 = this.rollD20();
+                if (d20 >= 10) {
+                    this.player.addGold(60);
+                    this.ui.logEvent(`🎲 [D20: ${d20}] ¡Robo perfecto! Te llevas 60 de oro sin que ${npc.name} se entere.`);
+                } else {
+                    this.audio.play('hit');
+                    this.player.health -= 15;
+                    this.setSceneImage(npc.images?.enraged || npc.images?.talk);
+                    this.showDialogueOverlay(npc.name, "¡LADRÓN! ¡Toma esto por tu osadía!");
+                    this.ui.logEvent(`🎲 [D20: ${d20}] ¡Te descubren! Recibes 15 de daño.`);
+                }
+                this.finishEncounter(3000);
             }
+        };
 
-            this.dungeonLevel++;
-
-            // TIEMPO AMPLIADO (3.5 segundos para saborear el enfado del buhonero)
-            setTimeout(() => this.loadNextExplorationEvent(), 3500);
+        const run = actions[action];
+        if (!run) {
+            // Acción desconocida: se avisa y se avanza para no bloquear el juego
+            console.warn(`[Game] Acción de PNJ sin manejar: "${action}" (${npc.id})`);
+            this.finishEncounter(1200);
             return;
         }
+        run();
+    }
 
-
-        // 7. ROMANCE / PACTO CON LA BRUJA MORGANA
-        if (action === 'morgana_romance' || action === 'morgana_romance_warrior') {
-            this.ui.logEvent(`🖤 Sellar un vínculo oscuro con la Bruja Morgana llena tu espíritu de un poder prohibido.`);
-            this.player.addGold(100);
-            this.player.health = this.player.maxHealth;
-
-            // Recompensa única de la bruja
-            this.player.inventory.push({ name: '🧪 Poción de Subsistencia', effect: '+20 HP Máximo' });
-            this.player.maxHealth += 20;
-            this.player.health = this.player.maxHealth;
-
-            this.ui.updateStats(this.player, this.dungeonLevel);
-
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1800);
-            return;
-        }
-
-        // 4. COMBATE TCG CONTRA EL CONDE
-        if (action === 'combat') {
-            this.ui.logEvent(`⚔️ ¡Desafías al ${npc.name}! Desenfundan sus cartas.`);
-
-            // Iniciar combate cargando las estadísticas y mazo de Valerius
-            this.startTcgCombat({
-                name: npc.name,
-                hp: npc.baseHp + (this.dungeonLevel * 10),
-                maxHp: npc.baseHp + (this.dungeonLevel * 10),
-                atk: npc.baseAtk,
-                shield: 0,
-                img: npc.img,
-                deck: npc.deck
-            });
-            return;
-        }
-
-        // 5. COMPRA / SOBORNO (GUERRERO)
-        if (action === 'buy') {
-            if (this.player.gold >= 50) {
-                this.player.gold -= 50;
-                this.ui.logEvent(`💰 Entregas 50 GP al Conde Valerius. Te permite el paso sin sangre.`);
-                this.ui.updateStats(this.player, this.dungeonLevel);
-                this.dungeonLevel++;
-                setTimeout(() => this.loadNextExplorationEvent(), 1400);
-            } else {
-                this.ui.logEvent(`❌ No tienes suficiente oro. ¡El Conde se impacienta!`);
-                this.startTcgCombat({
-                    name: npc.name,
-                    hp: npc.baseHp,
-                    maxHp: npc.baseHp,
-                    atk: npc.baseAtk,
-                    shield: 0,
-                    img: npc.img
-                });
-            }
-            return;
-        }
-
-        // 6. HUIR / PASAR
-        if (action === 'pass') {
-            this.ui.logEvent(`🏃 Te retiras con cautela antes de que el Conde decida atacarte.`);
-            this.dungeonLevel++;
-            setTimeout(() => this.loadNextExplorationEvent(), 1200);
+    grantXp(amount) {
+        if (this.player.addXp(amount)) {
+            this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
         }
     }
 
-    // INICIAR COMBATE TCG
-    // INICIAR COMBATE TCG
-    startTcgCombat(enemyData) {
-        const levelMultiplier = this.dungeonLevel;
+    morganaRomance() {
+        this.ui.logEvent(`🖤 Sellar un vínculo oscuro con la Bruja Morgana llena tu espíritu de un poder prohibido.`);
+        this.player.addGold(100);
+        this.player.inventory.push({ name: '🧪 Poción de Subsistencia', effect: '+20 HP Máximo' });
+        this.player.maxHealth += 20;
+        this.player.health = this.player.maxHealth;
+        this.finishEncounter(1800);
+    }
 
-        let enemyImg = 'img/gargola.png';
-        let enemyName = enemyData?.name || `Enemigo de Planta ${this.dungeonLevel}`;
+    payToll(npc) {
+        const toll = NPC_TOLLS[npc.id] ?? DEFAULT_TOLL;
 
-        const descLower = (enemyData?.description || document.getElementById('explorationText').textContent || "").toLowerCase();
-        if (descLower.includes('gárgola') || descLower.includes('estatua')) {
-            enemyImg = 'img/gargola.png';
-            enemyName = 'Estatua de Gárgola';
-        } else if (descLower.includes('hechicero') || descLower.includes('nigromante') || descLower.includes('mago')) {
-            enemyImg = 'img/hechicero.png';
-            enemyName = 'Hechicero Oscuro';
-        } else if (descLower.includes('dragón') || descLower.includes('dragon')) {
-            enemyImg = 'img/dragon.png';
-            enemyName = 'Dragón Anciano';
+        if (this.player.gold >= toll) {
+            this.player.gold -= toll;
+            this.ui.logEvent(`💰 Entregas ${toll} GP a ${npc.name}. Te permite el paso sin sangre.`);
+            this.finishEncounter(1400);
         } else {
-            enemyImg = 'img/guerreroCorrupto.png';
-            enemyName = 'Guerrero Corrupto';
+            this.ui.logEvent(`❌ No tienes suficiente oro. ¡${npc.name} se impacienta!`);
+            this.startNpcCombat(npc);
         }
+    }
 
-        this.currentEnemy = {
-            name: enemyName,
-            hp: 40 + (levelMultiplier * 18),
-            maxHp: 40 + (levelMultiplier * 18),
-            atk: 10 + (levelMultiplier * 2),
-            shield: 0,
-            img: enemyImg
-        };
+    leaveNpc(npc) {
+        if (npc.id === 'barnaby') {
+            this.showDialogueOverlay(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
+            this.ui.logEvent(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
+            this.finishEncounter(3500);
+        } else {
+            this.ui.logEvent(`🏃 Te retiras con cautela sin llamar la atención.`);
+            this.finishEncounter(1200);
+        }
+    }
+
+    startNpcCombat(npc) {
+        this.ui.logEvent(`⚔️ ¡Desafías a ${npc.name}! Desenfundan sus cartas.`);
+        const hp = npc.baseHp + (this.dungeonLevel * 10);
+
+        this.startTcgCombat({
+            name: npc.name,
+            hp,
+            maxHp: hp,
+            atk: npc.baseAtk,
+            img: npc.images?.enraged || npc.images?.room,
+            deck: npc.deck
+        });
+    }
+
+    // ───────────── COMBATE TCG ─────────────
+
+    startTcgCombat(enemyData = {}) {
+        const lvl = this.dungeonLevel;
+
+        if (enemyData.name && enemyData.hp) {
+            // PNJ con stats propios: se respetan nombre, vida, ataque, imagen y mazo
+            this.currentEnemy = {
+                name: enemyData.name,
+                hp: enemyData.hp,
+                maxHp: enemyData.maxHp ?? enemyData.hp,
+                atk: enemyData.atk,
+                shield: 0,
+                img: enemyData.img || FALLBACK_IMG,
+                deck: enemyData.deck || []
+            };
+        } else {
+            // Enemigo genérico: se deduce por la descripción del encuentro
+            const text = (enemyData.description || document.getElementById('explorationText')?.textContent || '').toLowerCase();
+            const template = GENERIC_ENEMIES.find(t => t.keys.some(k => text.includes(k))) || DEFAULT_ENEMY;
+
+            this.currentEnemy = {
+                name: template.name,
+                hp: 40 + (lvl * 18),
+                maxHp: 40 + (lvl * 18),
+                atk: 10 + (lvl * 2),
+                shield: 0,
+                img: template.img,
+                deck: []
+            };
+        }
 
         this.playerShield = 0;
 
-        // Elementos visuales del visor VS y estados
-        const enemyPortraitContainer = document.getElementById('enemyPortraitContainer');
-        const vsBadge = document.getElementById('vsBadge');
-        const enemyStatus = document.getElementById('enemyStatus');
-        const enemySceneImg = document.getElementById('enemySceneImage');
-        const enemyPortraitName = document.getElementById('enemyPortraitName');
-
-        if (enemyPortraitContainer) enemyPortraitContainer.style.display = 'flex';
-        if (vsBadge) vsBadge.style.display = 'inline';
-        if (enemyStatus) enemyStatus.style.display = 'block';
-        if (enemySceneImg) {
-            enemySceneImg.src = this.currentEnemy.img;
-            enemySceneImg.onerror = () => { enemySceneImg.src = 'img/guerrero.png'; };
-        }
-        if (enemyPortraitName) enemyPortraitName.textContent = this.currentEnemy.name;
-
-        // --- CAMBIO CLAVE: OCULTAR OPCIONES DE EXPLORACIÓN Y MOSTRAR TCG ---
-        const mainContent = document.getElementById('mainContent');
-        const tcgView = new TcgCombatView(mainContent, this);
+        const tcgView = new TcgCombatView(document.getElementById('mainContent'), this);
         tcgView.render(this.currentEnemy, this.player);
-        // -----------------------------------------------------------------
 
         const endTurnBtn = document.getElementById('endTurnTcgBtn');
-        if (endTurnBtn) {
-            endTurnBtn.onclick = () => this.executeEnemyTurn();
-        }
+        if (endTurnBtn) endTurnBtn.onclick = () => this.executeEnemyTurn();
 
         this.ui.logEvent(`⚔️ ¡ENTRAS EN COMBATE contra ${this.currentEnemy.name}!`);
         this.updateTcgUI();
@@ -703,6 +581,7 @@ class Game {
     }
 
     playTcgCard(card, index) {
+        if (!this.currentEnemy || this.currentEnemy.hp <= 0 || this.player.health <= 0) return;
         if (this.player.mana < card.cost) {
             this.ui.logEvent(`❌ ¡Maná insuficiente para jugar ${card.name}!`);
             return;
@@ -712,14 +591,15 @@ class Game {
         this.player.mana -= card.cost;
 
         if (card.type === 'atk') {
-            let remainingAtk = card.val;
+            const totalAtk = card.val + (this.player.attackBonus || 0);
+            let remainingAtk = totalAtk;
             if (this.currentEnemy.shield > 0) {
                 const absorbed = Math.min(this.currentEnemy.shield, remainingAtk);
                 this.currentEnemy.shield -= absorbed;
                 remainingAtk -= absorbed;
             }
             this.currentEnemy.hp -= remainingAtk;
-            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${card.val} de daño a ${this.currentEnemy.name}.`);
+            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${totalAtk} de daño a ${this.currentEnemy.name}.`);
         } else if (card.type === 'def') {
             this.playerShield += card.val;
             this.ui.logEvent(`🛡️ Usas ${card.name} y obtienes ${card.val} de escudo.`);
@@ -743,14 +623,14 @@ class Game {
         this.audio.play('hit');
 
         // Definir baraja de cartas del enemigo según el tipo
-        const enemyCards = [
-            { name: '🔪 Zarpazo Furtivo', type: 'atk', val: this.currentEnemy.atk + 4, desc: 'Ataque rápido' },
-            { name: '🛡️ Bloqueo Sombrío', type: 'def', val: 8, desc: 'Gana 8 de escudo' },
-            { name: '🔥 Fulgor Oscuro', type: 'atk', val: this.currentEnemy.atk + 8, desc: 'Ataque pesado' }
-        ];
-
-
-
+        const blockCard = { name: '🛡️ Bloqueo Sombrío', type: 'def', val: 8, desc: 'Gana 8 de escudo' };
+        const enemyCards = this.currentEnemy.deck?.length
+            ? [...this.currentEnemy.deck, blockCard]
+            : [
+                { name: '🔪 Zarpazo Furtivo', type: 'atk', val: this.currentEnemy.atk + 4, desc: 'Ataque rápido' },
+                blockCard,
+                { name: '🔥 Fulgor Oscuro', type: 'atk', val: this.currentEnemy.atk + 8, desc: 'Ataque pesado' }
+            ];
 
         // La IA elige una carta aleatoria de su baraja
         const chosenCard = enemyCards[Math.floor(Math.random() * enemyCards.length)];

@@ -7,10 +7,13 @@ const LORE_FALLBACKS = {
     "Pícaro": "EL MAZO ES LA MAYOR DE LAS FORTUNAS. ESCONDIDO EN LAS SOMBRAS, PREPÁRATE PARA EL SAQUEO..."
 };
 
+const NPC_FALLBACK_LINE = "Las sombras ocultan la respuesta de tu interlocutor.";
+const DEFAULT_ARCHETYPE = "un misterioso habitante de las mazmorras";
+
 export class GroqAI {
     /**
-     * Único punto de contacto con el backend.
-     * Lanza un error si la petición falla, se agota el tiempo o la respuesta no es válida.
+     * Único punto de contacto con el backend (/api/generate-lore).
+     * Lanza error si la petición falla o se agota el tiempo.
      */
     async _post(payload) {
         const controller = new AbortController();
@@ -23,61 +26,67 @@ export class GroqAI {
                 body: JSON.stringify(payload),
                 signal: controller.signal
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             return await response.json();
         } finally {
             clearTimeout(timer);
         }
     }
 
+    /** Frase de introducción del héroe. Devuelve siempre un texto. */
     async generateCharacterLore(className) {
         try {
             const data = await this._post({ className });
             if (!data.story) throw new Error("Respuesta sin 'story'");
             return data.story;
         } catch (error) {
-            // En local sin Vercel dev (o si la API falla) se usa el relato de contingencia
             console.warn("[GroqAI] generateCharacterLore:", error.message);
             return LORE_FALLBACKS[className] || LORE_FALLBACKS["Guerrero"];
         }
     }
 
-    async generateNpcDialogue(npcKey, playerChoice, playerClass = null) {
+    /**
+     * Reacción de un PNJ a lo que elige el jugador. Devuelve siempre un texto.
+     * @param {object} npc        Entrada de NPC_DATABASE (usa id, name y archetype)
+     * @param {string} choiceText Texto de la opción elegida
+     * @param {string} className  Nombre de la clase del jugador ("Guerrero", ...)
+     */
+    async generateNpcDialogue(npc, choiceText, className) {
         try {
             const data = await this._post({
                 type: "npc_interaction",
-                npc: npcKey,
-                action: playerChoice,
-                playerClass
+                npc: npc.id,
+                npcName: npc.name,
+                npcArchetype: npc.archetype || DEFAULT_ARCHETYPE,
+                className,
+                action: choiceText
             });
             if (!data.description) throw new Error("Respuesta sin 'description'");
             return data.description;
         } catch (error) {
             console.warn("[GroqAI] generateNpcDialogue:", error.message);
-            return "Las sombras ocultan la respuesta de tu interlocutor.";
+            return NPC_FALLBACK_LINE;
         }
     }
 
     /**
-     * Antes llamaba a this.queryGroq(), que no existe.
-     * Ahora reutiliza el mismo endpoint que el resto de NPCs.
+     * Encuentro procedural: { npcType, description, choices: [{ text, action }] }.
+     * Devuelve null si la respuesta no es válida, para que el juego use su plan B.
      */
-    async generateVampireDialogue(playerClass, actionChosen) {
+    async generateExploration(className, dungeonLevel) {
         try {
-            const data = await this._post({
-                type: "npc_interaction",
-                npc: "valerius",
-                action: actionChosen,
-                playerClass
-            });
-            if (!data.description) throw new Error("Respuesta sin 'description'");
-            return data.description;
+            const data = await this._post({ type: "exploration", className, dungeonLevel });
+
+            const valid = typeof data.description === "string"
+                && Array.isArray(data.choices)
+                && data.choices.length > 0
+                && data.choices.every(c => typeof c.text === "string" && typeof c.action === "string");
+
+            if (!valid) throw new Error("Encuentro con formato inválido");
+            return data;
         } catch (error) {
-            console.warn("[GroqAI] generateVampireDialogue:", error.message);
-            return "Tu presencia aquí es un insulto a la eternidad.";
+            console.warn("[GroqAI] generateExploration:", error.message);
+            return null;
         }
     }
 }

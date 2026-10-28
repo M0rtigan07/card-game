@@ -10,8 +10,7 @@ export const NPC_DATABASE = {
             seductive: 'img/npcs/conde_seductor.jpg'
         },
         cards: {
-            combat: 'img/npcs/condeCarta.png',
-            companion: 'img/npcs/condeCarta1.png'
+            combat: 'img/npcs/cartaConde.png'
         },
         type: 'vampire_lord',
         archetype: 'el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante',
@@ -108,7 +107,8 @@ export const NPC_DATABASE = {
         name: 'Barnaby el Buhonero',
         images: {
             room: 'img/barnaby_room.png',
-            talk: 'img/barnaby_talk.png'
+            talk: 'img/barnaby_talk.png',
+            enraged: 'img/barnaby_enfado.png'
         },
         type: 'merchant',
         dungeonLevel: 1, // <-- Aparece en la planta 1
@@ -170,7 +170,6 @@ export const NPC_DATABASE = {
                 choices: [
                     { text: "🌹 \"Una belleza tan salvaje merece algo mejor que pelear. Hablemos...\"", action: 'morgana_romance_warrior' },
                     { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
-                    { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
                     { text: "💰 Pagar peaje para cruzar (-60 Oro)", action: 'buy' }
                 ]
             },
@@ -180,7 +179,6 @@ export const NPC_DATABASE = {
                     { text: "💋 \"Contigo siempre apetece un buen trato bajo la luz de la luna...\"", action: 'morgana_romance' },
                     { text: "🗡️ Amenazarla", action: 'combat' },
                     { text: "🧪 Comprar veneno para las cartas", action: 'buy_poison' },
-                    { text: "🗡️ Amenazarla", action: 'combat' }
                 ]
             }
         }
