@@ -1,43 +1,49 @@
 // js/data/npcs.js
 export const NPC_DATABASE = {
-    // --- PLANTA 2: EL CONDE ---
     valerius: {
         id: 'valerius',
         name: 'Conde Valerius',
         images: {
-            room: 'img/valerius_room.png',
-            talk: 'img/valerius_talk.png',
-            enraged: 'img/valerius_enraged.png'
+            room: 'img/npcs/conde_valerius.jpg',
+            talk: 'img/npcs/conde_charla.jpg',
+            enraged: 'img/npcs/conde_enojado.jpg',
+            seductive: 'img/npcs/conde_seductor.jpg'
+        },
+        cards: {
+            combat: 'img/npcs/condeCarta.png',
+            companion: 'img/npcs/condeCarta1.png'
         },
         type: 'vampire_lord',
-        dungeonLevel: 2, // <-- Asignado estrictamente a la planta 2
-        baseHp: 70,
-        baseAtk: 16,
+        archetype: 'el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante',
+        dungeonLevel: 2, // O la planta en la que aparezca
+        baseHp: 80,
+        baseAtk: 18,
         deck: [
-            { name: '🍷 Mordisco Noblesse', type: 'atk', val: 18, desc: 'Ataque vampírico pesado' },
-            { name: '🦇 Capa de Sombras', type: 'def', val: 12, desc: 'Gana 12 de escudo' },
-            { name: '🔮 Seducción Oscura', type: 'atk', val: 24, desc: 'Daño mental/arcano' }
+            { name: '🦇 Colmillo de Sombra', type: 'atk', val: 22, desc: 'Duro mordisco vampírico' }
         ],
         interactions: {
-            'mage': {
-                greeting: "Vaya... Una hechicera de sangre pura recorre mi cripta...",
-                choices: [
-                    { text: "🍷 \"Acepto tu copa, Conde.\"", action: 'romance_accept' },
-                    { text: "🗡️ \"¡Desenfunda!\"", action: 'combat' }
-                ]
-            },
             'warrior': {
                 greeting: "Un patético bulto de acero profana mis aposentos...",
                 choices: [
-                    { text: "🗡️ [FUERZA] \"¡Lucha!\"", action: 'combat' },
-                    { text: "💰 \"Acepta este tributo de oro.\"", action: 'buy' }
+                    { text: "⚔️ \"¡Desenvaina, criatura de la noche!\"", action: "combat" },
+                    { text: "💰 \"Acepta este tributo de oro y permíteme pasar.\"", action: "buy" },
+                    { text: "🤝 \"Unamos fuerzas en esta mazmorra; juntos somos invencibles.\"", action: "pact_accept" }
+                ]
+            },
+            'mage': {
+                greeting: "Siento una chispa de maná interesante en tu sangre, hechicera...",
+                choices: [
+                    { text: "🌹 \"Una belleza tan salvaje merece algo mejor que pelear. Hablemos...\"", action: "flirt_challenge" },
+                    { text: "✨ \"Sellar un pacto oscuro contigo elevará mi poder.\"", action: "pact_accept" },
+                    { text: "⚔️ \"Tus días de tiranía terminan aquí.\"", action: "combat" }
                 ]
             },
             'rogue': {
-                greeting: "Un ratón sigiloso acecha en mis dominios...",
+                greeting: "Otro ratón merodeando por mis criptas oscuras...",
                 choices: [
-                    { text: "🤝 \"Hagamos un trato.\"", action: 'pact_accept' },
-                    { text: "🗡️ \"A las armas!\"", action: 'combat' }
+                    { text: "💰 \"Tengo oro y secretos que te interesan, señor de la noche.\"", action: "buy" },
+                    { text: "🤝 \"Ofrezco mis servicios como aliado en las sombras.\"", action: "pact_accept" },
+                    { text: "⚔️ \"Prefiero tu botín a tu charla.\"", action: "combat" }
                 ]
             }
         }
