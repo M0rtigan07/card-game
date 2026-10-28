@@ -1,55 +1,82 @@
+const API_ENDPOINT = "/api/generate-lore";
+const REQUEST_TIMEOUT_MS = 10000;
+
+const LORE_FALLBACKS = {
+    "Guerrero": "LAS LEYENDAS HABLAN DE TU ESPADA. TRAS AÑOS DE BATALLAS, EL MAZO RECLAMA TU VALOR. DESENFAÑA TU ACERO...",
+    "Maga Arcana": "LOS TOMOS PROHIBIDOS SUSURRABAN UN PRESAGIO SOBRE EL MAZO. SIENTE EL PULSO DE LA MAGIA...",
+    "Pícaro": "EL MAZO ES LA MAYOR DE LAS FORTUNAS. ESCONDIDO EN LAS SOMBRAS, PREPÁRATE PARA EL SAQUEO..."
+};
+
 export class GroqAI {
-    async generateCharacterLore(className) {
+    /**
+     * Único punto de contacto con el backend.
+     * Lanza un error si la petición falla, se agota el tiempo o la respuesta no es válida.
+     */
+    async _post(payload) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
         try {
-            const response = await fetch("/api/generate-lore", {
+            const response = await fetch(API_ENDPOINT, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ className })
+                body: JSON.stringify(payload),
+                signal: controller.signal
             });
 
-            if (!response.ok) throw new Error("Fallback local");
-            const data = await response.json();
-            return data.story;
-        } catch (error) {
-            // Si estás probando en local sin Vercel dev, usa el relato de contingencia
-            const fallbacks = {
-                "Guerrero": "LAS LEYENDAS HABLAN DE TU ESPADA. TRAS AÑOS DE BATALLAS, EL MAZO RECLAMA TU VALOR. DESENFAÑA TU ACERO...",
-                "Maga Arcana": "LOS TOMOS PROHIBIDOS SUSURRABAN UN PRESAGIO SOBRE EL MAZO. SIENTE EL PULSO DE LA MAGIA...",
-                "Pícaro": "EL MAZO ES LA MAYOR DE LAS FORTUNAS. ESCONDIDO EN LAS SOMBRAS, PREPÁRATE PARA EL SAQUEO..."
-            };
-            return fallbacks[className] || fallbacks["Guerrero"];
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return await response.json();
+        } finally {
+            clearTimeout(timer);
         }
     }
 
-    // Añade este método en tu clase GroqAI si no lo tienes:
-    async generateNpcDialogue(npcKey, playerChoice) {
+    async generateCharacterLore(className) {
         try {
-            const response = await fetch("/api/generate-lore", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    type: 'npc_interaction',
-                    npc: npcKey,
-                    action: playerChoice
-                })
+            const data = await this._post({ className });
+            if (!data.story) throw new Error("Respuesta sin 'story'");
+            return data.story;
+        } catch (error) {
+            // En local sin Vercel dev (o si la API falla) se usa el relato de contingencia
+            console.warn("[GroqAI] generateCharacterLore:", error.message);
+            return LORE_FALLBACKS[className] || LORE_FALLBACKS["Guerrero"];
+        }
+    }
+
+    async generateNpcDialogue(npcKey, playerChoice, playerClass = null) {
+        try {
+            const data = await this._post({
+                type: "npc_interaction",
+                npc: npcKey,
+                action: playerChoice,
+                playerClass
             });
-            const data = await response.json();
-            return data.description || "El personaje te mira fijamente en la penumbra sin pronunciar palabra...";
-        } catch (err) {
+            if (!data.description) throw new Error("Respuesta sin 'description'");
+            return data.description;
+        } catch (error) {
+            console.warn("[GroqAI] generateNpcDialogue:", error.message);
             return "Las sombras ocultan la respuesta de tu interlocutor.";
         }
     }
 
+    /**
+     * Antes llamaba a this.queryGroq(), que no existe.
+     * Ahora reutiliza el mismo endpoint que el resto de NPCs.
+     */
     async generateVampireDialogue(playerClass, actionChosen) {
         try {
-            const prompt = `Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante de un juego de rol gótico oscuro. 
-        El jugador es un ${playerClass} que ha tomado la siguiente acción o postura: "${actionChosen}".
-        Responde brevemente (máximo 2 líneas) con una frase llena de desdén, superioridad y toque gótico, manteniendo su personalidad altiva. Devuélvelo en un tono teatral tipo aventura gráfica clásica.`;
-
-            // Llamada a tu API de Groq configurada
-            const response = await this.queryGroq(prompt);
-            return response || "¡Insensato! Tu osadía sella tu destino en mis dominios.";
-        } catch (err) {
+            const data = await this._post({
+                type: "npc_interaction",
+                npc: "valerius",
+                action: actionChosen,
+                playerClass
+            });
+            if (!data.description) throw new Error("Respuesta sin 'description'");
+            return data.description;
+        } catch (error) {
+            console.warn("[GroqAI] generateVampireDialogue:", error.message);
             return "Tu presencia aquí es un insulto a la eternidad.";
         }
     }
