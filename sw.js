@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mazo-destino-6';
+const CACHE_NAME = 'mazo-destino-7';
 const ASSETS = [
   '/',
   '/index.html',
