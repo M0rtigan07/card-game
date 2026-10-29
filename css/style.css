@@ -718,10 +718,8 @@ h1 {
 .elvira-scene-frame img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    /* Mantiene la proporción de la imagen completa sin recortarla */
-    background-color: #000;
-    /* Fondo negro lateral si la foto es más estrecha */
+    object-fit: contain;      /* Mantiene la proporción de la imagen completa sin recortarla */
+    background-color: #000;   /* Fondo negro lateral si la foto es más estrecha */
     image-rendering: pixelated;
     /* Hace que la imagen cubra todo el marco sin verse pequeña */
 }
@@ -1086,25 +1084,11 @@ h1 {
 }
 
 /* Color del borde según el tipo de jugada */
-.intent-def {
-    border-color: #60a5fa;
-}
-
-.intent-heal {
-    border-color: #4ade80;
-}
-
-.intent-poison {
-    border-color: #c084fc;
-}
-
-.intent-buff {
-    border-color: #fb923c;
-}
-
-.intent-drain {
-    border-color: #f43f5e;
-}
+.intent-def { border-color: #60a5fa; }
+.intent-heal { border-color: #4ade80; }
+.intent-poison { border-color: #c084fc; }
+.intent-buff { border-color: #fb923c; }
+.intent-drain { border-color: #f43f5e; }
 
 .enemy-intent-card.playing {
     animation: intentPlay 0.9s ease-out;
@@ -1137,74 +1121,32 @@ h1 {
     animation: floatUp 1s ease-out forwards;
 }
 
-.float-dmg {
-    color: #ef4444;
-}
-
-.float-heal {
-    color: #4ade80;
-}
-
-.float-shield {
-    color: #60a5fa;
-}
-
-.float-poison {
-    color: #c084fc;
-}
-
-.float-buff {
-    color: #fb923c;
-}
+.float-dmg { color: #ef4444; }
+.float-heal { color: #4ade80; }
+.float-shield { color: #60a5fa; }
+.float-poison { color: #c084fc; }
+.float-buff { color: #fb923c; }
 
 .hit-shake {
     animation: hitShake 0.4s;
 }
 
 @keyframes floatUp {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, 10px);
-    }
-
-    15% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -55px);
-    }
+    0% { opacity: 0; transform: translate(-50%, 10px); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -55px); }
 }
 
 @keyframes hitShake {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-7px);
-    }
-
-    75% {
-        transform: translateX(7px);
-    }
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
 }
 
 @keyframes intentPlay {
-    0% {
-        transform: scale(1);
-    }
-
-    40% {
-        transform: scale(1.06);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
 }
 
 /* Mientras juega el enemigo */
@@ -1267,4 +1209,67 @@ h1 {
     filter: grayscale(0.8) brightness(0.55);
     cursor: not-allowed;
     pointer-events: none;
+}
+
+/* ═══════════ RECOMPENSA DE CARTAS Y RAREZAS ═══════════ */
+
+.energy-deck {
+    margin-left: 10px;
+    font-size: 0.7em;
+    color: var(--text-main);
+    opacity: 0.8;
+}
+
+.tcg-card.rarity-uncommon { border-color: #4ade80; }
+
+.tcg-card.rarity-rare {
+    border-color: #c084fc;
+    box-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
+}
+
+.reward-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    padding: 20px;
+    background: rgba(5, 2, 12, 0.94);
+}
+
+.reward-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9em;
+    color: var(--gold);
+    text-align: center;
+}
+
+.reward-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 22px;
+}
+
+.reward-card {
+    width: 150px;
+    height: 215px;
+    padding: 8px;
+}
+
+.reward-card .tcg-card-img { height: 85px; }
+.reward-card .title { font-size: 0.85em; }
+.reward-card .desc { font-size: 0.72em; }
+
+.rarity-tag {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.4em;
+    color: #cbd5e1;
+}
+
+.reward-skip {
+    padding: 8px 20px;
 }

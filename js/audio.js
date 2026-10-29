@@ -1,6 +1,7 @@
 export class AudioManager {
     constructor() {
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioCtx = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
+        this.ctx = new AudioCtx();
     }
 
     play(type) {
@@ -26,7 +27,7 @@ export class AudioManager {
         } else if (type === 'hit') {
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(140, this.ctx.currentTime);
-            osc.frequency.linearRampToValueAtTime(40, Object.assign(this.ctx.currentTime + 0.2));
+            osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.2);
             gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
             osc.start(); osc.stop(this.ctx.currentTime + 0.2);

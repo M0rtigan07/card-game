@@ -51,7 +51,7 @@ export class UIManager {
 
         // 2. Mostrar el nombre personalizado en el pie de la foto de la carta
         const heroTag = document.getElementById('heroClassTag');
-        const savedName = localStorage.getItem('mazo_hero_name') || window.game?.playerName;
+        const savedName = localStorage.getItem('mazo_hero_name') || /** @type {any} */ (window).game?.playerName;
         if (heroTag && savedName) {
             heroTag.textContent = savedName.toUpperCase();
         }

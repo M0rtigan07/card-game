@@ -6,9 +6,13 @@ import { NPC_DATABASE } from './data/npcs.js';
 import { ExplorationView } from './views/ExplorationView.js';
 import { TcgCombatView } from './views/TcgCombatView.js';
 import { EnemyBrain, describeCard, effectiveAtk } from './systems/EnemyAI.js';
+import { PlayerDeck, instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './systems/PlayerCards.js';
+import { STARTER_DECKS, REWARD_CONFIG } from './data/playerCards.js';
 
 const FALLBACK_IMG = 'img/guerrero.png';
 const MAX_NAME_LENGTH = 10;
+const HAND_SIZE = 5;           // cartas que robas cada turno
+const MAX_HAND_SIZE = 8;       // tope de mano con efectos de robar
 const ENERGY_PER_TURN = 3;     // energía para jugar cartas cada turno (sube con player.energyBonus)
 const ENEMY_REVEAL_MS = 900;   // pausa enseñando la carta enemiga
 const ENEMY_RESOLVE_MS = 900;  // pausa viendo su efecto antes de tu turno
@@ -59,6 +63,7 @@ class Game {
 
         this.currentEnemy = null;
         this.playerHand = [];
+        this.deck = null;           // PlayerDeck: tu colección de cartas (crece con las recompensas)
         this.playerShield = 0;
         this.playerPoison = null;   // { dmg, turns } mientras estés envenenado
         this.brain = null;          // mazo e intención del enemigo actual
@@ -99,8 +104,9 @@ class Game {
         });
 
         document.querySelectorAll('.char-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                this.selectCharacter(e.currentTarget.dataset.class).catch(err => console.error(err));
+            card.addEventListener('click', () => {
+                const classKey = /** @type {HTMLElement} */ (card).dataset.class;
+                this.selectCharacter(classKey).catch(err => console.error(err));
             });
         });
 
@@ -116,10 +122,11 @@ class Game {
         this.nameDraft = 'HERO';
         display.textContent = this.nameDraft;
 
-        document.querySelectorAll('.cv-key').forEach(key => {
-            key.onclick = (e) => {
+        const keys = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.cv-key'));
+        keys.forEach(key => {
+            key.onclick = () => {
                 this.audio.play('card');
-                const val = e.currentTarget.textContent;
+                const val = key.textContent;
 
                 if (val === '⌫') {
                     this.nameDraft = this.nameDraft.slice(0, -1);
@@ -151,13 +158,14 @@ class Game {
         this.playerName = localStorage.getItem('mazo_hero_name') || this.playerName;
         this.player.name = this.playerName;
         this.player.img = HERO_IMAGES[classKey] || HERO_IMAGES.warrior;
+        this.deck = new PlayerDeck(STARTER_DECKS[classKey] || STARTER_DECKS.warrior);
 
         this.setText('heroClassTag', this.playerName.toUpperCase());
         this.setText('introHeroTitle', `${this.playerName} - ${this.player.className.toUpperCase()}`);
 
         // 'introHeroImg' = pantalla de historia, 'sidebarHeroImg' = hoja de héroe
         ['introHeroImg', 'sidebarHeroImg'].forEach(id => {
-            const img = document.getElementById(id);
+            const img = /** @type {HTMLImageElement | null} */ (document.getElementById(id));
             if (img) img.src = this.player.img;
         });
 
@@ -189,7 +197,7 @@ class Game {
     }
 
     setSceneImage(src) {
-        const img = document.getElementById('centralSceneImage');
+        const img = /** @type {HTMLImageElement | null} */ (document.getElementById('centralSceneImage'));
         if (!img) return;
         img.onerror = () => { img.onerror = null; img.src = FALLBACK_IMG; };
         img.src = src || FALLBACK_IMG;
@@ -197,7 +205,8 @@ class Game {
 
     // Evita dobles clics: cada elección avanza la planta una sola vez
     lockChoices() {
-        document.querySelectorAll('#actionChoices button').forEach(b => { b.disabled = true; });
+        const buttons = /** @type {NodeListOf<HTMLButtonElement>} */ (document.querySelectorAll('#actionChoices button'));
+        buttons.forEach(b => { b.disabled = true; });
     }
 
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
@@ -523,6 +532,8 @@ class Game {
         this.brain = new EnemyBrain(this.currentEnemy.deckId);
         this.brain.drawIntent(this.currentEnemy, { poison: null });
         this.energy = this.getMaxEnergy();
+        this.deck.startCombat();
+        this.playerHand = [];
 
         const tcgView = new TcgCombatView(document.getElementById('mainContent'), this);
         tcgView.render(this.currentEnemy, this.player);
@@ -536,37 +547,32 @@ class Game {
         this.drawTcgHand();
     }
 
-    getClassDeck() {
-        const lvl = this.player.level;
-        const cKey = this.player.classKey || 'warrior';
+    // ───────────── MAZO Y MANO DEL JUGADOR ─────────────
 
-        const decks = {
-            'warrior': [
-                { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', val: 15 + (lvl * 5), img: 'img/estocada.png', desc: `Inflige ${15 + (lvl * 5)} daño físico` },
-                { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', val: 12 + (lvl * 4), img: 'img/escudo.png', desc: `Gana ${12 + (lvl * 4)} guardia` },
-                { id: 'whirlwind', name: 'Torbellino', cost: 2, type: 'atk', val: 28 + (lvl * 8), img: 'img/guerrero.png', desc: `Inflige ${28 + (lvl * 8)} daño pesado` },
-                { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', val: 18 + (lvl * 3), img: 'img/pocion.png', desc: `Recupera ${18 + (lvl * 3)} HP` }
-            ],
-            'mage': [
-                { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', val: 25 + (lvl * 7), img: 'img/bolafuego.png', desc: `Inflige ${25 + (lvl * 7)} daño arcano` },
-                { id: 'ice_barrier', name: 'Barrera de Hielo', cost: 1, type: 'def', val: 15 + (lvl * 5), img: 'img/escudo.png', desc: `Gana ${15 + (lvl * 5)} guardia` },
-                { id: 'arcane_missile', name: 'Proyectiles', cost: 1, type: 'atk', val: 16 + (lvl * 4), img: 'img/maga.png', desc: `Inflige ${16 + (lvl * 4)} daño rápido` },
-                { id: 'mana_heal', name: 'Canalización', cost: 1, type: 'heal', val: 22 + (lvl * 4), img: 'img/pocion.png', desc: `Sana ${22 + (lvl * 4)} HP` }
-            ],
-            'rogue': [
-                { id: 'backstab', name: 'Puñalada', cost: 1, type: 'atk', val: 20 + (lvl * 6), img: 'img/estocada.png', desc: `Inflige ${20 + (lvl * 6)} daño crítico` },
-                { id: 'evasion', name: 'Doble Paso', cost: 1, type: 'def', val: 14 + (lvl * 4), img: 'img/escudo.png', desc: `Gana ${14 + (lvl * 4)} esquiva/def` },
-                { id: 'poison_blade', name: 'Hoja Envenenada', cost: 2, type: 'atk', val: 32 + (lvl * 8), img: 'img/picaro.png', desc: `Inflige ${32 + (lvl * 8)} daño venenoso` },
-                { id: 'shadow_heal', name: 'Venda de Sombras', cost: 1, type: 'heal', val: 16 + (lvl * 3), img: 'img/pocion.png', desc: `Cura ${16 + (lvl * 3)} HP` }
-            ]
-        };
-
-        return decks[cKey] || decks['warrior'];
+    // Lo que no jugaste va al descarte y se roba una mano nueva
+    drawTcgHand() {
+        this.playerHand.forEach(card => this.deck.discard(card.id));
+        this.playerHand = this.deck.draw(HAND_SIZE).map(id => instantiateCard(id, this.player.level));
+        this.renderHand();
     }
 
-    drawTcgHand() {
-        this.playerHand = [...this.getClassDeck()];
-        this.renderHand();
+    // Efecto "robar": añade cartas a la mano (con un máximo) sin repartir una mano nueva
+    drawExtraCards(amount) {
+        const room = Math.max(0, MAX_HAND_SIZE - this.playerHand.length);
+        const ids = this.deck.draw(Math.min(amount, room));
+        this.playerHand.push(...ids.map(id => instantiateCard(id, this.player.level)));
+    }
+
+    buildCardElement(card) {
+        const el = document.createElement('div');
+        el.className = `tcg-card rarity-${card.rarity}`;
+        el.innerHTML = `
+            <div class="cost-gem">${card.cost}</div>
+            <img src="${card.img}" alt="${card.name}" class="tcg-card-img" onerror="this.src='img/guerrero.png'">
+            <span class="title">${card.name}</span>
+            <span class="desc">${card.desc}</span>
+        `;
+        return el;
     }
 
     renderHand() {
@@ -576,19 +582,11 @@ class Game {
         handContainer.innerHTML = '';
 
         this.playerHand.forEach((card, index) => {
-            const cardEl = document.createElement('div');
-            cardEl.className = 'tcg-card';
+            const cardEl = this.buildCardElement(card);
             if (card.cost > this.energy) cardEl.classList.add('unplayable');
 
             const rotation = (index - (this.playerHand.length - 1) / 2) * 4;
             cardEl.style.transform = `rotate(${rotation}deg)`;
-
-            cardEl.innerHTML = `
-                <div class="cost-gem">${card.cost}</div>
-                <img src="${card.img}" alt="${card.name}" class="tcg-card-img" onerror="this.src='img/guerrero.png'">
-                <span class="title">${card.name}</span>
-                <span class="desc">${card.desc}</span>
-            `;
 
             cardEl.addEventListener('click', () => this.playTcgCard(card, index));
             handContainer.appendChild(cardEl);
@@ -606,35 +604,127 @@ class Game {
         this.energy -= card.cost;
         const enemy = this.currentEnemy;
 
-        if (card.type === 'atk') {
-            const total = card.val + (this.player.attackBonus || 0);
-            const absorbed = Math.min(enemy.shield, total);
-            const dealt = total - absorbed;
-            enemy.shield -= absorbed;
-            enemy.hp -= dealt;
+        const hero = { health: this.player.health, maxHealth: this.player.maxHealth, shield: this.playerShield };
+        const events = resolvePlayerCard(card, enemy, hero, { attackBonus: this.player.attackBonus || 0 });
+        this.player.health = hero.health;
+        this.playerShield = hero.shield;
 
-            this.ui.logEvent(`🗡️ Usas ${card.name} e infliges ${dealt} de daño a ${enemy.name}.`);
-            if (absorbed > 0) this.ui.logEvent(`🛡️ El escudo de ${enemy.name} absorbe ${absorbed}.`);
-            this.floatText('enemyPortraitContainer', dealt > 0 ? `-${dealt}` : '🛡️', dealt > 0 ? 'dmg' : 'shield');
-            this.shake('enemyPortraitContainer');
-        } else if (card.type === 'def') {
-            this.playerShield += card.val;
-            this.ui.logEvent(`🛡️ Usas ${card.name} y obtienes ${card.val} de escudo.`);
-            this.floatText('heroPortraitContainer', `+${card.val}`, 'shield');
-        } else if (card.type === 'heal') {
-            const healed = Math.min(card.val, this.player.maxHealth - this.player.health);
-            this.player.health += healed;
-            this.ui.logEvent(`✨ Usas ${card.name} y restauras ${healed} HP.`);
-            this.floatText('heroPortraitContainer', `+${healed}`, 'heal');
+        this.narratePlayerEvents(card, events);
+
+        // La carta jugada va al descarte; después se aplican los efectos que tocan mano y energía
+        this.playerHand.splice(index, 1);
+        this.deck.discard(card.id);
+        for (const ev of events) {
+            if (ev.kind === 'energy') this.energy += ev.amount;
+            if (ev.kind === 'draw') this.drawExtraCards(ev.amount);
         }
 
-        this.playerHand.splice(index, 1);
         this.renderHand();
         this.updateTcgUI();
 
         if (enemy.hp <= 0) {
             this.winTcgCombat();
         }
+    }
+
+    // Cuenta qué ha hecho tu carta (diario, números flotantes)
+    narratePlayerEvents(card, events) {
+        const enemy = this.currentEnemy;
+
+        for (const ev of events) {
+            switch (ev.kind) {
+                case 'damage':
+                    this.ui.logEvent(`🗡️ ${card.name}: infliges ${ev.dealt} de daño a ${enemy.name}.`);
+                    if (ev.absorbed > 0) this.ui.logEvent(`🛡️ El escudo de ${enemy.name} absorbe ${ev.absorbed}.`);
+                    this.floatText('enemyPortraitContainer', ev.dealt > 0 ? `-${ev.dealt}` : '🛡️', ev.dealt > 0 ? 'dmg' : 'shield');
+                    this.shake('enemyPortraitContainer');
+                    break;
+                case 'heal':
+                    this.ui.logEvent(`✨ ${card.name}: restauras ${ev.amount} HP.`);
+                    this.floatText('heroPortraitContainer', `+${ev.amount}`, 'heal');
+                    break;
+                case 'shield':
+                    this.ui.logEvent(`🛡️ ${card.name}: obtienes ${ev.amount} de escudo.`);
+                    this.floatText('heroPortraitContainer', `+${ev.amount}`, 'shield');
+                    break;
+                case 'poison':
+                    this.ui.logEvent(`☠️ ${card.name}: ${enemy.name} sufrirá ${ev.dmg} de daño durante ${ev.turns} turnos.`);
+                    this.floatText('enemyPortraitContainer', '☠️', 'poison');
+                    break;
+                case 'energy':
+                    this.ui.logEvent(`⚡ ${card.name}: ganas ${ev.amount} de energía.`);
+                    this.floatText('heroPortraitContainer', `⚡ +${ev.amount}`, 'buff');
+                    break;
+                case 'draw':
+                    this.ui.logEvent(`📜 ${card.name}: robas ${ev.amount} cartas.`);
+                    break;
+            }
+        }
+    }
+
+    // Tras ganar un combate eliges 1 de 3 cartas para tu mazo (o las saltas por oro)
+    showCardReward() {
+        return new Promise(resolve => {
+            const ids = rollRewards({
+                classKey: this.player.classKey,
+                owned: this.deck.collection,
+                level: this.dungeonLevel
+            });
+            if (ids.length === 0) {
+                resolve();
+                return;
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'reward-overlay';
+
+            const title = document.createElement('div');
+            title.className = 'reward-title';
+            title.textContent = 'ELIGE UNA CARTA PARA TU MAZO';
+
+            const row = document.createElement('div');
+            row.className = 'reward-row';
+
+            const close = () => {
+                overlay.remove();
+                resolve();
+            };
+
+            const RARITY_LABEL = { common: 'COMÚN', uncommon: 'POCO COMÚN', rare: 'RARA' };
+
+            ids.forEach(id => {
+                const card = instantiateCard(id, this.player.level);
+                const el = this.buildCardElement(card);
+                el.classList.add('reward-card');
+
+                const tag = document.createElement('span');
+                tag.className = 'rarity-tag';
+                tag.textContent = RARITY_LABEL[card.rarity] || '';
+                el.appendChild(tag);
+
+                el.addEventListener('click', () => {
+                    this.audio.play('sega');
+                    this.deck.addCard(id);
+                    this.ui.logEvent(`🃏 Añades ${card.name} a tu mazo (${this.deck.counts.total} cartas).`);
+                    close();
+                }, { once: true });
+
+                row.appendChild(el);
+            });
+
+            const skip = document.createElement('button');
+            skip.className = 'fantasy-btn reward-skip';
+            skip.textContent = `Saltar (+${REWARD_CONFIG.skipGold} oro)`;
+            skip.addEventListener('click', () => {
+                this.player.addGold(REWARD_CONFIG.skipGold);
+                this.ui.logEvent(`💰 Renuncias a la carta y te quedas ${REWARD_CONFIG.skipGold} de oro.`);
+                this.ui.updateStats(this.player, this.dungeonLevel);
+                close();
+            }, { once: true });
+
+            overlay.append(title, row, skip);
+            document.body.appendChild(overlay);
+        });
     }
 
     // ───────────── TURNO ENEMIGO ─────────────
@@ -645,7 +735,7 @@ class Game {
 
     // Bloquea o desbloquea el botón de fin de turno y la mano mientras juega el enemigo
     setCombatControls(enabled) {
-        const btn = document.getElementById('endTurnTcgBtn');
+        const btn = /** @type {HTMLButtonElement | null} */ (document.getElementById('endTurnTcgBtn'));
         if (btn) btn.disabled = !enabled;
         document.getElementById('playerHand')?.classList.toggle('locked', !enabled);
     }
@@ -724,6 +814,12 @@ class Game {
             pip.textContent = '⚡';
             host.appendChild(pip);
         }
+
+        const { drawPile, discardPile } = this.deck.counts;
+        const info = document.createElement('span');
+        info.className = 'energy-deck';
+        info.textContent = `🃏 Mazo ${drawPile}  ·  ♻️ Descarte ${discardPile}`;
+        host.appendChild(info);
     }
 
     // Estados del jugador en combate: guardia y veneno
@@ -734,6 +830,7 @@ class Game {
         const parts = [];
         if (this.playerShield > 0) parts.push(`🛡️ Guardia ${this.playerShield}`);
         if (this.playerPoison) parts.push(`☠️ Veneno ${this.playerPoison.dmg} x ${this.playerPoison.turns} turnos`);
+        if (this.currentEnemy?.poison) parts.push(`☠️ ${this.currentEnemy.name} envenenado ${this.currentEnemy.poison.dmg} x ${this.currentEnemy.poison.turns}`);
         host.textContent = parts.join('   ·   ');
     }
 
@@ -785,6 +882,21 @@ class Game {
         this.setCombatControls(false);
 
         enemy.shield = 0; // su escudo solo dura hasta que le toca jugar otra vez
+
+        const poisonDmg = tickPoison(enemy);
+        if (poisonDmg > 0) {
+            this.audio.play('hit');
+            this.ui.logEvent(`☠️ El veneno hace ${poisonDmg} de daño a ${enemy.name}.`);
+            this.floatText('enemyPortraitContainer', `-${poisonDmg}`, 'poison');
+            this.shake('enemyPortraitContainer');
+            this.updateTcgUI();
+
+            if (enemy.hp <= 0) {
+                this.winTcgCombat();
+                return;
+            }
+            await this.wait(700);
+        }
         this.updateTcgUI();
 
         const card = this.brain.intent;
@@ -864,6 +976,8 @@ class Game {
             victoryModal.style.display = 'none';
         }
 
+        await this.showCardReward();
+
         this.dungeonLevel++;
 
         // Volvemos a inicializar la vista de exploración estándar en el contenedor central
@@ -899,7 +1013,7 @@ class Game {
         const d20Val = document.getElementById('d20Val');
 
         if (d20Box && d20Val) {
-            d20Val.textContent = d20;
+            d20Val.textContent = String(d20);
             d20Box.style.display = 'flex';
         }
 
@@ -941,9 +1055,10 @@ class Game {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-    window.game = new Game();
+    const game = new Game();
+    /** @type {any} */ (window).game = game; // UIManager lo lee para mostrar el nombre del héroe
     try {
-        await window.game.initGame();
+        await game.initGame();
     } catch (err) {
         console.error(err);
     }
