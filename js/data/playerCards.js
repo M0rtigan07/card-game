@@ -25,14 +25,14 @@
 export const CARD_LIBRARY = [
     // ───── Mazo inicial: Guerrero ─────
     { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', base: 15, perLevel: 5, img: 'img/estocada.png', text: 'Inflige {val} daño físico', rarity: 'starter', classes: ['warrior'] },
-    { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', base: 12, perLevel: 4, img: 'img/escudo.png', text: 'Gana {val} guardia', rarity: 'starter', classes: ['warrior'] },
-    { id: 'whirlwind', name: 'Torbellino', cost: 2, type: 'atk', base: 28, perLevel: 8, img: 'img/guerrero.png', text: 'Inflige {val} daño pesado', rarity: 'starter', classes: ['warrior'] },
-    { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', base: 18, perLevel: 3, img: 'img/pocion.png', text: 'Recupera {val} HP', rarity: 'starter', classes: ['warrior'] },
+    { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', base: 12, perLevel: 4, img: 'img/cartasJugador/escudo.png', text: 'Gana {val} guardia', rarity: 'starter', classes: ['warrior'] },
+    { id: 'whirlwind', name: 'Torbellino', cost: 2, type: 'atk', base: 28, perLevel: 8, img: 'img/cartasJugador/torbellino.png', text: 'Inflige {val} daño pesado', rarity: 'starter', classes: ['warrior'] },
+    { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', base: 18, perLevel: 3, img: 'img/cartasJugador/pocion.png', text: 'Recupera {val} HP', rarity: 'starter', classes: ['warrior'] },
 
     // ───── Mazo inicial: Maga ─────
-    { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', base: 25, perLevel: 7, img: 'img/bolaFuego.png', text: 'Inflige {val} daño arcano', rarity: 'starter', classes: ['mage'] },
-    { id: 'ice_barrier', name: 'Barrera de Hielo', cost: 1, type: 'def', base: 15, perLevel: 5, img: 'img/escudo.png', text: 'Gana {val} guardia', rarity: 'starter', classes: ['mage'] },
-    { id: 'arcane_missile', name: 'Proyectiles', cost: 1, type: 'atk', base: 16, perLevel: 4, img: 'img/maga.png', text: 'Inflige {val} daño rápido', rarity: 'starter', classes: ['mage'] },
+    { id: 'fireball', name: 'Bola de Fuego', cost: 2, type: 'atk', base: 25, perLevel: 7, img: 'img/cartasJugador/bolaFuego.png', text: 'Inflige {val} daño arcano', rarity: 'starter', classes: ['mage'] },
+    { id: 'ice_barrier', name: 'Barrera de Hielo', cost: 1, type: 'def', base: 15, perLevel: 5, img: 'img/cartasJugador/escudo.png', text: 'Gana {val} guardia', rarity: 'starter', classes: ['mage'] },
+    { id: 'arcane_missile', name: 'Proyectiles', cost: 1, type: 'atk', base: 16, perLevel: 4, img: 'img/cartasJugador/maga.png', text: 'Inflige {val} daño rápido', rarity: 'starter', classes: ['mage'] },
     { id: 'mana_heal', name: 'Canalización', cost: 1, type: 'heal', base: 22, perLevel: 4, img: 'img/pocion.png', text: 'Sana {val} HP', rarity: 'starter', classes: ['mage'] },
 
     // ───── Mazo inicial: Pícaro ─────
