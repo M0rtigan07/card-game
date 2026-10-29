@@ -7,7 +7,7 @@
 // ({ kind: 'damage' | 'heal' | 'shield' | 'poison' | 'draw' | 'energy', ... })
 // para que la interfaz pueda narrar lo ocurrido.
 
-import { CARD_LIBRARY, REWARD_CONFIG } from '../data/playerCards.js';
+import { CARD_LIBRARY, REWARD_CONFIG } from '../data/cardCatalog.js';
 import { shuffle } from './EnemyAI.js';
 
 const BY_ID = new Map(CARD_LIBRARY.map(card => [card.id, card]));

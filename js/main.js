@@ -6,8 +6,8 @@ import { NPC_DATABASE } from './data/npcs.js';
 import { ExplorationView } from './views/ExplorationView.js';
 import { TcgCombatView } from './views/TcgCombatView.js';
 import { EnemyBrain, describeCard, effectiveAtk } from './systems/EnemyAI.js';
-import { PlayerDeck, instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './systems/PlayerCards.js';
-import { STARTER_DECKS, REWARD_CONFIG } from './data/playerCards.js';
+import { PlayerDeck, instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './systems/JugadorCards.js';
+import { STARTER_DECKS, REWARD_CONFIG } from './data/cardCatalog.js';
 
 const FALLBACK_IMG = 'img/guerrero.png';
 const MAX_NAME_LENGTH = 10;
