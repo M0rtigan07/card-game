@@ -9,6 +9,7 @@ import { EnemyBrain, describeCard, effectiveAtk } from './systems/EnemyAI.js';
 
 const FALLBACK_IMG = 'img/guerrero.png';
 const MAX_NAME_LENGTH = 10;
+const ENERGY_PER_TURN = 3;     // energía para jugar cartas cada turno (sube con player.energyBonus)
 const ENEMY_REVEAL_MS = 900;   // pausa enseñando la carta enemiga
 const ENEMY_RESOLVE_MS = 900;  // pausa viendo su efecto antes de tu turno
 
@@ -62,6 +63,7 @@ class Game {
         this.playerPoison = null;   // { dmg, turns } mientras estés envenenado
         this.brain = null;          // mazo e intención del enemigo actual
         this.turnBusy = false;      // true mientras juega el enemigo
+        this.energy = 0;            // energía que te queda este turno
 
         this.player = null;
         this.playerName = 'HÉROE';
@@ -520,6 +522,7 @@ class Game {
         this.turnBusy = false;
         this.brain = new EnemyBrain(this.currentEnemy.deckId);
         this.brain.drawIntent(this.currentEnemy, { poison: null });
+        this.energy = this.getMaxEnergy();
 
         const tcgView = new TcgCombatView(document.getElementById('mainContent'), this);
         tcgView.render(this.currentEnemy, this.player);
@@ -575,6 +578,7 @@ class Game {
         this.playerHand.forEach((card, index) => {
             const cardEl = document.createElement('div');
             cardEl.className = 'tcg-card';
+            if (card.cost > this.energy) cardEl.classList.add('unplayable');
 
             const rotation = (index - (this.playerHand.length - 1) / 2) * 4;
             cardEl.style.transform = `rotate(${rotation}deg)`;
@@ -593,13 +597,13 @@ class Game {
 
     playTcgCard(card, index) {
         if (this.turnBusy || !this.currentEnemy || this.currentEnemy.hp <= 0 || this.player.health <= 0) return;
-        if (this.player.mana < card.cost) {
-            this.ui.logEvent(`❌ ¡Maná insuficiente para jugar ${card.name}!`);
+        if (this.energy < card.cost) {
+            this.ui.logEvent(`⚡ Energía insuficiente para jugar ${card.name}.`);
             return;
         }
 
         this.audio.play('card');
-        this.player.mana -= card.cost;
+        this.energy -= card.cost;
         const enemy = this.currentEnemy;
 
         if (card.type === 'atk') {
@@ -696,6 +700,30 @@ class Game {
 
         box.append(head, name, desc);
         host.appendChild(box);
+    }
+
+    getMaxEnergy() {
+        return ENERGY_PER_TURN + (this.player.energyBonus || 0);
+    }
+
+    // Barra de energía: un rayo por punto, apagado si ya lo has gastado
+    renderEnergy() {
+        const host = document.getElementById('energyBar');
+        if (!host) return;
+        host.replaceChildren();
+
+        const label = document.createElement('span');
+        label.className = 'energy-label';
+        label.textContent = 'ENERGÍA';
+        host.appendChild(label);
+
+        const max = this.getMaxEnergy();
+        for (let i = 0; i < max; i++) {
+            const pip = document.createElement('span');
+            pip.className = `energy-pip${i < this.energy ? ' full' : ''}`;
+            pip.textContent = '⚡';
+            host.appendChild(pip);
+        }
     }
 
     // Estados del jugador en combate: guardia y veneno
@@ -803,7 +831,7 @@ class Game {
             }
         }
 
-        this.player.mana = this.player.maxMana;
+        this.energy = this.getMaxEnergy();
         this.brain.drawIntent(this.currentEnemy, { poison: this.playerPoison });
         this.renderEnemyIntent();
         this.drawTcgHand();
@@ -852,6 +880,7 @@ class Game {
         const bonus = this.currentEnemy.atkBonus ? ` (+${this.currentEnemy.atkBonus})` : '';
         document.getElementById('enemyAtk').textContent = `⚔️ ATK: ${effectiveAtk(this.currentEnemy)}${bonus}`;
         document.getElementById('enemyShield').textContent = `🛡️ DEF: ${this.currentEnemy.shield}`;
+        this.renderEnergy();
         this.renderCombatStatus();
         this.ui.updateStats(this.player, this.dungeonLevel);
     }

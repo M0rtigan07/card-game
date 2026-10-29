@@ -44,6 +44,7 @@ export class TcgCombatView {
 
             <!-- TABLERO DE CARTAS TCG (BAJADO Y ESPACIADO) -->
             <div id="tcgCombatView" style="display:flex; width:100%; flex-direction:column; align-items:center; gap:12px; margin-top: 10px;">
+                <div id="energyBar" class="energy-bar"></div>
                 <div id="playerHand" class="tcg-hand" style="min-height: 180px; padding: 15px;">
                     <!-- Las cartas se inyectarán aquí -->
                 </div>

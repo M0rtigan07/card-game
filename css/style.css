@@ -1234,3 +1234,37 @@ h1 {
     border: 1px solid var(--gold-border);
     border-radius: 4px;
 }
+
+/* ═══════════ COMBATE TCG: ENERGÍA POR TURNO ═══════════ */
+
+.energy-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.energy-label {
+    margin-right: 4px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.5em;
+    color: #93c5fd;
+}
+
+.energy-pip {
+    font-size: 1.3em;
+    filter: grayscale(1) brightness(0.35);
+    transition: filter 0.2s, transform 0.2s;
+}
+
+.energy-pip.full {
+    filter: drop-shadow(0 0 6px #facc15);
+    transform: scale(1.1);
+}
+
+/* Carta que no puedes pagar este turno */
+.tcg-card.unplayable {
+    filter: grayscale(0.8) brightness(0.55);
+    cursor: not-allowed;
+    pointer-events: none;
+}
