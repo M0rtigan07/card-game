@@ -1,4 +1,4 @@
-// js/systems/PlayerCards.js
+// js/systems/JugadorCards.js
 // Lógica del mazo y las cartas del jugador. No toca el DOM, así que se puede testear con `node --test`.
 //
 //   enemy = { hp, shield, poison? }
@@ -78,7 +78,7 @@ export function resolvePlayerCard(card, enemy, hero, { attackBonus = 0 } = {}) {
             events.push({ kind: 'energy', amount: card.val });
             break;
         default:
-            console.warn(`[PlayerCards] Tipo de carta desconocido: "${card.type}"`);
+            console.warn(`[JugadorCards] Tipo de carta desconocido: "${card.type}"`);
     }
 
     return events;
