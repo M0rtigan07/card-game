@@ -49,7 +49,8 @@ export class GroqAI {
      * Devuelve null si falla o tarda, para que el juego use una frase de respaldo.
      *
      * @param {object} request
-     * @param {'greeting' | 'reaction' | 'outcome'} request.kind  Saludo, réplica a tu elección o comentario de lo ocurrido
+     * @param {'greeting' | 'reaction' | 'outcome' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_defeat' | 'combat_victory'} request.kind
+     *        Saludo, réplica, comentario de lo ocurrido o frase de combate
      * @param {object} request.npc             Entrada de NPC_DATABASE (id, name, archetype, voice)
      * @param {string} request.className       Clase del jugador ("Guerrero", ...)
      * @param {string} request.heroName        Nombre del héroe
@@ -58,10 +59,13 @@ export class GroqAI {
      * @param {number} request.gold
      * @param {string} [request.action]        (reaction) Lo que ha elegido el jugador
      * @param {string} [request.outcome]       (outcome) Qué acaba de ocurrir
+     * @param {string} [request.cardName]      (combat_card) Carta que va a jugar el enemigo
+     * @param {string} [request.cardEffect]    (combat_card) Su efecto, con números
+     * @param {number} [request.enemyHpPercent] (combate) Vida que le queda al enemigo
      * @param {string[]} [request.avoid]       Últimas frases del PNJ, que no debe repetir
      * @param {number} [request.timeoutMs]
      */
-    async generateNpcLine({ kind, npc, className, heroName, dungeonLevel, heroHpPercent, gold, action, outcome, avoid = [], timeoutMs }) {
+    async generateNpcLine({ kind, npc, className, heroName, dungeonLevel, heroHpPercent, gold, action, outcome, cardName, cardEffect, enemyHpPercent, avoid = [], timeoutMs }) {
         try {
             const data = await this._post({
                 // "npc_interaction" es el tipo que ya entendía el backend antiguo: así las réplicas siguen funcionando
@@ -78,6 +82,9 @@ export class GroqAI {
                 gold,
                 action,
                 outcome,
+                cardName,
+                cardEffect,
+                enemyHpPercent,
                 avoid
             }, timeoutMs);
 

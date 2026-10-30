@@ -19,11 +19,15 @@ export class NpcDialogue {
      * Devuelve lo que dice el PNJ. Nunca falla y nunca repite una de sus últimas frases.
      *
      * @param {object} npc                  Entrada de NPC_DATABASE
-     * @param {'greeting' | 'reaction' | 'outcome'} kind
+     * @param {'greeting' | 'reaction' | 'outcome' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_defeat' | 'combat_victory'} kind
      * @param {object} [context]
      * @param {string} [context.action]     (reaction) Lo que ha elegido el jugador
      * @param {string} [context.outcome]    (outcome) Clave del desenlace: bought | no_gold | caught | offended
      * @param {string} [context.detail]     (outcome) Qué ha pasado, escrito para que lo lea la IA
+     * @param {string} [context.cardName]   (combat_card) Carta que va a jugar el enemigo
+     * @param {string} [context.cardEffect] (combat_card) Su efecto, con números
+     * @param {number} [context.enemyHpPercent] (combate) Vida que le queda al enemigo
+     * @param {string} [context.poolKey]    Banco de respaldo a usar (por defecto, el del tipo de frase)
      * @param {string[]} [context.extraFallback]  Frases de respaldo propias de la situación
      */
     async say(npc, kind, context = {}) {
@@ -39,6 +43,9 @@ export class NpcDialogue {
             gold: player.gold,
             action: context.action,
             outcome: context.detail ?? context.outcome,
+            cardName: context.cardName,
+            cardEffect: context.cardEffect,
+            enemyHpPercent: context.enemyHpPercent,
             avoid: this.memory.recent(npc.id),
             timeoutMs: DIALOGUE.TIMEOUT_MS[kind]
         });
@@ -47,7 +54,7 @@ export class NpcDialogue {
         let line = generated && !this.memory.has(npc.id, generated) ? generated : null;
 
         if (!line) {
-            const key = kind === 'outcome' ? context.outcome : kind;
+            const key = context.poolKey ?? (kind === 'outcome' ? context.outcome : kind);
             const pool = [...(context.extraFallback ?? []), ...fallbackPool(npc.id, key)];
             line = this.memory.pick(npc.id, pool) ?? LAST_RESORT_LINE;
         }

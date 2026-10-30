@@ -38,6 +38,7 @@ export class TcgCombatView {
                     <span id="enemyAtk">⚔️ ATK: ${enemyData.atk}</span>
                     <span id="enemyShield">🛡️ DEF: ${enemyData.shield}</span>
                 </div>
+                <div id="enemySpeech" class="enemy-speech"></div>
                 <div id="enemyIntent" class="enemy-intent"></div>
                 <div id="combatStatusLine" class="combat-status-line"></div>
             </div>

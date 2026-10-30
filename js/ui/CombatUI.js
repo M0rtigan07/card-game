@@ -4,6 +4,7 @@
 
 import { TcgCombatView } from '../views/TcgCombatView.js';
 import { setText } from './helpers.js';
+import { DIALOGUE } from '../data/gameConfig.js';
 
 const RARITY_LABEL = { common: 'COMÚN', uncommon: 'POCO COMÚN', rare: 'RARA' };
 
@@ -29,6 +30,24 @@ export class CombatUI {
     setVictory(visible) {
         const modal = document.getElementById('victoryAnimationModal');
         if (modal) modal.style.display = visible ? 'flex' : 'none';
+    }
+
+    setVictoryText(text) {
+        setText('victoryRewardText', text);
+    }
+
+    /** Frase del enemigo sobre su panel. El estilo (color, tipografía) depende de quién habla: ver .speech-<id> en el CSS. */
+    showSpeech(text, speakerId = '') {
+        const host = document.getElementById('enemySpeech');
+        if (!host) return;
+
+        host.textContent = `“${text}”`;
+        host.className = `enemy-speech speech-${speakerId}`;
+        void host.offsetWidth; // reinicia la animación
+        host.classList.add('visible');
+
+        clearTimeout(this.speechTimer);
+        this.speechTimer = setTimeout(() => host.classList.remove('visible'), DIALOGUE.SPEECH_VISIBLE_MS);
     }
 
     // ───────────── Cartas y mano ─────────────

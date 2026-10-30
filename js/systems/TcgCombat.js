@@ -5,9 +5,11 @@
 import { EnemyBrain, describeCard, effectiveAtk } from './EnemyAI.js';
 import { instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './JugadorCards.js';
 import { REWARD_CONFIG } from '../data/cardCatalog.js';
-import { COMBAT, FALLBACK_IMG, GENERIC_ENEMIES, DEFAULT_ENEMY } from '../data/gameConfig.js';
+import { COMBAT, DIALOGUE, FALLBACK_IMG, GENERIC_ENEMIES, DEFAULT_ENEMY } from '../data/gameConfig.js';
 import { CombatUI } from '../ui/CombatUI.js';
 import { wait } from '../ui/helpers.js';
+
+const DEFAULT_VICTORY_TEXT = '¡Has barrido al enemigo de la mazmorra!';
 
 export class TcgCombat {
     /** @param {import('../Game.js').Game} game */
@@ -22,6 +24,9 @@ export class TcgCombat {
         this.brain = null;       // mazo e intención del enemigo actual
         this.busy = false;       // true mientras juega el enemigo o se celebra la victoria
         this.energy = 0;         // energía que te queda este turno
+        this.rng = Math.random;  // se puede sustituir en los tests
+        this.intentLine = null;  // grito del enemigo para su próxima carta, ya pedido a la IA
+        this.hurtSpoken = false; // ya protestó al verse herido en este combate
     }
 
     get player() { return this.game.player; }
@@ -46,7 +51,8 @@ export class TcgCombat {
             maxHp: hp,
             atk: npc.baseAtk,
             img: npc.images?.enraged || npc.images?.room,
-            deckId: npc.id
+            deckId: npc.id,
+            speaker: npc
         });
     }
 
@@ -63,6 +69,8 @@ export class TcgCombat {
         this.energy = this.maxEnergy();
         this.deck.startCombat();
         this.hand = [];
+        this.hurtSpoken = false;
+        this.intentLine = null;
 
         this.view.mount(this.game, this.enemy, this.player);
         this.view.bindEndTurn(() => this.endTurn());
@@ -71,6 +79,9 @@ export class TcgCombat {
         this.renderIntent();
         this.refresh();
         this.drawHand();
+
+        this.speak('combat_start');
+        this.prepareIntentLine();
     }
 
     createEnemy(enemyData) {
@@ -82,7 +93,8 @@ export class TcgCombat {
                 atk: enemyData.atk,
                 shield: 0,
                 img: enemyData.img || FALLBACK_IMG,
-                deckId: enemyData.deckId
+                deckId: enemyData.deckId,
+                speaker: enemyData.speaker // quién habla (nombre, voz...); sin él, el enemigo no dice nada
             };
         }
 
@@ -98,7 +110,8 @@ export class TcgCombat {
             atk: 10 + (level * 2),
             shield: 0,
             img: template.img,
-            deckId: template.deckId
+            deckId: template.deckId,
+            speaker: { id: template.id, name: template.name, archetype: template.archetype, voice: template.voice }
         };
     }
 
@@ -141,6 +154,11 @@ export class TcgCombat {
         this.heroShield = hero.shield;
 
         this.narratePlayer(card, events);
+
+        if (enemy.hp > 0 && !this.hurtSpoken && enemy.hp <= enemy.maxHp * DIALOGUE.HURT_THRESHOLD) {
+            this.hurtSpoken = true;
+            this.speak('combat_hurt');
+        }
 
         // La carta jugada va al descarte; después se aplican los efectos que tocan mano y energía
         this.hand.splice(index, 1);
@@ -224,7 +242,7 @@ export class TcgCombat {
         this.log(`⏳ Fin de tu turno. ¡${enemy.name} juega ${card.name}!`);
         this.audio.play('card');
         this.renderIntent(true);
-        await wait(COMBAT.ENEMY_REVEAL_MS);
+        await Promise.all([wait(COMBAT.ENEMY_REVEAL_MS), this.showCardLine()]);
 
         const hero = { health: this.player.health, shield: this.heroShield, poison: this.heroPoison };
         const { events } = this.brain.play(enemy, hero);
@@ -237,6 +255,8 @@ export class TcgCombat {
         await wait(COMBAT.ENEMY_RESOLVE_MS);
 
         if (this.player.health <= 0) {
+            await this.speak('combat_victory', {}, { log: true });
+            await wait(1200);
             this.game.ui.showGameOver();
             return;
         }
@@ -306,6 +326,7 @@ export class TcgCombat {
 
         this.energy = this.maxEnergy();
         this.brain.drawIntent(this.enemy, { poison: this.heroPoison });
+        this.prepareIntentLine();
         this.renderIntent();
         this.drawHand();
         this.refresh();
@@ -326,8 +347,17 @@ export class TcgCombat {
             this.log(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
+        // Las últimas palabras del enemigo se añaden al cartel de victoria si llegan a tiempo
+        const defeated = this.enemy;
+        let modalOpen = true;
+        this.view.setVictoryText(DEFAULT_VICTORY_TEXT);
+        this.speak('combat_defeat', {}, { log: true }).then(line => {
+            if (line && modalOpen) this.view.setVictoryText(`${defeated.name}: “${line}”`);
+        });
+
         this.view.setVictory(true);
         await wait(COMBAT.VICTORY_MS);
+        modalOpen = false;
         this.view.setVictory(false);
 
         await this.chooseReward();
@@ -365,6 +395,50 @@ export class TcgCombat {
                 }
             });
         });
+    }
+
+    // ───────────── EL ENEMIGO HABLA ─────────────
+
+    enemyHpPercent() {
+        return Math.round((Math.max(0, this.enemy.hp) / this.enemy.maxHp) * 100);
+    }
+
+    /** El enemigo dice una frase con su estilo (Groq o, si falla, su banco). Devuelve la frase, o null si no habla. */
+    async speak(kind, context = {}, { log = false } = {}) {
+        const enemy = this.enemy;
+        const speaker = enemy?.speaker;
+        if (!speaker) return null;
+
+        const line = await this.game.dialogue.say(speaker, kind, { ...context, enemyHpPercent: this.enemyHpPercent() });
+        if (this.enemy !== enemy) return line; // el combate ya cambió: no se enseña
+
+        this.view.showSpeech(line, speaker.id);
+        if (log) this.log(`💬 ${speaker.name}: “${line}”`);
+        return line;
+    }
+
+    /** Pide ya el grito de la carta que jugará el enemigo: llegará lista cuando le toque, sin retrasar su turno. */
+    prepareIntentLine() {
+        this.intentLine = null;
+        const card = this.brain?.intent;
+        if (!card || !this.enemy?.speaker || this.rng() >= DIALOGUE.CARD_LINE_CHANCE) return;
+
+        this.intentLine = this.game.dialogue.say(this.enemy.speaker, 'combat_card', {
+            cardName: card.name,
+            cardEffect: describeCard(card, this.enemy),
+            poolKey: ['atk', 'multi', 'drain'].includes(card.type) ? 'combat_attack' : 'combat_other',
+            enemyHpPercent: this.enemyHpPercent()
+        });
+    }
+
+    /** Enseña el grito preparado; si aún no ha llegado, espera un poco y, si tampoco, el enemigo no dice nada este turno. */
+    async showCardLine() {
+        const pending = this.intentLine;
+        this.intentLine = null;
+        if (!pending) return;
+
+        const line = await Promise.race([pending, wait(DIALOGUE.CARD_LINE_WAIT_MS).then(() => null)]);
+        if (line) this.view.showSpeech(line, this.enemy.speaker.id);
     }
 
     // ───────────── REFRESCO DE LA INTERFAZ ─────────────
