@@ -2,7 +2,7 @@
 // Lógica del mazo y las cartas del jugador. No toca el DOM, así que se puede testear con `node --test`.
 //
 //   enemy = { hp, shield, poison? }
-//   hero  = { health, maxHealth, shield }
+//   hero  = { health, maxHealth, shield, poison? }
 // resolvePlayerCard modifica esos objetos y devuelve "eventos"
 // ({ kind: 'damage' | 'heal' | 'shield' | 'poison' | 'draw' | 'energy', ... })
 // para que la interfaz pueda narrar lo ocurrido.
@@ -77,6 +77,13 @@ export function resolvePlayerCard(card, enemy, hero, { attackBonus = 0 } = {}) {
         case 'energy':
             events.push({ kind: 'energy', amount: card.val });
             break;
+        case 'cleanse': {
+            // Solo lo usan los objetos (Antídoto): elimina el veneno que tengas
+            const removed = Boolean(hero.poison);
+            hero.poison = null;
+            events.push({ kind: 'cleanse', removed });
+            break;
+        }
         default:
             console.warn(`[JugadorCards] Tipo de carta desconocido: "${card.type}"`);
     }

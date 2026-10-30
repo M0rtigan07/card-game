@@ -89,7 +89,7 @@ export const NPC_DATABASE = {
         interactions: {
             choices: [
                 { text: "🏹 Pedirle consejo sobre los peligros de la mazmorra", action: 'witch_knowledge' },
-                { text: "💰 Comprar flechas envenenadas (-40 Oro)", action: 'buy_poison' },
+                { text: "🏹 Comprar flechas envenenadas: Veneno de Filo (-40 Oro, +5 de daño)", action: 'buy_poison' },
                 { text: "⚔️ Atacar al nómada", action: 'combat' }
             ]
         }
@@ -114,14 +114,16 @@ export const NPC_DATABASE = {
             'warrior': {
                 greeting: "¡Psst! ¿Buscas equipamiento, viajero? Los pasillos de aquí abajo no perdonan a los imprudentes.",
                 choices: [
-                    { text: "💰 Comprar poción de salud (-30 Oro)", action: 'buy_potion' },
+                    { text: "🧪 Comprar Poción de Salud (-30 Oro)", action: 'buy_potion' },
+                    { text: "🔥 Comprar Frasco de Fuego (-35 Oro)", action: 'buy:fire_flask' },
                     { text: "🏃 Ignorarlo y seguir avanzando", action: 'pass' }
                 ]
             },
             'mage': {
                 greeting: "Saludos, erudita de lo arcano. Tengo pergaminos que podrían interesarte.",
                 choices: [
-                    { text: "🔮 Comprar grimorio (+10 Maná max, -40 Oro)", action: 'buy_mana' },
+                    { text: "📖 Comprar Grimorio Arcano (+1 energía por turno, -40 Oro)", action: 'buy_mana' },
+                    { text: "🧪 Comprar Poción de Salud (-30 Oro)", action: 'buy_potion' },
                     { text: "🏃 Seguir mi camino", action: 'pass' }
                 ]
             },
@@ -129,6 +131,7 @@ export const NPC_DATABASE = {
                 greeting: "He visto cosas en la sombra que te encantaría saber... a buen precio.",
                 choices: [
                     { text: "🗡️ Robarle la mercancía con sigilo (Tirada D20)", action: 'steal' },
+                    { text: "💧 Comprar Antídoto (-25 Oro)", action: 'buy:antidote' },
                     { text: "🏃 Pasar de largo", action: 'pass' }
                 ]
             }
@@ -172,7 +175,7 @@ export const NPC_DATABASE = {
                 choices: [
                     { text: "💋 \"Contigo siempre apetece un buen trato bajo la luz de la luna...\"", action: 'morgana_romance' },
                     { text: "🗡️ Amenazarla", action: 'combat' },
-                    { text: "🧪 Comprar veneno para las cartas", action: 'buy_poison' },
+                    { text: "🧪 Comprar Veneno de Filo (-40 Oro, +5 de daño)", action: 'buy_poison' },
                 ]
             }
         }

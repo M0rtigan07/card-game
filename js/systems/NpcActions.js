@@ -3,7 +3,8 @@
 // Para añadir una acción nueva: una entrada más en el mapa `actions` de run().
 // Lo que dice el PNJ tras cada desenlace lo genera la IA (NpcDialogue) con una frase de respaldo.
 
-import { DEFAULT_TOLL, NPC_TOLLS, POISON_COST } from '../data/gameConfig.js';
+import { DEFAULT_TOLL, NPC_TOLLS } from '../data/gameConfig.js';
+import { addItem, getItem, owns } from './Items.js';
 
 export class NpcActions {
     /**
@@ -55,44 +56,11 @@ export class NpcActions {
                 this.game.finishEncounter(1800);
             },
 
-            buy_poison: () => {
-                if (this.player.gold >= POISON_COST) {
-                    this.player.gold -= POISON_COST;
-                    this.player.attackBonus = (this.player.attackBonus || 0) + 5;
-                    this.player.inventory.push({ name: '🧪 Veneno de Filo', effect: '+5 daño en ataques' });
-                    this.log(`🧪 Compras veneno (-${POISON_COST} Oro). Tus ataques hacen +5 de daño.`);
-                } else {
-                    this.log(`❌ No tienes suficiente oro para el veneno.`);
-                }
-                this.game.finishEncounter(2000);
-            },
-
-            buy_potion: async () => {
-                if (this.player.gold >= 30) {
-                    this.player.gold -= 30;
-                    this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
-                    this.log(`🧪 Compras una poción a ${npc.name} (-30 Oro). Recuperas 40 HP.`);
-                    await this.speak(npc, 'bought', 'El héroe te ha comprado una poción curativa por 30 de oro.');
-                } else {
-                    this.log(`❌ No tienes suficiente oro para comprar la poción.`);
-                    await this.speak(npc, 'no_gold', 'El héroe quería comprar una poción curativa (30 de oro) pero no tiene suficiente dinero.');
-                }
-                this.game.finishEncounter(2500);
-            },
-
-            buy_mana: async () => {
-                if (this.player.gold >= 40) {
-                    this.player.gold -= 40;
-                    this.player.maxMana += 10;
-                    this.player.mana = this.player.maxMana;
-                    this.log(`🔮 Compras un grimorio a ${npc.name} (-40 Oro). ¡Maná máximo aumentado!`);
-                    await this.speak(npc, 'bought', 'La hechicera te ha comprado un grimorio mágico por 40 de oro.');
-                } else {
-                    this.log(`❌ No tienes suficiente oro.`);
-                    await this.speak(npc, 'no_gold', 'La hechicera quería comprar un grimorio mágico (40 de oro) pero no tiene suficiente dinero.');
-                }
-                this.game.finishEncounter(2500);
-            },
+            // Compras: el precio y el efecto salen de data/itemCatalog.js.
+            // En npcs.js también vale "buy:<id>" (por ejemplo "buy:fire_flask") para vender cualquier objeto.
+            buy_potion: () => this.purchase(npc, 'health_potion'),
+            buy_mana: () => this.purchase(npc, 'arcane_grimoire'),
+            buy_poison: () => this.purchase(npc, 'blade_venom'),
 
             steal: async () => {
                 const d20 = this.scene.rollD20();
@@ -110,7 +78,7 @@ export class NpcActions {
             }
         };
 
-        const handler = actions[action];
+        const handler = actions[action] ?? (action.startsWith('buy:') ? () => this.purchase(npc, action.slice(4)) : undefined);
         if (!handler) {
             console.warn(`[NpcActions] Acción de PNJ sin manejar: "${action}" (${npc.id})`);
             this.game.finishEncounter(1200);
@@ -134,10 +102,36 @@ export class NpcActions {
     morganaRomance() {
         this.log(`🖤 Sellar un vínculo oscuro con la Bruja Morgana llena tu espíritu de un poder prohibido.`);
         this.player.addGold(100);
-        this.player.inventory.push({ name: '🧪 Poción de Subsistencia', effect: '+20 HP Máximo' });
-        this.player.maxHealth += 20;
-        this.player.health = this.player.maxHealth;
+        if (addItem(this.player, 'subsistence_potion').ok) {
+            this.log(`🧪 Obtienes ${getItem('subsistence_potion').name}: +20 HP máximo.`);
+        }
         this.game.finishEncounter(1800);
+    }
+
+    /** Compra un objeto del catálogo. Las reliquias no se compran dos veces y los consumibles tienen tope. */
+    async purchase(npc, itemId) {
+        const item = getItem(itemId);
+        if (!item?.price) {
+            console.warn(`[NpcActions] "${itemId}" no se puede comprar`);
+            this.game.finishEncounter(1200);
+            return;
+        }
+
+        if (item.kind === 'relic' && owns(this.player, itemId)) {
+            this.log(`ℹ️ Ya tienes ${item.name}.`);
+            await this.speak(npc, 'already_owned', `El héroe quiere comprarte ${item.name}, pero ya lo tiene.`);
+        } else if (this.player.gold < item.price) {
+            this.log(`❌ No tienes suficiente oro para ${item.name}.`);
+            await this.speak(npc, 'no_gold', `El héroe quería comprarte ${item.name} (${item.price} de oro) pero no tiene suficiente dinero.`);
+        } else if (addItem(this.player, itemId).ok) {
+            this.player.gold -= item.price;
+            this.log(`🛒 Compras ${item.name} (-${item.price} Oro): ${item.effect}.`);
+            await this.speak(npc, 'bought', `El héroe te ha comprado ${item.name} por ${item.price} de oro.`);
+        } else {
+            this.log(`🎒 No puedes llevar más ${item.name}.`);
+            await this.speak(npc, 'already_owned', `El héroe quiere comprarte más ${item.name}, pero ya no le caben.`);
+        }
+        this.game.finishEncounter(2500);
     }
 
     payToll(npc) {

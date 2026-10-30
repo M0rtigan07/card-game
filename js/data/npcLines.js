@@ -2,7 +2,7 @@
 // Frases de respaldo: se usan solo cuando Groq no responde, tarda o repite una frase.
 // Hay varias por personaje y tipo para que, aun sin IA, el diálogo no sea siempre igual.
 //
-// Tipos (key):  greeting · reaction · bought · no_gold · caught · offended
+// Tipos (key):  greeting · reaction · bought · no_gold · already_owned · caught · offended
 //               combat_start · combat_attack · combat_other · combat_hurt · combat_defeat · combat_victory
 // Se busca primero el banco del PNJ; si no tiene ese tipo, el de `default`.
 
@@ -67,6 +67,11 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Tan débil...',
             'Se acabó.'
+        ],
+        already_owned: [
+            'Eso ya lo llevas encima.',
+            'No te venderé dos veces lo mismo.',
+            'Mira bien tu inventario, viajero.'
         ]
     },
 
@@ -149,6 +154,21 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Jejeje, qué buen ingrediente acabas de convertirte.',
             'Dulces sueños, cielo. El caldero te espera.'
+        ],
+        bought: [
+            'Jejeje, buena elección, cariño. Úsalo con cuidado.',
+            'Un regalito de la casa... bueno, no tan regalito.',
+            'Ay, qué bien te sienta. Cuídalo.'
+        ],
+        no_gold: [
+            'Sin oro no hay magia, cielo.',
+            'Jejeje, tus bolsillos están más vacíos que mi caldero en invierno.',
+            'Vuelve cuando pese tu bolsa, cariño.'
+        ],
+        already_owned: [
+            'Jejeje, ya lo llevas, cariño. No seas goloso.',
+            'Dos veces no funciona, cielo. La magia no se duplica.',
+            'Mira en tu bolsa, tontorrón.'
         ]
     },
 
@@ -231,6 +251,21 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'El cielo lo quiso así. Descansa, viajero.',
             'Tu viaje termina aquí. Que el viento te lleve.'
+        ],
+        bought: [
+            'Bien elegido. Úsalo con paciencia, viajero.',
+            'La flecha ahora es tuya. Que el viento te guíe.',
+            'Un buen trato, como entre jinetes.'
+        ],
+        no_gold: [
+            'Sin plata no hay flechas, viajero.',
+            'La estepa no regala nada. Vuelve con monedas.',
+            'Tu bolsa está ligera como el viento.'
+        ],
+        already_owned: [
+            'Ya portas ese veneno, viajero. Una flecha no se afila dos veces.',
+            'Mira en tu aljaba: ya lo tienes.',
+            'El halcón no pide lo que ya tiene.'
         ]
     },
 
@@ -292,6 +327,11 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Uf... ¿ves lo que pasa por no pagar?',
             'Qué desperdicio de cliente...'
+        ],
+        already_owned: [
+            '¡Pero si ya tienes uno, amigo! Yo no vendo dos veces lo mismo.',
+            'Ja, ¿te falla la memoria? Eso ya lo llevas encima.',
+            'Guarda tu oro, que ese género ya es tuyo.'
         ]
     },
 

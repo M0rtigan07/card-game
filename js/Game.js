@@ -12,6 +12,7 @@ import { PlayerDeck } from './systems/JugadorCards.js';
 import { TcgCombat } from './systems/TcgCombat.js';
 import { Exploration } from './systems/Exploration.js';
 import { NpcDialogue } from './systems/NpcDialogue.js';
+import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES } from './data/gameConfig.js';
 
@@ -30,6 +31,7 @@ export class Game {
         this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
+        this.ui.onUseItem = (id) => this.useItem(id); // botón "Usar" del inventario
 
         this.initEvents();
     }
@@ -128,6 +130,32 @@ export class Game {
     advanceFloor(delay = 1800) {
         this.dungeonLevel++;
         setTimeout(() => this.loadNextEvent(), delay);
+    }
+
+    /** Usa un consumible del inventario, dentro o fuera de combate. Devuelve true si se ha gastado. */
+    useItem(id) {
+        const item = getItem(id);
+        if (!item || item.kind !== 'consumable' || !findEntry(this.player, id)) return false;
+
+        const inCombat = this.combat.inCombat;
+        const check = canUseItem(item, { inCombat, player: this.player, poisoned: Boolean(this.combat.heroPoison) });
+        if (!check.ok) {
+            this.ui.logEvent(`❌ ${item.name}: ${check.reason}.`);
+            return false;
+        }
+
+        if (inCombat) {
+            if (!this.combat.useItem(item)) return false;
+        } else {
+            // Fuera de combate solo sirven las curas
+            const healed = Math.min(item.card.value, this.player.maxHealth - this.player.health);
+            this.player.health += healed;
+            this.ui.logEvent(`🧪 Usas ${item.name}: recuperas ${healed} HP.`);
+        }
+
+        removeOne(this.player, id);
+        this.ui.updateStats(this.player, this.dungeonLevel);
+        return true;
     }
 
     // Cierre común de un encuentro: refresca stats, comprueba muerte y avanza

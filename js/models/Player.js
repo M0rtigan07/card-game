@@ -13,8 +13,6 @@ export class Player {
         this.className = config.name;
         this.name = 'HÉROE';   // nombre elegido por el jugador
         this.img = '';         // retrato del héroe
-        this.attackBonus = 0;  // daño extra en ataques (veneno de filo)
-        this.energyBonus = 0;  // energía extra por turno en combate
         this.health = config.hp;
         this.maxHealth = config.hp;
         this.mana = config.mana;

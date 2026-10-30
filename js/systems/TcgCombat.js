@@ -4,6 +4,7 @@
 
 import { EnemyBrain, describeCard, effectiveAtk } from './EnemyAI.js';
 import { instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './JugadorCards.js';
+import { addItem, getModifiers, rollLoot } from './Items.js';
 import { REWARD_CONFIG } from '../data/cardCatalog.js';
 import { COMBAT, DIALOGUE, FALLBACK_IMG, GENERIC_ENEMIES, DEFAULT_ENEMY } from '../data/gameConfig.js';
 import { CombatUI } from '../ui/CombatUI.js';
@@ -24,6 +25,7 @@ export class TcgCombat {
         this.brain = null;       // mazo e intención del enemigo actual
         this.busy = false;       // true mientras juega el enemigo o se celebra la victoria
         this.energy = 0;         // energía que te queda este turno
+        this.inCombat = false;   // hay un combate en curso (los consumibles solo se usan en combate)
         this.rng = Math.random;  // se puede sustituir en los tests
         this.intentLine = null;  // grito del enemigo para su próxima carta, ya pedido a la IA
         this.hurtSpoken = false; // ya protestó al verse herido en este combate
@@ -34,8 +36,13 @@ export class TcgCombat {
     get audio() { return this.game.audio; }
     log(message) { this.game.ui.logEvent(message); }
 
+    /** Bonos de tus reliquias (energía, daño, guardia inicial, robo extra, regeneración, oro). */
+    modifiers() {
+        return getModifiers(this.player);
+    }
+
     maxEnergy() {
-        return COMBAT.ENERGY_PER_TURN + (this.player.energyBonus || 0);
+        return COMBAT.ENERGY_PER_TURN + this.modifiers().energyBonus;
     }
 
     // ───────────── INICIO DEL COMBATE ─────────────
@@ -59,9 +66,10 @@ export class TcgCombat {
     /** Empieza un combate. Sin nombre y vida, se deduce un enemigo genérico por la descripción. */
     start(enemyData = {}) {
         this.enemy = this.createEnemy(enemyData);
-        this.heroShield = 0;
+        this.heroShield = this.modifiers().startShield;
         this.heroPoison = null;
         this.busy = false;
+        this.inCombat = true;
 
         this.brain = new EnemyBrain(this.enemy.deckId);
         this.brain.drawIntent(this.enemy, { poison: null });
@@ -76,6 +84,7 @@ export class TcgCombat {
         this.view.bindEndTurn(() => this.endTurn());
 
         this.log(`⚔️ ¡ENTRAS EN COMBATE contra ${this.enemy.name}!`);
+        if (this.heroShield > 0) this.log(`🛡️ Tus reliquias te dan ${this.heroShield} de guardia inicial.`);
         this.renderIntent();
         this.refresh();
         this.drawHand();
@@ -120,7 +129,7 @@ export class TcgCombat {
     /** Lo que no jugaste va al descarte y se roba una mano nueva. */
     drawHand() {
         this.hand.forEach(card => this.deck.discard(card.id));
-        this.hand = this.deck.draw(COMBAT.HAND_SIZE).map(id => instantiateCard(id, this.player.level));
+        this.hand = this.deck.draw(COMBAT.HAND_SIZE + this.modifiers().extraDraw).map(id => instantiateCard(id, this.player.level));
         this.renderHand();
     }
 
@@ -148,25 +157,12 @@ export class TcgCombat {
         this.audio.play('card');
         this.energy -= card.cost;
 
-        const hero = { health: this.player.health, maxHealth: this.player.maxHealth, shield: this.heroShield };
-        const events = resolvePlayerCard(card, enemy, hero, { attackBonus: this.player.attackBonus || 0 });
-        this.player.health = hero.health;
-        this.heroShield = hero.shield;
-
-        this.narratePlayer(card, events);
-
-        if (enemy.hp > 0 && !this.hurtSpoken && enemy.hp <= enemy.maxHp * DIALOGUE.HURT_THRESHOLD) {
-            this.hurtSpoken = true;
-            this.speak('combat_hurt');
-        }
+        const events = this.applyEffect(card);
 
         // La carta jugada va al descarte; después se aplican los efectos que tocan mano y energía
         this.hand.splice(index, 1);
         this.deck.discard(card.id);
-        for (const ev of events) {
-            if (ev.kind === 'energy') this.energy += ev.amount;
-            if (ev.kind === 'draw') this.drawExtra(ev.amount);
-        }
+        this.applyHandEffects(events);
 
         this.renderHand();
         this.refresh();
@@ -174,6 +170,51 @@ export class TcgCombat {
         if (enemy.hp <= 0) {
             this.win();
         }
+    }
+
+    /** Resuelve el efecto de una carta o de un objeto sobre el combate (sin pagar coste ni tocar la mano). */
+    applyEffect(card) {
+        const enemy = this.enemy;
+        const hero = { health: this.player.health, maxHealth: this.player.maxHealth, shield: this.heroShield, poison: this.heroPoison };
+        const events = resolvePlayerCard(card, enemy, hero, { attackBonus: this.modifiers().attackBonus });
+        this.player.health = hero.health;
+        this.heroShield = hero.shield;
+        this.heroPoison = hero.poison;
+
+        this.narratePlayer(card, events);
+
+        if (enemy.hp > 0 && !this.hurtSpoken && enemy.hp <= enemy.maxHp * DIALOGUE.HURT_THRESHOLD) {
+            this.hurtSpoken = true;
+            this.speak('combat_hurt');
+        }
+        return events;
+    }
+
+    /** Efectos que tocan la energía y la mano: ganar energía y robar cartas. */
+    applyHandEffects(events) {
+        for (const ev of events) {
+            if (ev.kind === 'energy') this.energy += ev.amount;
+            if (ev.kind === 'draw') this.drawExtra(ev.amount);
+        }
+    }
+
+    /** Usa un consumible del inventario como una carta gratuita. Devuelve true si se ha gastado. */
+    useItem(item) {
+        const enemy = this.enemy;
+        if (!this.inCombat || this.busy || !enemy || enemy.hp <= 0 || this.player.health <= 0) {
+            this.log(`⏳ No puedes usar ${item.name} ahora.`);
+            return false;
+        }
+
+        this.audio.play('card');
+        const events = this.applyEffect({ id: item.id, name: item.name, cost: 0, type: item.card.type, val: item.card.value, turns: item.card.turns });
+        this.applyHandEffects(events);
+
+        this.renderHand();
+        this.refresh();
+
+        if (enemy.hp <= 0) this.win();
+        return true;
     }
 
     // Cuenta qué ha hecho tu carta (diario y números flotantes)
@@ -206,6 +247,10 @@ export class TcgCombat {
                     break;
                 case 'draw':
                     this.log(`📜 ${card.name}: robas ${ev.amount} cartas.`);
+                    break;
+                case 'cleanse':
+                    this.log(ev.removed ? `💧 ${card.name}: el veneno desaparece de tu sangre.` : `💧 ${card.name}: no tenías veneno.`);
+                    if (ev.removed) this.view.float('heroPortraitContainer', '💧', 'heal');
                     break;
             }
         }
@@ -306,6 +351,14 @@ export class TcgCombat {
     startPlayerTurn() {
         this.heroShield = 0;
 
+        const regen = this.modifiers().regen;
+        if (regen > 0 && this.player.health < this.player.maxHealth) {
+            const healed = Math.min(regen, this.player.maxHealth - this.player.health);
+            this.player.health += healed;
+            this.log(`💍 Tus reliquias te curan ${healed} HP.`);
+            this.view.float('heroPortraitContainer', `+${healed}`, 'heal');
+        }
+
         if (this.heroPoison) {
             const { dmg } = this.heroPoison;
             this.player.health -= dmg;
@@ -342,17 +395,30 @@ export class TcgCombat {
         this.audio.play('sega');
         this.log(`🏆 ¡Has derrotado a ${this.enemy.name}!`);
 
-        this.player.addGold(100 + (this.game.dungeonLevel * 15));
+        this.inCombat = false;
+
+        const baseGold = 100 + (this.game.dungeonLevel * 15);
+        const gold = Math.round(baseGold * (1 + this.modifiers().goldPercent / 100));
+        this.player.addGold(gold);
+        if (gold > baseGold) this.log(`💰 Tus reliquias te dan ${gold - baseGold} de oro extra.`);
+
         if (this.player.addXp(60)) {
             this.log(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
+        // A veces el enemigo suelta un objeto
+        const lootId = rollLoot({ player: this.player, rng: this.rng });
+        const loot = lootId ? addItem(this.player, lootId).item : null;
+        if (loot) this.log(`🎁 Encuentras ${loot.name}: ${loot.effect}.`);
+        const lootText = loot ? `${loot.name}` : '';
+        this.game.ui.updateStats(this.player, this.game.dungeonLevel);
+
         // Las últimas palabras del enemigo se añaden al cartel de victoria si llegan a tiempo
         const defeated = this.enemy;
         let modalOpen = true;
-        this.view.setVictoryText(DEFAULT_VICTORY_TEXT);
+        this.view.setVictoryText(lootText ? `${DEFAULT_VICTORY_TEXT} 🎁 ${lootText}` : DEFAULT_VICTORY_TEXT);
         this.speak('combat_defeat', {}, { log: true }).then(line => {
-            if (line && modalOpen) this.view.setVictoryText(`${defeated.name}: “${line}”`);
+            if (line && modalOpen) this.view.setVictoryText(`${defeated.name}: “${line}”${lootText ? ` · 🎁 ${lootText}` : ''}`);
         });
 
         this.view.setVictory(true);

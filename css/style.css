@@ -1315,3 +1315,42 @@ h1 {
 .speech-gargola { color: #cbd5e1; border-color: #64748b; letter-spacing: 0.1em; }
 .speech-hechicero { color: #93c5fd; border-color: #3b82f6; }
 .speech-dragon { font-family: 'Cinzel', serif; font-size: 1em; font-weight: 700; font-style: normal; color: #fb923c; border-color: #dc2626; }
+
+/* ═══════════ INVENTARIO: OBJETOS CON EFECTO ═══════════ */
+
+.inv-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3px 8px;
+    margin-bottom: 5px;
+    padding: 5px 8px;
+    font-size: 0.8em;
+    list-style: none;
+    background: rgba(30, 10, 50, 0.4);
+    border-left: 4px solid #a855f7;
+    border-radius: 6px;
+}
+
+.inv-consumable { border-left-color: #4ade80; }
+
+.inv-effect {
+    flex-basis: 100%;
+    color: #d8b4fe;
+}
+
+.inv-use-btn {
+    margin-left: auto;
+    padding: 2px 12px;
+    font-family: inherit;
+    font-size: 0.9em;
+    color: #0f0a1f;
+    background: var(--gold);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.inv-use-btn:hover { filter: brightness(1.15); }
+

@@ -1,6 +1,7 @@
 export class UIManager {
     constructor() {
         this.typewriterTimer = null;
+        this.onUseItem = null; // lo asigna Game: se llama con el id del objeto al pulsar "Usar"
     }
 
     showScreen(screenId) {
@@ -72,7 +73,24 @@ export class UIManager {
             invList.innerHTML = '';
             player.inventory.forEach(item => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${item.name}</span><small style="color:#d8b4fe;">${item.effect}</small>`;
+                li.className = `inv-item inv-${item.kind || 'relic'}`;
+
+                const name = document.createElement('span');
+                name.textContent = item.qty > 1 ? `${item.name} x${item.qty}` : item.name;
+
+                const effect = document.createElement('small');
+                effect.className = 'inv-effect';
+                effect.textContent = item.effect;
+
+                li.append(name, effect);
+
+                if (item.kind === 'consumable' && this.onUseItem) {
+                    const useButton = document.createElement('button');
+                    useButton.className = 'inv-use-btn';
+                    useButton.textContent = 'Usar';
+                    useButton.addEventListener('click', () => this.onUseItem(item.id));
+                    li.appendChild(useButton);
+                }
                 invList.appendChild(li);
             });
         }

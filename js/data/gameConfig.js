@@ -7,7 +7,7 @@ export const MAX_NAME_LENGTH = 10;
 export const COMBAT = {
     HAND_SIZE: 5,          // cartas que robas cada turno
     MAX_HAND_SIZE: 8,      // tope de mano con efectos de robar
-    ENERGY_PER_TURN: 3,    // energía para jugar cartas cada turno (sube con player.energyBonus)
+    ENERGY_PER_TURN: 3,    // energía base para jugar cartas cada turno (las reliquias pueden sumar más)
     ENEMY_REVEAL_MS: 900,  // pausa enseñando la carta enemiga
     ENEMY_RESOLVE_MS: 900, // pausa viendo su efecto antes de tu turno
     VICTORY_MS: 3000       // duración de la animación de victoria
@@ -93,4 +93,3 @@ export const DIALOGUE = {
 // Economía de los PNJ
 export const NPC_TOLLS = { morgana: 60 };
 export const DEFAULT_TOLL = 50;
-export const POISON_COST = 40;
