@@ -14,6 +14,7 @@ export const NPC_DATABASE = {
         },
         type: 'vampire_lord',
         archetype: 'el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante',
+        voice: 'Desdén refinado y teatral. Llama "mortal" o "criatura" al héroe. Usa metáforas de sangre, noche y eternidad. Frases largas y elegantes.',
         dungeonLevel: 2, // O la planta en la que aparezca
         baseHp: 80,
         baseAtk: 18,
@@ -56,6 +57,7 @@ export const NPC_DATABASE = {
         },
         type: 'warrior_viking',
         archetype: 'una guerrera vikinga feroz, orgullosa, de pocas palabras y sedienta de honor y batallas en el Valhalla',
+        voice: 'Frases cortas, directas y bruscas. Habla de honor, del Valhalla, de Odín, de hidromiel y de acero. Nunca divaga.',
         dungeonLevel: 4,
         baseHp: 60,
         baseAtk: 15,
@@ -80,6 +82,7 @@ export const NPC_DATABASE = {
         },
         type: 'nomad_archer',
         archetype: 'un arquero nómada de las estepas, sabio, curtido en tormentas de arena y misterioso',
+        voice: 'Calmado y enigmático. Usa proverbios y comparaciones con el viento, el caballo, el río y el cielo de la estepa.',
         dungeonLevel: 5,
         baseHp: 50,
         baseAtk: 14,
@@ -102,6 +105,8 @@ export const NPC_DATABASE = {
             enraged: 'img/barnaby_enfado.png'
         },
         type: 'merchant',
+        archetype: 'Barnaby el Buhonero, un mercader callejero astuto, precavido, cotilla y un poco cascarrabias',
+        voice: 'Habla rápido y en voz baja, soltando rumores. Regatea, se queja de los precios y llama "viajero" o "amigo" al héroe.',
         dungeonLevel: 1, // <-- Aparece en la planta 1
         baseHp: 40,
         baseAtk: 8,
@@ -140,6 +145,8 @@ export const NPC_DATABASE = {
             romance: 'img/morgana_romance.png' // Primer plano de seducción / romance oscuro
         },
         type: 'witch',
+        archetype: 'la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática',
+        voice: 'Seductora y burlona, con confianza peligrosa. Ríe ("jejeje"), habla de calderos, hierbas, pantanos y venenos. Tutea y usa apelativos como "cariño" o "cielo".',
         dungeonLevel: 3, // <-- Aparece en la planta 3
         baseHp: 60,
         baseAtk: 14,

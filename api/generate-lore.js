@@ -1,3 +1,30 @@
+import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcPrompt.js';
+
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+// Pide una frase de PNJ a Groq. Se mandan penalizaciones de repetición; si el modelo las rechaza (400), se reintenta sin ellas.
+async function requestNpcLine(apiKey, messages, npcName) {
+    const call = (extra) => fetch(GROQ_URL, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+            model: process.env.GROQ_NPC_MODEL || "llama-3.3-70b-versatile",
+            messages,
+            temperature: 1,
+            top_p: 0.95,
+            max_tokens: 120,
+            ...extra
+        })
+    });
+
+    let response = await call({ frequency_penalty: 0.7, presence_penalty: 0.5 });
+    if (response.status === 400) response = await call({});
+    if (!response.ok) throw new Error(`Groq HTTP ${response.status}`);
+
+    const data = await response.json();
+    return cleanModelLine(data.choices?.[0]?.message?.content, npcName);
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -53,10 +80,10 @@ export default async function handler(req, res) {
             "Pícaro": [
                 {
                     npcType: "rogue",
-                    description: "Un contrabandista encapuchado saca una dula de joyas en las sombras: \"Tengo las llaves del cofre del tesoro real... ¿Nos repartimos el botín o me delatarás?\"",
+                    description: "Un contrabandista encapuchado saca una bolsa de joyas en las sombras: \"Tengo las llaves del cofre del tesoro real... ¿Nos repartimos el botín o me delatarás?\"",
                     choices: [
                         { text: "💰 [PERSUASIÓN] \"Acepto el trato, pero me llevo el 60%.\"", action: "buy" },
-                        { text: "🗡️ [INMERCENARIO] \"Te quitaré las llaves y el saco ahora mismo.\"", action: "strength" },
+                        { text: "🗡️ [SIGILO] \"Te quitaré las llaves y el saco ahora mismo.\"", action: "strength" },
                         { text: "🚪 \"No me mezclo en asuntos de ladrones torpes.\"", action: "pass" }
                     ]
                 }
@@ -88,55 +115,19 @@ export default async function handler(req, res) {
             story: `EL DESTINO DE ${className.toUpperCase()} ESTÁ FORJADO EN SANGRE Y MANÁ. ADÉNTRATE EN LA PLANTA ${dungeonLevel}.`
         };
 
-        // 💬 MANEJADOR DE DIÁLOGOS DINÁMICOS PARA PNJS (FIJOS Y NUEVOS ARQUETIPOS)
-        // 💬 MANEJADOR DE DIÁLOGOS DINÁMICOS PARA PNJS
-        if (type === 'npc_interaction') {
-            if (!apiKey) {
-                return res.status(200).json({ description: "El personaje te observa en silencio en la penumbra..." });
-            }
+        // 💬 FRASES DE LOS PNJ: saludo, réplica a tu elección y comentario de lo ocurrido.
+        // Si algo falla se devuelve una frase VACÍA: es el juego quien elige una de su banco de respaldo,
+        // para que no salga siempre el mismo texto fijo.
+        if (type === 'npc_interaction' || type === 'npc_line') {
+            const request = sanitizeNpcRequest({ ...body, kind: type === 'npc_interaction' ? 'reaction' : body.kind });
+            if (!apiKey) return res.status(200).json({ description: '' });
 
             try {
-                let personaPrompt = "Actúa como un habitante misterioso de una mazmorra gótica oscura.";
-
-                if (npc === 'valerius') {
-                    personaPrompt = "Actúa como el Conde Valerius, un lord vampiro milenario, aristócrata, extremadamente arrogante, cínico y elegante.";
-                } else if (npc === 'barnaby') {
-                    personaPrompt = "Actúa como Barnaby el Buhonero, un mercader callejero astuto, precavido, cotilla y un poco cascarrabias.";
-                } else if (npc === 'morgana') {
-                    personaPrompt = "Actúa como la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática.";
-                } else if (npcName && npcArchetype) {
-                    personaPrompt = `Actúa como ${npcName}, que es ${npcArchetype}.`;
-                }
-
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
-                        messages: [{
-                            role: "system",
-                            content: `${personaPrompt} El jugador de clase ${className} ha realizado la siguiente acción o dicho esto: "${action}". Responde brevemente (máximo 2 líneas) con una frase directa en español metida en el personaje, reaccionando específicamente a lo que acaba de hacer el héroe.`
-                        }, {
-                            role: "user",
-                            content: "Reacciona a la acción del héroe."
-                        }],
-                        temperature: 0.9, // Subimos un poco la temperatura para que varíe más las respuestas
-                        max_tokens: 100
-                    })
-                });
-
-               /*  if (!response.ok) {
-                    return res.status(200).json({ description: "El personaje te mira de reojo sin decir nada." });
-                } */
-
-                const data = await response.json();
-                const description = data.choices?.[0]?.message?.content?.trim() || "Viajero ....";
+                const description = await requestNpcLine(apiKey, buildNpcMessages(request), request.npcName);
                 return res.status(200).json({ description });
             } catch (err) {
-                return res.status(200).json({ description: "Un eco sordo ahoga las palabras de tu interlocutor." });
+                console.error('[generate-lore] frase de PNJ:', err.message);
+                return res.status(200).json({ description: '' });
             }
         }
 

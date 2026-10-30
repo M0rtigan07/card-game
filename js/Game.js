@@ -11,6 +11,7 @@ import { GroqAI } from './systems/GroqAI.js';
 import { PlayerDeck } from './systems/JugadorCards.js';
 import { TcgCombat } from './systems/TcgCombat.js';
 import { Exploration } from './systems/Exploration.js';
+import { NpcDialogue } from './systems/NpcDialogue.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES } from './data/gameConfig.js';
 
@@ -26,6 +27,7 @@ export class Game {
         this.dungeonLevel = 1;
 
         this.nameEntry = new NameEntry(this.audio);
+        this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
 

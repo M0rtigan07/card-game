@@ -7,7 +7,6 @@ const LORE_FALLBACKS = {
     "Pícaro": "EL MAZO ES LA MAYOR DE LAS FORTUNAS. ESCONDIDO EN LAS SOMBRAS, PREPÁRATE PARA EL SAQUEO..."
 };
 
-const NPC_FALLBACK_LINE = "Las sombras ocultan la respuesta de tu interlocutor.";
 const DEFAULT_ARCHETYPE = "un misterioso habitante de las mazmorras";
 
 export class GroqAI {
@@ -15,9 +14,9 @@ export class GroqAI {
      * Único punto de contacto con el backend (/api/generate-lore).
      * Lanza error si la petición falla o se agota el tiempo.
      */
-    async _post(payload) {
+    async _post(payload, timeoutMs = REQUEST_TIMEOUT_MS) {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
 
         try {
             const response = await fetch(API_ENDPOINT, {
@@ -46,26 +45,47 @@ export class GroqAI {
     }
 
     /**
-     * Reacción de un PNJ a lo que elige el jugador. Devuelve siempre un texto.
-     * @param {object} npc        Entrada de NPC_DATABASE (usa id, name y archetype)
-     * @param {string} choiceText Texto de la opción elegida
-     * @param {string} className  Nombre de la clase del jugador ("Guerrero", ...)
+     * Frase de un PNJ generada por la IA, con el contexto de la situación.
+     * Devuelve null si falla o tarda, para que el juego use una frase de respaldo.
+     *
+     * @param {object} request
+     * @param {'greeting' | 'reaction' | 'outcome'} request.kind  Saludo, réplica a tu elección o comentario de lo ocurrido
+     * @param {object} request.npc             Entrada de NPC_DATABASE (id, name, archetype, voice)
+     * @param {string} request.className       Clase del jugador ("Guerrero", ...)
+     * @param {string} request.heroName        Nombre del héroe
+     * @param {number} request.dungeonLevel
+     * @param {number} request.heroHpPercent
+     * @param {number} request.gold
+     * @param {string} [request.action]        (reaction) Lo que ha elegido el jugador
+     * @param {string} [request.outcome]       (outcome) Qué acaba de ocurrir
+     * @param {string[]} [request.avoid]       Últimas frases del PNJ, que no debe repetir
+     * @param {number} [request.timeoutMs]
      */
-    async generateNpcDialogue(npc, choiceText, className) {
+    async generateNpcLine({ kind, npc, className, heroName, dungeonLevel, heroHpPercent, gold, action, outcome, avoid = [], timeoutMs }) {
         try {
             const data = await this._post({
-                type: "npc_interaction",
+                // "npc_interaction" es el tipo que ya entendía el backend antiguo: así las réplicas siguen funcionando
+                type: kind === 'reaction' ? 'npc_interaction' : 'npc_line',
+                kind,
                 npc: npc.id,
                 npcName: npc.name,
                 npcArchetype: npc.archetype || DEFAULT_ARCHETYPE,
+                npcVoice: npc.voice || '',
                 className,
-                action: choiceText
-            });
-            if (!data.description) throw new Error("Respuesta sin 'description'");
-            return data.description;
+                heroName,
+                dungeonLevel,
+                heroHpPercent,
+                gold,
+                action,
+                outcome,
+                avoid
+            }, timeoutMs);
+
+            const line = typeof data.description === 'string' ? data.description.trim() : '';
+            return line || null;
         } catch (error) {
-            console.warn("[GroqAI] generateNpcDialogue:", error.message);
-            return NPC_FALLBACK_LINE;
+            console.warn("[GroqAI] generateNpcLine:", error.message);
+            return null;
         }
     }
 

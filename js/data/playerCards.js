@@ -24,7 +24,7 @@
 
 export const CARD_LIBRARY = [
     // ───── Mazo inicial: Guerrero ─────
-    { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', base: 15, perLevel: 5, img: 'img/estocada.png', text: 'Inflige {val} daño físico', rarity: 'starter', classes: ['warrior'] },
+    { id: 'strike', name: 'Golpe Demoledor', cost: 1, type: 'atk', base: 15, perLevel: 5, img: 'img/cartasJugador/estocada.png', text: 'Inflige {val} daño físico', rarity: 'starter', classes: ['warrior'] },
     { id: 'shield', name: 'Muro de Acero', cost: 1, type: 'def', base: 12, perLevel: 4, img: 'img/cartasJugador/escudo.png', text: 'Gana {val} guardia', rarity: 'starter', classes: ['warrior'] },
     { id: 'whirlwind', name: 'Torbellino', cost: 2, type: 'atk', base: 28, perLevel: 8, img: 'img/cartasJugador/torbellino.png', text: 'Inflige {val} daño pesado', rarity: 'starter', classes: ['warrior'] },
     { id: 'second_wind', name: 'Poción de Agallas', cost: 1, type: 'heal', base: 18, perLevel: 3, img: 'img/cartasJugador/pocion.png', text: 'Recupera {val} HP', rarity: 'starter', classes: ['warrior'] },

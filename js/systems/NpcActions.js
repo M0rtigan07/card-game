@@ -1,6 +1,7 @@
 // js/systems/NpcActions.js
 // Qué ocurre cuando eliges una acción con un PNJ (las acciones se declaran en data/npcs.js).
 // Para añadir una acción nueva: una entrada más en el mapa `actions` de run().
+// Lo que dice el PNJ tras cada desenlace lo genera la IA (NpcDialogue) con una frase de respaldo.
 
 import { DEFAULT_TOLL, NPC_TOLLS, POISON_COST } from '../data/gameConfig.js';
 
@@ -17,8 +18,15 @@ export class NpcActions {
     get player() { return this.game.player; }
     log(message) { this.game.ui.logEvent(message); }
 
+    /** El PNJ comenta lo que acaba de pasar. `outcome` = bought | no_gold | caught | offended; `detail` lo lee la IA. */
+    async speak(npc, outcome, detail) {
+        this.scene.showDialogue(npc.name, '...');
+        const line = await this.game.dialogue.say(npc, 'outcome', { outcome, detail });
+        this.scene.showDialogue(npc.name, line);
+    }
+
     /** Ejecuta la acción elegida con `npc`. Una acción desconocida avisa y avanza, nunca bloquea el juego. */
-    run(npc, action) {
+    async run(npc, action) {
         this.game.audio.play('card');
 
         const actions = {
@@ -59,34 +67,34 @@ export class NpcActions {
                 this.game.finishEncounter(2000);
             },
 
-            buy_potion: () => {
+            buy_potion: async () => {
                 if (this.player.gold >= 30) {
                     this.player.gold -= 30;
                     this.player.health = Math.min(this.player.maxHealth, this.player.health + 40);
-                    this.scene.showDialogue(npc.name, "¡Excelente elección, viajero! Volverás a visitarme.");
                     this.log(`🧪 Compras una poción a ${npc.name} (-30 Oro). Recuperas 40 HP.`);
+                    await this.speak(npc, 'bought', 'El héroe te ha comprado una poción curativa por 30 de oro.');
                 } else {
-                    this.scene.showDialogue(npc.name, "¿Pretendes engañarme? ¡No tienes suficiente oro!");
                     this.log(`❌ No tienes suficiente oro para comprar la poción.`);
+                    await this.speak(npc, 'no_gold', 'El héroe quería comprar una poción curativa (30 de oro) pero no tiene suficiente dinero.');
                 }
-                this.game.finishEncounter(3500);
+                this.game.finishEncounter(2500);
             },
 
-            buy_mana: () => {
+            buy_mana: async () => {
                 if (this.player.gold >= 40) {
                     this.player.gold -= 40;
                     this.player.maxMana += 10;
                     this.player.mana = this.player.maxMana;
-                    this.scene.showDialogue(npc.name, "Un grimorio de poder... Que la magia te proteja.");
                     this.log(`🔮 Compras un grimorio a ${npc.name} (-40 Oro). ¡Maná máximo aumentado!`);
+                    await this.speak(npc, 'bought', 'La hechicera te ha comprado un grimorio mágico por 40 de oro.');
                 } else {
-                    this.scene.showDialogue(npc.name, "Tus bolsillos están tan vacíos como tus conjuros.");
                     this.log(`❌ No tienes suficiente oro.`);
+                    await this.speak(npc, 'no_gold', 'La hechicera quería comprar un grimorio mágico (40 de oro) pero no tiene suficiente dinero.');
                 }
-                this.game.finishEncounter(3500);
+                this.game.finishEncounter(2500);
             },
 
-            steal: () => {
+            steal: async () => {
                 const d20 = this.scene.rollD20();
                 if (d20 >= 10) {
                     this.player.addGold(60);
@@ -95,10 +103,10 @@ export class NpcActions {
                     this.game.audio.play('hit');
                     this.player.health -= 15;
                     this.scene.setSceneImage(npc.images?.enraged || npc.images?.talk);
-                    this.scene.showDialogue(npc.name, "¡LADRÓN! ¡Toma esto por tu osadía!");
                     this.log(`🎲 [D20: ${d20}] ¡Te descubren! Recibes 15 de daño.`);
+                    await this.speak(npc, 'caught', 'Acabas de sorprender al héroe intentando robarte la mercancía, y le has dado un golpe.');
                 }
-                this.game.finishEncounter(3000);
+                this.game.finishEncounter(2500);
             }
         };
 
@@ -108,7 +116,13 @@ export class NpcActions {
             this.game.finishEncounter(1200);
             return;
         }
-        handler();
+
+        try {
+            await handler();
+        } catch (error) {
+            console.error(`[NpcActions] Falló la acción "${action}" (${npc.id}):`, error);
+            this.game.finishEncounter(1200);
+        }
     }
 
     grantXp(amount) {
@@ -139,11 +153,11 @@ export class NpcActions {
         }
     }
 
-    leave(npc) {
+    async leave(npc) {
         if (npc.id === 'barnaby') {
-            this.scene.showDialogue(npc.name, "¡Bah, tacaño ingrato! ¡Que la oscuridad te devore en el próximo pasillo!");
             this.log(`💢 Barnaby se enfada al ver que ignoras su mercancía.`);
-            this.game.finishEncounter(3500);
+            await this.speak(npc, 'offended', 'El héroe ha ignorado por completo tu mercancía y se marcha sin comprar nada.');
+            this.game.finishEncounter(2500);
         } else {
             this.log(`🏃 Te retiras con cautela sin llamar la atención.`);
             this.game.finishEncounter(1200);

@@ -47,6 +47,16 @@ export const NPC_MOOD_BY_ACTION = {
     morgana_romance_warrior: 'romance'
 };
 
+// Frases de los PNJ generadas por Groq
+export const DIALOGUE = {
+    MEMORY_LINES: 6,          // últimas frases de cada PNJ que se recuerdan (y se piden no repetir)
+    TIMEOUT_MS: {             // tiempo máximo esperando a Groq antes de usar una frase de respaldo
+        greeting: 4000,
+        reaction: 6000,
+        outcome: 3500
+    }
+};
+
 // Economía de los PNJ
 export const NPC_TOLLS = { morgana: 60 };
 export const DEFAULT_TOLL = 50;

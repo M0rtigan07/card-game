@@ -12,6 +12,7 @@ export class Exploration {
     constructor(game) {
         this.game = game;
         this.npcActions = new NpcActions(game, this);
+        this.sceneToken = 0; // cambia con cada escena: descarta respuestas de la IA que llegan tarde
     }
 
     get player() { return this.game.player; }
@@ -21,6 +22,7 @@ export class Exploration {
 
     /** Dibuja la vista de exploración en el panel central y la devuelve. */
     render() {
+        this.sceneToken++;
         const view = new ExplorationView(document.getElementById('mainContent'), this.game);
         view.render();
         return view;
@@ -175,25 +177,32 @@ export class Exploration {
         return { ...interaction, choices: unique };
     }
 
-    showNpc(npcKey) {
+    async showNpc(npcKey) {
         const npc = NPC_DATABASE[npcKey];
         if (!npc) return;
 
         const view = this.render();
+        const token = this.sceneToken;
         this.setSceneImage(npc.images?.room);
         setText('sceneBadgeOverlay', npc.name.toUpperCase());
+        this.log(`👁️ Te encuentras cara a cara con ${npc.name}.`);
 
         const interaction = this.getNpcInteraction(npc);
 
+        // Mientras la IA piensa el saludo se ve una línea de espera; si tarda o falla, sale uno del banco
+        view.setNarrative(`${npc.name} te observa en silencio...`, []);
+        const greeting = await this.game.dialogue.say(npc, 'greeting', {
+            extraFallback: interaction.greeting ? [interaction.greeting] : []
+        });
+        if (token !== this.sceneToken) return; // ya estás en otra escena
+
         view.setNarrative(
-            interaction.greeting || `Te encuentras con ${npc.name}.`,
+            greeting,
             interaction.choices.map(choice => ({
                 text: choice.text,
                 callback: () => this.onNpcChoice(npc, choice)
             }))
         );
-
-        this.log(`👁️ Te encuentras cara a cara con ${npc.name}.`);
     }
 
     async onNpcChoice(npc, choice) {
@@ -204,14 +213,15 @@ export class Exploration {
 
         // Barnaby ofendido responde con frase fija, sin gastar una llamada a la IA
         if (npc.id === 'barnaby' && choice.action === 'pass') {
-            this.npcActions.run(npc, 'pass');
+            await this.npcActions.run(npc, 'pass');
             return;
         }
 
-        const reply = await this.game.groq.generateNpcDialogue(npc, choice.text, this.player.className);
+        this.showDialogue(npc.name, '...');
+        const reply = await this.game.dialogue.say(npc, 'reaction', { action: choice.text });
         this.showDialogue(npc.name, reply);
 
         await wait(2200);
-        this.npcActions.run(npc, choice.action);
+        await this.npcActions.run(npc, choice.action);
     }
 }
