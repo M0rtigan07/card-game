@@ -16,6 +16,8 @@ import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES } from './data/gameConfig.js';
 import { getBossForFloor } from './systems/jefes.js';
+import { NpcChatController } from './systems/NpcChatController.js';
+
 
 export class Game {
     constructor() {
@@ -27,12 +29,14 @@ export class Game {
         this.playerName = 'HÉROE';
         this.deck = null;           // PlayerDeck: tu colección de cartas (crece con las recompensas)
         this.dungeonLevel = 1;
+        this.npcChat = new NpcChatController(this);
 
         this.nameEntry = new NameEntry(this.audio);
         this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
         this.ui.onUseItem = (id) => this.useItem(id); // botón "Usar" del inventario
+    
 
         this.initEvents();
     }

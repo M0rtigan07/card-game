@@ -35,6 +35,8 @@ export class NpcActions {
             buy: () => this.payToll(npc),
             pass: () => this.leave(npc),
 
+            custom_chat: () => this.game.npcChat.startChat(npc),
+
             pact_accept: () => {
                 this.log(`🤝 Sellas un pacto con ${npc.name}. Obtienes información y riquezas (+200 oro).`);
                 this.player.addGold(200);

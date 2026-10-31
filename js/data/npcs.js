@@ -166,6 +166,7 @@ export const NPC_DATABASE = {
                 greeting: "Hueles a metal y sudor. Tu carne servirá para mis calderos, guerrero.",
                 choices: [
                     { text: "🌹 \"Una belleza tan salvaje merece algo mejor que pelear. Hablemos...\"", action: 'morgana_romance_warrior' },
+                    { text: "💬 Conversar con la Bruja", action: "custom_chat" },
                     { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
                     { text: "💰 Pagar peaje para cruzar (-60 Oro)", action: 'buy' }
                 ]
