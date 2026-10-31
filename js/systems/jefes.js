@@ -1,7 +1,7 @@
 // js/systems/jefes.js
 // Qué jefe toca en cada planta y cómo se convierte en un enemigo de combate. Lógica pura, sin DOM.
 
-import { BOSSES } from '../data/Bosses.js';
+import { BOSSES } from '../data/bossCatalog.js';
 import { BOSS } from '../data/gameConfig.js';
 
 /** ¿Hay jefe en esta planta? (5, 10, 15...) */

@@ -1,4 +1,4 @@
-// js/data/bosses.js
+// js/data/bossCatalog.js
 // Jefes del juego: uno cada BOSS.EVERY plantas (5, 10, 15...), en este orden y repitiéndose al acabar la lista.
 //
 // Un jefe es un enemigo más duro que los demás:
