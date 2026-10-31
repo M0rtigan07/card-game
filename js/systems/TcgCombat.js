@@ -2,15 +2,17 @@
 // Controlador del combate de cartas: turnos, energía, mano, turno enemigo y recompensas.
 // Las reglas puras viven en EnemyAI.js y JugadorCards.js; lo que se dibuja, en ui/CombatUI.js.
 
-import { EnemyBrain, describeCard, effectiveAtk } from './EnemyAI.js';
+import { EnemyBrain, applyPhase, describeCard, effectiveAtk } from './EnemyAI.js';
 import { instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './JugadorCards.js';
-import { addItem, getModifiers, rollLoot } from './Items.js';
+import { addItem, getModifiers, rollBossRelic, rollLoot } from './Items.js';
+import { buildBossEnemy } from './jefes.js';
 import { REWARD_CONFIG } from '../data/cardCatalog.js';
-import { COMBAT, DIALOGUE, FALLBACK_IMG, GENERIC_ENEMIES, DEFAULT_ENEMY } from '../data/gameConfig.js';
+import { BOSS, COMBAT, DIALOGUE, FALLBACK_IMG, GENERIC_ENEMIES, DEFAULT_ENEMY } from '../data/gameConfig.js';
 import { CombatUI } from '../ui/CombatUI.js';
 import { wait } from '../ui/helpers.js';
 
 const DEFAULT_VICTORY_TEXT = '¡Has barrido al enemigo de la mazmorra!';
+const BOSS_VICTORY_TEXT = '¡Has derrotado al jefe de la planta!';
 
 export class TcgCombat {
     /** @param {import('../Game.js').Game} game */
@@ -82,6 +84,7 @@ export class TcgCombat {
 
         this.view.mount(this.game, this.enemy, this.player);
         this.view.bindEndTurn(() => this.endTurn());
+        if (this.enemy.isBoss) this.view.setBossTitle(this.enemy.name);
 
         this.log(`⚔️ ¡ENTRAS EN COMBATE contra ${this.enemy.name}!`);
         if (this.heroShield > 0) this.log(`🛡️ Tus reliquias te dan ${this.heroShield} de guardia inicial.`);
@@ -100,10 +103,14 @@ export class TcgCombat {
                 hp: enemyData.hp,
                 maxHp: enemyData.maxHp ?? enemyData.hp,
                 atk: enemyData.atk,
-                shield: 0,
+                shield: enemyData.armor ?? 0,
                 img: enemyData.img || FALLBACK_IMG,
                 deckId: enemyData.deckId,
-                speaker: enemyData.speaker // quién habla (nombre, voz...); sin él, el enemigo no dice nada
+                speaker: enemyData.speaker, // quién habla (nombre, voz...); sin él, el enemigo no dice nada
+                isBoss: Boolean(enemyData.isBoss),
+                armor: enemyData.armor ?? 0, // los jefes empiezan cada turno con esta guardia
+                phases: enemyData.phases ?? [],
+                phaseIndex: 0
             };
         }
 
@@ -183,7 +190,8 @@ export class TcgCombat {
 
         this.narratePlayer(card, events);
 
-        if (enemy.hp > 0 && !this.hurtSpoken && enemy.hp <= enemy.maxHp * DIALOGUE.HURT_THRESHOLD) {
+        const phased = this.checkPhases(); // si cambia de fase, esa es la frase del momento
+        if (!phased && enemy.hp > 0 && !this.hurtSpoken && enemy.hp <= enemy.maxHp * DIALOGUE.HURT_THRESHOLD) {
             this.hurtSpoken = true;
             this.speak('combat_hurt');
         }
@@ -265,7 +273,7 @@ export class TcgCombat {
         this.busy = true;
         this.view.setControls(false);
 
-        enemy.shield = 0; // su escudo solo dura hasta que le toca jugar otra vez
+        enemy.shield = enemy.armor ?? 0; // su escudo dura hasta que le toca jugar otra vez (los jefes regeneran su armadura)
 
         const poisonDmg = tickPoison(enemy);
         if (poisonDmg > 0) {
@@ -279,6 +287,7 @@ export class TcgCombat {
                 this.win();
                 return;
             }
+            this.checkPhases();
             await wait(700);
         }
         this.refresh();
@@ -397,18 +406,28 @@ export class TcgCombat {
 
         this.inCombat = false;
 
-        const baseGold = 100 + (this.game.dungeonLevel * 15);
+        const boss = Boolean(this.enemy.isBoss);
+        const baseGold = (100 + (this.game.dungeonLevel * 15)) * (boss ? BOSS.GOLD_MULT : 1);
         const gold = Math.round(baseGold * (1 + this.modifiers().goldPercent / 100));
         this.player.addGold(gold);
         if (gold > baseGold) this.log(`💰 Tus reliquias te dan ${gold - baseGold} de oro extra.`);
 
-        if (this.player.addXp(60)) {
+        if (this.player.addXp(60 * (boss ? BOSS.XP_MULT : 1))) {
             this.log(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
         // A veces el enemigo suelta un objeto
-        const lootId = rollLoot({ player: this.player, rng: this.rng });
+        const lootId = boss ? rollBossRelic({ player: this.player, rng: this.rng }) : rollLoot({ player: this.player, rng: this.rng });
         const loot = lootId ? addItem(this.player, lootId).item : null;
+        if (boss) {
+            if (!loot) {
+                this.player.addGold(100);
+                this.log(`💰 El jefe no tenía más reliquias que darte: +100 de oro.`);
+            }
+            const rest = Math.min(Math.round(this.player.maxHealth * BOSS.REST_PERCENT), this.player.maxHealth - this.player.health);
+            this.player.health += rest;
+            this.log(`🏕️ Descansas tras la batalla: +${rest} HP.`);
+        }
         if (loot) this.log(`🎁 Encuentras ${loot.name}: ${loot.effect}.`);
         const lootText = loot ? `${loot.name}` : '';
         this.game.ui.updateStats(this.player, this.game.dungeonLevel);
@@ -416,7 +435,8 @@ export class TcgCombat {
         // Las últimas palabras del enemigo se añaden al cartel de victoria si llegan a tiempo
         const defeated = this.enemy;
         let modalOpen = true;
-        this.view.setVictoryText(lootText ? `${DEFAULT_VICTORY_TEXT} 🎁 ${lootText}` : DEFAULT_VICTORY_TEXT);
+        const victoryText = boss ? BOSS_VICTORY_TEXT : DEFAULT_VICTORY_TEXT;
+        this.view.setVictoryText(lootText ? `${victoryText} 🎁 ${lootText}` : victoryText);
         this.speak('combat_defeat', {}, { log: true }).then(line => {
             if (line && modalOpen) this.view.setVictoryText(`${defeated.name}: “${line}”${lootText ? ` · 🎁 ${lootText}` : ''}`);
         });
@@ -426,19 +446,19 @@ export class TcgCombat {
         modalOpen = false;
         this.view.setVictory(false);
 
-        await this.chooseReward();
+        await this.chooseReward({ boss });
 
         this.game.dungeonLevel++;
         await this.game.loadNextEvent();
     }
 
     /** Tras ganar eliges 1 de 3 cartas para tu mazo (o las saltas por oro). */
-    chooseReward() {
+    chooseReward({ boss = false } = {}) {
         return new Promise(resolve => {
             const ids = rollRewards({
                 classKey: this.player.classKey,
                 owned: this.deck.collection,
-                level: this.game.dungeonLevel
+                level: this.game.dungeonLevel + (boss ? BOSS.CARD_RARITY_BONUS : 0) // contra jefes salen más cartas raras
             });
             if (ids.length === 0) {
                 resolve();
@@ -461,6 +481,48 @@ export class TcgCombat {
                 }
             });
         });
+    }
+
+    // ───────────── JEFES ─────────────
+
+    /** Combate contra el jefe de la planta: más vida, armadura que se regenera cada turno, fases y mazo propio. */
+    startBoss(boss) {
+        this.log(`💀 ¡${boss.name} te corta el paso!`);
+        this.start(buildBossEnemy(boss, this.game.dungeonLevel));
+    }
+
+    /** Activa las fases del jefe cuyo umbral de vida ya se ha cruzado. Devuelve true si cambió de fase. */
+    checkPhases() {
+        const enemy = this.enemy;
+        let changed = false;
+
+        while (enemy?.hp > 0 && enemy.phases?.length > enemy.phaseIndex
+            && enemy.hp <= enemy.maxHp * enemy.phases[enemy.phaseIndex].at) {
+            this.enterPhase(enemy.phases[enemy.phaseIndex++]);
+            changed = true;
+        }
+        return changed;
+    }
+
+    enterPhase(phase) {
+        const enemy = this.enemy;
+        const applied = applyPhase(enemy, phase, this.brain);
+
+        this.log(`💢 ¡${enemy.name} ${phase.announce}!`);
+        for (const bonus of applied) {
+            if (bonus.kind === 'buff') this.log(`🔥 Su ataque sube +${bonus.amount}.`);
+            if (bonus.kind === 'shield') this.log(`🛡️ Gana ${bonus.amount} de escudo.`);
+            if (bonus.kind === 'heal') this.log(`💚 Recupera ${bonus.amount} de vida.`);
+        }
+        if (phase.addCards?.length) this.log(`🃏 ¡Nuevas cartas peligrosas en su mazo!`);
+
+        this.audio.play('sega');
+        this.view.float('enemyPortraitContainer', '¡FASE!', 'buff');
+        this.view.shake('enemyPortraitContainer');
+        if (phase.img) this.view.setEnemyImage(phase.img);
+
+        this.speak('combat_phase', { detail: phase.announce });
+        this.refresh();
     }
 
     // ───────────── EL ENEMIGO HABLA ─────────────

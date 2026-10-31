@@ -5,6 +5,7 @@ import { NPC_DATABASE } from '../data/npcs.js';
 import { DEFAULT_ENCOUNTER_IMAGE, ENCOUNTER_IMAGES, FALLBACK_IMG, NPC_MOOD_BY_ACTION } from '../data/gameConfig.js';
 import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
+import { getBossForFloor, isBossFloor } from './jefes.js';
 import { setText, wait } from '../ui/helpers.js';
 
 export class Exploration {
@@ -63,14 +64,24 @@ export class Exploration {
     // ───────────── SIGUIENTE ENCUENTRO ─────────────
 
     async loadNext() {
+        const level = this.game.dungeonLevel;
+
+        // 0. Jefe (cada 5 plantas): tiene prioridad sobre todo lo demás
+        const boss = getBossForFloor(level);
+        if (boss) {
+            return this.showBoss(boss);
+        }
+        if (isBossFloor(level + 1)) {
+            this.log(`⚠️ Una presencia enorme aguarda en la planta siguiente...`);
+        }
+
         // 1. PNJ fijo de planta (Barnaby, Valerius, Morgana, Astrid, Batu Jan)
-        const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === this.game.dungeonLevel);
+        const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === level);
         if (npcKey) {
             return this.showNpc(npcKey);
         }
 
         // 2. Encuentro procedural del backend (plantas sin PNJ fijo)
-        const level = this.game.dungeonLevel;
         const view = this.render();
         view.setNarrative("Escuchando los pasos en la penumbra...", []);
 
@@ -149,6 +160,31 @@ export class Exploration {
         this.game.dungeonLevel++;
         await wait(1400);
         await this.game.loadNextEvent();
+    }
+
+    // ───────────── JEFES ─────────────
+
+    /** Escena previa al combate de jefe: aparece, te habla y solo hay una salida. Es el momento de prepararte (objetos, etc.). */
+    async showBoss(boss) {
+        const level = this.game.dungeonLevel;
+        const view = this.render();
+        const token = this.sceneToken;
+
+        this.setSceneImage(boss.img);
+        setText('sceneBadgeOverlay', `⚠️ JEFE · PLANTA ${level}`);
+        this.log(`💀 ¡${boss.name} guarda la planta ${level}!`);
+
+        view.setNarrative(`${boss.name} bloquea el camino...`, []);
+        const greeting = await this.game.dialogue.say(boss, 'greeting');
+        if (token !== this.sceneToken) return; // ya estás en otra escena
+
+        view.setNarrative(greeting, [{
+            text: '⚔️ ¡Enfrentarse al jefe!',
+            callback: () => {
+                this.lockChoices();
+                this.game.combat.startBoss(boss);
+            }
+        }]);
     }
 
     // ───────────── PNJ FIJOS ─────────────
