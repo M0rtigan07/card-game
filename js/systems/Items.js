@@ -98,3 +98,17 @@ export function rollLoot({ player, rng = Math.random, chance = LOOT.chance }) {
     const index = pool.findIndex(item => (roll -= item.lootWeight) < 0);
     return pool[index === -1 ? pool.length - 1 : index].id;
 }
+
+/**
+ * Selecciona una reliquia especial como botín de jefe (por ejemplo, reliquias que aún no posea el jugador).
+ */
+export function rollBossRelic({ player, rng = Math.random }) {
+    const pool = ITEM_CATALOG.filter(item => {
+        if (item.kind !== 'relic') return false;
+        return !owns(player, item.id);
+    });
+    if (pool.length === 0) return null;
+
+    const index = Math.floor(rng() * pool.length);
+    return pool[index].id;
+}
