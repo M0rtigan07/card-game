@@ -71,6 +71,14 @@ export const NPC_MOOD_BY_ACTION = {
     morgana_romance_warrior: 'romance'
 };
 
+export const BOSS = {
+    EVERY: 5,
+    GOLD_MULT: 2,
+    XP_MULT: 2,
+    REST_PERCENT: 0.5,
+    CARD_RARITY_BONUS: 1
+};
+
 // Frases de los PNJ y de los enemigos generadas por Groq
 export const DIALOGUE = {
     MEMORY_LINES: 6,           // últimas frases de cada personaje que se recuerdan (y se piden no repetir)
