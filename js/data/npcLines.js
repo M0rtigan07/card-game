@@ -3,7 +3,7 @@
 // Hay varias por personaje y tipo para que, aun sin IA, el diálogo no sea siempre igual.
 //
 // Tipos (key):  greeting · reaction · bought · no_gold · already_owned · caught · offended
-//               combat_start · combat_attack · combat_other · combat_hurt · combat_defeat · combat_victory
+//               combat_start · combat_attack · combat_other · combat_hurt · combat_phase · combat_defeat · combat_victory
 // Se busca primero el banco del PNJ; si no tiene ese tipo, el de `default`.
 
 export const LAST_RESORT_LINE = 'El personaje te observa en silencio.';
@@ -72,6 +72,10 @@ export const FALLBACK_LINES = {
             'Eso ya lo llevas encima.',
             'No te venderé dos veces lo mismo.',
             'Mira bien tu inventario, viajero.'
+        ],
+        combat_phase: [
+            '¡Esto no ha terminado!',
+            'Ahora te enseñaré mi verdadero poder.'
         ]
     },
 
@@ -512,6 +516,162 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Ceniza y silencio. Como debía ser.',
             'Otro valiente más para mi tesoro de huesos.'
+        ]
+    },
+
+    orco_jefe: {
+        greeting: [
+            '¡Gorgrim ver pequeño humano! ¡Gorgrim hacer collar con tus dientes!',
+            '¡Horda, mirad! ¡Comida venir sola!',
+            '¡Aquí mandar Gorgrim! ¡Humano pagar peaje con huesos!'
+        ],
+        combat_start: [
+            '¡WAAAGH! ¡Horda, a por él!',
+            '¡Gorgrim romper humano en dos!',
+            '¡Hoy Gorgrim cenar héroe!'
+        ],
+        combat_attack: [
+            '¡Gorgrim aplastar!',
+            '¡Toma hacha de jefe!',
+            '¡Horda, mirad cómo se hace!'
+        ],
+        combat_other: [
+            '¡Gorgrim no caer! ¡Gorgrim ser jefe!',
+            '¡Horda, cubrid a Gorgrim!',
+            '¡Gorgrim comer, Gorgrim más fuerte!'
+        ],
+        combat_hurt: [
+            '¡Ay! ¡Humano pegar duro! ¡Gorgrim enfadar!',
+            '¡Sangre de Gorgrim! ¡Humano morir lento!'
+        ],
+        combat_phase: [
+            '¡AAARGH! ¡Ahora Gorgrim ir en serio!',
+            '¡Frenesí! ¡Gorgrim no sentir dolor!'
+        ],
+        combat_defeat: [
+            '¡Gorgrim... jefe caer... horda sin jefe...',
+            'Humano fuerte... Gorgrim respetar... un poco...'
+        ],
+        combat_victory: [
+            '¡Gorgrim ganar! ¡Horda, a comer!',
+            '¡Gorgrim jefe de jefes!'
+        ]
+    },
+
+    vampira_jefa: {
+        greeting: [
+            'Qué visita tan inesperada, querido. Pocas veces la noche me trae algo tan... vivo.',
+            'Bienvenido a mi salón. Pasa, que la sangre joven siempre es bien recibida.',
+            'Llevo siglos aburrida. Dime que vas a entretenerme.'
+        ],
+        combat_start: [
+            'Baila conmigo, querido. Será la última vez.',
+            'No temas: dolerá solo un instante... eterno.',
+            'Que comience el baile de la noche.'
+        ],
+        combat_attack: [
+            'Un besito, querido.',
+            'Siente cómo se detiene el tiempo.',
+            'Qué delicia de pulso tienes.'
+        ],
+        combat_other: [
+            'La noche es mi manto, querido.',
+            'Nada que me hagas me alcanza.',
+            'Ay, qué torpe. Observa cómo se hace.'
+        ],
+        combat_hurt: [
+            'Qué descaro... me has hecho sangrar.',
+            'Eso ha sido de muy mal gusto, querido.'
+        ],
+        combat_phase: [
+            'Basta de juegos. Ahora verás lo que soy.',
+            'Has despertado a la verdadera Dama de la Noche.'
+        ],
+        combat_defeat: [
+            'Qué pena... tan joven y ya me ganas...',
+            'La noche no olvida, querido...'
+        ],
+        combat_victory: [
+            'Duerme, querido. La noche te acuna.',
+            'Tan dulce... y tan breve.'
+        ]
+    },
+
+    escorpiones_jefe: {
+        greeting: [
+            'Pocos llegan hasta aquí. Menos aún regresan.',
+            'Los Escorpiones Negros te vieron entrar hace rato. Ya eres nuestro.',
+            'Un mercenario más. Veamos de qué color es tu sangre.'
+        ],
+        combat_start: [
+            'El contrato dice que no salgas vivo.',
+            'Sin testigos. Sin ruido. Sin piedad.',
+            'Que sea rápido. Tengo otro encargo.'
+        ],
+        combat_attack: [
+            'Un corte limpio.',
+            'Ni lo verás venir.',
+            'El aguijón siempre encuentra su sitio.'
+        ],
+        combat_other: [
+            'Las sombras me protegen.',
+            'Aún no me has visto.',
+            'Paciencia. Todo escorpión espera.'
+        ],
+        combat_hurt: [
+            'Interesante. Nadie me había tocado en años.',
+            'Buen golpe. Tendrás que pagarlo.'
+        ],
+        combat_phase: [
+            'Se acabó el juego. Ahora van las dagas.',
+            'Los Escorpiones no se rinden: se enfurecen.'
+        ],
+        combat_defeat: [
+            'El contrato queda sin cumplir...',
+            'Los Escorpiones te encontrarán igualmente...'
+        ],
+        combat_victory: [
+            'Contrato cumplido. Sin testigos.',
+            'Otro nombre menos en el mundo.'
+        ]
+    },
+
+    dragon_jefe: {
+        greeting: [
+            'Eras enteras dormí sobre mi tesoro. ¿Quién osa interrumpir mi sueño?',
+            'Hormiga... incluso el aire de esta cueva tiembla ante mí.',
+            'Ignis, el Guardián, te saluda. Y también te despide.'
+        ],
+        combat_start: [
+            'Mi llama ha derretido reinos enteros, hormiga.',
+            'Arrodíllate o arde. Me es indiferente.',
+            'Que el infierno recuerde tu nombre... un instante.'
+        ],
+        combat_attack: [
+            '¡Arde!',
+            '¡Siente el aliento de las eras!',
+            '¡Que el infierno te reclame, hormiga!'
+        ],
+        combat_other: [
+            'Mis escamas son más viejas que tu reino.',
+            'Ningún acero rasguña a Ignis.',
+            'Hasta el fuego me obedece.'
+        ],
+        combat_hurt: [
+            '¡Insolente! Has herido a un dragón.',
+            'Esa herida la pagarán tus descendientes.'
+        ],
+        combat_phase: [
+            '¡Despierta, llama ancestral!',
+            '¡Ahora conocerás el verdadero fuego!'
+        ],
+        combat_defeat: [
+            'Un dragón derrotado por una hormiga...',
+            'Mi tesoro era tuyo desde el principio...'
+        ],
+        combat_victory: [
+            'Ceniza y silencio. Otra vez.',
+            'Otro héroe para mi colección de huesos.'
         ]
     }
 };

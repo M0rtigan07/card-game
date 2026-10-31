@@ -117,6 +117,31 @@ export function resolveEnemyCard(card, enemy, hero) {
     return events;
 }
 
+/**
+ * Aplica una fase de jefe (ver data/bossCatalog.js): bonos inmediatos y cartas nuevas para su mazo.
+ * Devuelve la lista de bonos aplicados, para poder narrarlos.
+ */
+export function applyPhase(enemy, phase, brain) {
+    const applied = [];
+
+    if (phase.atkBonus) {
+        enemy.atkBonus = (enemy.atkBonus || 0) + phase.atkBonus;
+        applied.push({ kind: 'buff', amount: phase.atkBonus });
+    }
+    if (phase.armor) enemy.armor = (enemy.armor || 0) + phase.armor;
+    if (phase.shield) {
+        enemy.shield = (enemy.shield || 0) + phase.shield;
+        applied.push({ kind: 'shield', amount: phase.shield });
+    }
+    if (phase.heal) {
+        const healed = healEnemy(enemy, phase.heal);
+        if (healed > 0) applied.push({ kind: 'heal', amount: healed });
+    }
+    if (phase.addCards?.length) brain?.addCards(phase.addCards);
+
+    return applied;
+}
+
 // Evita jugadas inútiles (curarse con la vida llena, acumular furia sin fin...)
 function isUseful(card, enemy, hero) {
     switch (card.type) {
@@ -138,6 +163,12 @@ export class EnemyBrain {
 
     get cardsLeft() {
         return this.drawPile.length;
+    }
+
+    /** Mete cartas nuevas en el mazo (por ejemplo al cambiar de fase). Se barajan con las que quedan y ya no se pierden. */
+    addCards(cards) {
+        const added = cards.flatMap(card => Array.from({ length: card.copies ?? 1 }, () => ({ ...card })));
+        this.drawPile = shuffle([...this.drawPile, ...added], this.rng);
     }
 
     /** Roba la próxima jugada, descartando mentalmente las inútiles. */
@@ -166,34 +197,4 @@ export class EnemyBrain {
         this.intent = null;
         return { card, events };
     }
-
-
-
-}
-
-/** Aplica los cambios de una fase de jefe (ataque extra, escudo, curación y cartas nuevas). */
-export function applyPhase(enemy, phase, brain) {
-    const events = [];
-    if (phase.atkBonus) {
-        enemy.atkBonus = (enemy.atkBonus || 0) + phase.atkBonus;
-        events.push({ kind: 'buff', amount: phase.atkBonus });
-    }
-    if (phase.shield) {
-        enemy.shield = (enemy.shield || 0) + phase.shield;
-        events.push({ kind: 'shield', amount: phase.shield });
-    }
-    if (phase.heal) {
-        const healed = Math.max(0, Math.min(phase.heal, enemy.maxHp - enemy.hp));
-        enemy.hp += healed;
-        if (healed > 0) events.push({ kind: 'heal', amount: healed });
-    }
-    if (phase.addCards && brain) {
-        // Añade las nuevas cartas al mazo del jefe
-        for (const newCard of phase.addCards) {
-            for (let i = 0; i < (newCard.copies ?? 1); i++) {
-                brain.drawPile.push({ ...newCard });
-            }
-        }
-    }
-    return events;
 }

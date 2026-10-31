@@ -26,7 +26,7 @@ export const BOSSES = [
         name: 'Gorgrim, Jefe Orco',
         img: 'img/jefe_orco_hacha.jpg',
         deckId: 'orco_jefe',
-        baseHp: 150, hpPerFloor: 10, baseAtk: 15, atkPerFloor: 0.6, armor: 6,
+        baseHp: 165, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 6,
         archetype: 'Gorgrim, el jefe de una horda orca: brutal, orgulloso y fanfarrón, con ansias de aplastar cráneos',
         voice: 'Habla en tercera persona ("Gorgrim aplasta") con gramática simple, pero con orgullo de líder: da órdenes y presume de su horda. Grita mucho.',
         phases: [
@@ -75,7 +75,7 @@ export const BOSSES = [
         name: 'Ignis, el Dragón Guardián',
         img: 'img/dragon.png',
         deckId: 'dragon_jefe',
-        baseHp: 200, hpPerFloor: 12, baseAtk: 18, atkPerFloor: 0.7, armor: 12,
+        baseHp: 190, hpPerFloor: 9, baseAtk: 17, atkPerFloor: 0.5, armor: 12,
         archetype: 'Ignis, un dragón guardián milenario, majestuoso y orgulloso, dueño de un tesoro inmenso',
         voice: 'Grandilocuente y solemne. Llama "hormiga" al héroe. Habla de eras, de imperios caídos, de su tesoro y de su fuego.',
         phases: [

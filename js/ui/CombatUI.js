@@ -36,6 +36,21 @@ export class CombatUI {
         setText('victoryRewardText', text);
     }
 
+    /** Título de combate de jefe (más llamativo que el normal). */
+    setBossTitle(name) {
+        setText('dungeonTitle', `⚠️ ¡JEFE! ${name}`);
+        document.getElementById('dungeonTitle')?.classList.add('boss-title');
+    }
+
+    /** Cambia el retrato del enemigo (fases de jefe). Si la imagen no existe, se queda la anterior. */
+    setEnemyImage(src) {
+        const img = /** @type {HTMLImageElement | null} */ (document.getElementById('enemySceneImage'));
+        if (!img) return;
+        const previous = img.src;
+        img.onerror = () => { img.onerror = null; img.src = previous; };
+        img.src = src;
+    }
+
     /** Frase del enemigo sobre su panel. El estilo (color, tipografía) depende de quién habla: ver .speech-<id> en el CSS. */
     showSpeech(text, speakerId = '') {
         const host = document.getElementById('enemySpeech');

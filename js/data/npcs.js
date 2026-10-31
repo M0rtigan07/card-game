@@ -83,7 +83,7 @@ export const NPC_DATABASE = {
         type: 'nomad_archer',
         archetype: 'un arquero nómada de las estepas, sabio, curtido en tormentas de arena y misterioso',
         voice: 'Calmado y enigmático. Usa proverbios y comparaciones con el viento, el caballo, el río y el cielo de la estepa.',
-        dungeonLevel: 5,
+        dungeonLevel: 6, // la planta 5 es del primer jefe
         baseHp: 50,
         baseAtk: 14,
         interactions: {
@@ -166,7 +166,6 @@ export const NPC_DATABASE = {
                 greeting: "Hueles a metal y sudor. Tu carne servirá para mis calderos, guerrero.",
                 choices: [
                     { text: "🌹 \"Una belleza tan salvaje merece algo mejor que pelear. Hablemos...\"", action: 'morgana_romance_warrior' },
-                    { text: "💬 Conversar con la Bruja", action: "custom_chat" },
                     { text: "🗡️ \"¡Prueba el filo de mi espada, bruja!\"", action: 'combat' },
                     { text: "💰 Pagar peaje para cruzar (-60 Oro)", action: 'buy' }
                 ]

@@ -15,9 +15,6 @@ import { NpcDialogue } from './systems/NpcDialogue.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES } from './data/gameConfig.js';
-import { getBossForFloor } from './systems/jefes.js';
-import { NpcChatController } from './systems/NpcChatController.js';
-
 
 export class Game {
     constructor() {
@@ -29,14 +26,12 @@ export class Game {
         this.playerName = 'HÉROE';
         this.deck = null;           // PlayerDeck: tu colección de cartas (crece con las recompensas)
         this.dungeonLevel = 1;
-        this.npcChat = new NpcChatController(this);
 
         this.nameEntry = new NameEntry(this.audio);
         this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
         this.ui.onUseItem = (id) => this.useItem(id); // botón "Usar" del inventario
-    
 
         this.initEvents();
     }
@@ -128,19 +123,6 @@ export class Game {
     // ───────────── FLUJO ENTRE PLANTAS ─────────────
 
     loadNextEvent() {
-        // PASO A PASO:
-        // 1. Preguntamos si la planta actual (ej: planta 5) tiene un jefe asignado
-        const boss = getBossForFloor(this.dungeonLevel);
-
-        // 2. Si 'boss' no es null, significa que ¡tocó jefe!
-        if (boss) {
-            // Iniciamos el combate especial de jefe usando el sistema TCG que ya tienes creado
-            this.combat.startBoss(boss);
-            return; // Cortamos aquí para que no cargue una exploración normal
-        }
-
-        // 3. Si 'boss' es null (planta normal 1, 2, 3, 4, 6...), 
-        // continúa con la exploración procedural o PNJ habituales
         return this.exploration.loadNext();
     }
 

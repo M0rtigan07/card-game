@@ -71,12 +71,13 @@ export const NPC_MOOD_BY_ACTION = {
     morgana_romance_warrior: 'romance'
 };
 
+// Jefes
 export const BOSS = {
-    EVERY: 5,
-    GOLD_MULT: 2,
-    XP_MULT: 2,
-    REST_PERCENT: 0.5,
-    CARD_RARITY_BONUS: 1
+    EVERY: 5,               // hay un jefe cada 5 plantas
+    GOLD_MULT: 3,           // multiplicador del oro al derrotarlo
+    XP_MULT: 3,             // multiplicador de la experiencia
+    REST_PERCENT: 0.4,      // vida que recuperas al derrotarlo (proporción de tu vida máxima)
+    CARD_RARITY_BONUS: 6    // niveles "virtuales" extra al sortear su recompensa de cartas: salen más raras
 };
 
 // Frases de los PNJ y de los enemigos generadas por Groq
@@ -93,6 +94,7 @@ export const DIALOGUE = {
         combat_start: 2500,
         combat_card: 4000,
         combat_hurt: 2500,
+        combat_phase: 2500,
         combat_defeat: 3000,
         combat_victory: 2500
     }

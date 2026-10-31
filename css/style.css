@@ -1354,3 +1354,21 @@ h1 {
 
 .inv-use-btn:hover { filter: brightness(1.15); }
 
+/* ═══════════ JEFES ═══════════ */
+
+.boss-title {
+    color: #ef4444;
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.8), 2px 2px 0 #000;
+    animation: bossPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes bossPulse {
+    0%, 100% { text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 2px 2px 0 #000; }
+    50% { text-shadow: 0 0 20px rgba(239, 68, 68, 1), 2px 2px 0 #000; }
+}
+
+/* Estilo de habla de los jefes */
+.speech-orco_jefe { text-transform: uppercase; font-style: normal; font-weight: 800; font-size: 0.95em; color: #86efac; border-color: #15803d; }
+.speech-vampira_jefa { font-family: 'Cinzel', serif; color: #f9a8d4; border-color: #be185d; letter-spacing: 0.03em; }
+.speech-escorpiones_jefe { font-family: 'Courier New', monospace; font-style: normal; letter-spacing: 0.04em; color: #a5b4fc; border-color: #4338ca; }
+.speech-dragon_jefe { font-family: 'Cinzel', serif; font-size: 1.05em; font-weight: 700; font-style: normal; color: #fdba74; border-color: #b91c1c; text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }

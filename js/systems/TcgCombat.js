@@ -5,7 +5,7 @@
 import { EnemyBrain, applyPhase, describeCard, effectiveAtk } from './EnemyAI.js';
 import { instantiateCard, resolvePlayerCard, rollRewards, tickPoison } from './JugadorCards.js';
 import { addItem, getModifiers, rollBossRelic, rollLoot } from './Items.js';
-import { buildBossEnemy } from './jefes.js';
+import { buildBossEnemy } from './Bosses.js';
 import { REWARD_CONFIG } from '../data/cardCatalog.js';
 import { BOSS, COMBAT, DIALOGUE, FALLBACK_IMG, GENERIC_ENEMIES, DEFAULT_ENEMY } from '../data/gameConfig.js';
 import { CombatUI } from '../ui/CombatUI.js';
@@ -127,7 +127,11 @@ export class TcgCombat {
             shield: 0,
             img: template.img,
             deckId: template.deckId,
-            speaker: { id: template.id, name: template.name, archetype: template.archetype, voice: template.voice }
+            speaker: { id: template.id, name: template.name, archetype: template.archetype, voice: template.voice },
+            isBoss: false,
+            armor: 0,
+            phases: [],
+            phaseIndex: 0
         };
     }
 

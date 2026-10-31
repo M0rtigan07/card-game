@@ -3,7 +3,7 @@
 // El guion bajo inicial evita que Vercel lo publique como endpoint: es solo un módulo auxiliar.
 
 const LIMITS = { name: 60, archetype: 240, voice: 320, action: 220, outcome: 240, avoidLine: 200, avoidCount: 6, heroName: 24, className: 30, cardName: 60, cardEffect: 120 };
-const KINDS = ['greeting', 'reaction', 'outcome', 'combat_start', 'combat_card', 'combat_hurt', 'combat_defeat', 'combat_victory'];
+const KINDS = ['greeting', 'reaction', 'outcome', 'combat_start', 'combat_card', 'combat_hurt', 'combat_phase', 'combat_defeat', 'combat_victory'];
 
 // Un "tono" distinto en cada petición: hace que dos réplicas parecidas no suenen igual
 const ANGLES = {
@@ -13,6 +13,7 @@ const ANGLES = {
     combat_start: ['con una amenaza', 'con burla', 'con arrogancia', 'con una calma inquietante', 'con una promesa de dolor'],
     combat_card: ['como un grito de guerra', 'con frialdad', 'con burla', 'con rabia', 'murmurando entre dientes'],
     combat_hurt: ['con rabia', 'con incredulidad', 'con una risa forzada', 'con dolor y orgullo'],
+    combat_phase: ['con furia desatada', 'con una amenaza solemne', 'con una risa siniestra', 'con orgullo desafiante'],
     combat_defeat: ['con orgullo herido', 'con una maldición', 'con una advertencia', 'con resignación'],
     combat_victory: ['con burla', 'con satisfacción', 'con desprecio', 'con calma']
 };
@@ -94,6 +95,7 @@ export function buildNpcMessages(request, rng = Math.random) {
         combat_start: `Empieza un combate a muerte contra el héroe ${hero}. ${fight} Lánzale una provocación o amenaza de inicio.`,
         combat_card: `En pleno combate contra el héroe ${hero}, vas a jugar tu carta «${cardName || 'un ataque'}» (${cardEffect || 'sin efecto conocido'}). ${fight} Di una frase breve mientras la juegas.`,
         combat_hurt: `El héroe ${hero} acaba de herirte de gravedad. ${fight} Reacciona según tu carácter: rabia, miedo o burla.`,
+        combat_phase: `Tu combate contra el héroe ${hero} entra en una fase más peligrosa: «${outcome || 'tu furia crece'}». ${fight} Dilo con una frase breve que intimide.`,
         combat_defeat: `El héroe ${hero} acaba de derrotarte y estás a punto de caer. Di tus últimas palabras.`,
         combat_victory: `Acabas de derrotar al héroe ${hero}, que cae ante ti. Celebra tu victoria a tu manera.`
     }[kind];

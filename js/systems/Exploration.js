@@ -5,7 +5,7 @@ import { NPC_DATABASE } from '../data/npcs.js';
 import { DEFAULT_ENCOUNTER_IMAGE, ENCOUNTER_IMAGES, FALLBACK_IMG, NPC_MOOD_BY_ACTION } from '../data/gameConfig.js';
 import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
-import { getBossForFloor, isBossFloor } from './jefes.js';
+import { getBossForFloor, isBossFloor } from './Bosses.js';
 import { setText, wait } from '../ui/helpers.js';
 
 export class Exploration {

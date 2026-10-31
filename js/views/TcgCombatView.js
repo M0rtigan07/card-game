@@ -23,7 +23,7 @@ export class TcgCombatView {
 
                     <!-- Retrato del Enemigo (Más grande) -->
                     <div class="character-portrait" id="enemyPortraitContainer">
-                        <img id="enemySceneImage" src="${enemyData.img}" alt="Enemigo" style="max-height: 160px;">
+                        <img id="enemySceneImage" src="${enemyData.img}" alt="Enemigo" style="max-height: 160px;" onerror="this.onerror=null;this.src='img/guerreroCorrupto.png'">
                         <span class="character-tag enemy-tag" id="enemyPortraitName">${enemyData.name}</span>
                     </div>
                 </div>

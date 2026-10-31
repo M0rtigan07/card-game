@@ -78,6 +78,12 @@ export function canUseItem(item, { inCombat, player, poisoned }) {
     return { ok: true };
 }
 
+/** Reliquia que suelta un jefe: una al azar de las que aún no tienes (null si ya las tienes todas). */
+export function rollBossRelic({ player, rng = Math.random }) {
+    const pool = ITEM_CATALOG.filter(item => item.kind === 'relic' && item.lootWeight > 0 && !owns(player, item.id));
+    return pool.length ? pool[Math.floor(rng() * pool.length)].id : null;
+}
+
 /**
  * ¿Aparece un objeto tras ganar un combate? Devuelve su id o null.
  * No ofrece reliquias que ya tienes ni consumibles que ya no te caben.
@@ -97,18 +103,4 @@ export function rollLoot({ player, rng = Math.random, chance = LOOT.chance }) {
     let roll = rng() * total;
     const index = pool.findIndex(item => (roll -= item.lootWeight) < 0);
     return pool[index === -1 ? pool.length - 1 : index].id;
-}
-
-/**
- * Selecciona una reliquia especial como botín de jefe (por ejemplo, reliquias que aún no posea el jugador).
- */
-export function rollBossRelic({ player, rng = Math.random }) {
-    const pool = ITEM_CATALOG.filter(item => {
-        if (item.kind !== 'relic') return false;
-        return !owns(player, item.id);
-    });
-    if (pool.length === 0) return null;
-
-    const index = Math.floor(rng() * pool.length);
-    return pool[index].id;
 }
