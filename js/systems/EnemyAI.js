@@ -166,4 +166,34 @@ export class EnemyBrain {
         this.intent = null;
         return { card, events };
     }
+
+
+
+}
+
+/** Aplica los cambios de una fase de jefe (ataque extra, escudo, curación y cartas nuevas). */
+export function applyPhase(enemy, phase, brain) {
+    const events = [];
+    if (phase.atkBonus) {
+        enemy.atkBonus = (enemy.atkBonus || 0) + phase.atkBonus;
+        events.push({ kind: 'buff', amount: phase.atkBonus });
+    }
+    if (phase.shield) {
+        enemy.shield = (enemy.shield || 0) + phase.shield;
+        events.push({ kind: 'shield', amount: phase.shield });
+    }
+    if (phase.heal) {
+        const healed = Math.max(0, Math.min(phase.heal, enemy.maxHp - enemy.hp));
+        enemy.hp += healed;
+        if (healed > 0) events.push({ kind: 'heal', amount: healed });
+    }
+    if (phase.addCards && brain) {
+        // Añade las nuevas cartas al mazo del jefe
+        for (const newCard of phase.addCards) {
+            for (let i = 0; i < (newCard.copies ?? 1); i++) {
+                brain.drawPile.push({ ...newCard });
+            }
+        }
+    }
+    return events;
 }
