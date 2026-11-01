@@ -80,6 +80,14 @@ export const BOSS = {
     CARD_RARITY_BONUS: 6    // niveles "virtuales" extra al sortear su recompensa de cartas: salen más raras
 };
 
+// Conversaciones con PNJ (menú de temas y entrada libre)
+export const CHAT = {
+    FREE_PER_NPC: 4,       // mensajes libres que puedes escribirle a cada personaje (cuida la cuota de Groq)
+    MAX_INPUT: 140,        // longitud máxima de lo que escribes
+    TYPE_SPEED_MS: 22,     // milisegundos por letra al escribir las frases (0 = de golpe)
+    BLIP_EVERY: 2          // suena un pitido cada tantas letras
+};
+
 // Frases de los PNJ y de los enemigos generadas por Groq
 export const DIALOGUE = {
     MEMORY_LINES: 6,           // últimas frases de cada personaje que se recuerdan (y se piden no repetir)
@@ -93,6 +101,8 @@ export const DIALOGUE = {
         outcome: 3500,
         combat_start: 2500,
         combat_card: 4000,
+        chat_topic: 6000,
+        chat_free: 6000,
         combat_hurt: 2500,
         combat_phase: 2500,
         combat_defeat: 3000,

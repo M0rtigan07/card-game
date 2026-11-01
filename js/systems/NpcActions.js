@@ -4,7 +4,7 @@
 // Lo que dice el PNJ tras cada desenlace lo genera la IA (NpcDialogue) con una frase de respaldo.
 
 import { DEFAULT_TOLL, NPC_TOLLS } from '../data/gameConfig.js';
-import { addItem, getItem, owns } from './Items.js';
+import { addItem, getItem, itemIdForAction, owns } from './Items.js';
 
 export class NpcActions {
     /**
@@ -56,11 +56,7 @@ export class NpcActions {
                 this.game.finishEncounter(1800);
             },
 
-            // Compras: el precio y el efecto salen de data/itemCatalog.js.
-            // En npcs.js también vale "buy:<id>" (por ejemplo "buy:fire_flask") para vender cualquier objeto.
-            buy_potion: () => this.purchase(npc, 'health_potion'),
-            buy_mana: () => this.purchase(npc, 'arcane_grimoire'),
-            buy_poison: () => this.purchase(npc, 'blade_venom'),
+            chat: () => this.scene.openChat(npc),
 
             steal: async () => {
                 const d20 = this.scene.rollD20();
@@ -78,7 +74,9 @@ export class NpcActions {
             }
         };
 
-        const handler = actions[action] ?? (action.startsWith('buy:') ? () => this.purchase(npc, action.slice(4)) : undefined);
+        // Compras: el precio y el efecto salen de data/itemCatalog.js (acciones buy_potion, buy_mana, buy_poison y buy:<id>)
+        const itemId = itemIdForAction(action);
+        const handler = actions[action] ?? (itemId ? () => this.purchase(npc, itemId) : undefined);
         if (!handler) {
             console.warn(`[NpcActions] Acción de PNJ sin manejar: "${action}" (${npc.id})`);
             this.game.finishEncounter(1200);

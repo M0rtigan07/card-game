@@ -208,9 +208,10 @@ export class Exploration {
             };
         }
 
-        // Quita opciones repetidas (mismo texto)
+        // Quita opciones repetidas (mismo texto) y añade la de conversar, que tienen todos los PNJ
         const unique = [...new Map(interaction.choices.map(c => [c.text, c])).values()];
-        return { ...interaction, choices: unique };
+        const talk = { text: `💬 Conversar con ${npc.name}`, action: 'chat' };
+        return { ...interaction, choices: [...unique, talk] };
     }
 
     async showNpc(npcKey) {
@@ -232,8 +233,20 @@ export class Exploration {
         });
         if (token !== this.sceneToken) return; // ya estás en otra escena
 
+        this.setNpcChoices(view, npc, interaction, greeting);
+    }
+
+    /** Menú de acciones con el PNJ: lo que ves tras su saludo y al volver de una conversación. */
+    showNpcMenu(npc, text) {
+        const view = this.render();
+        this.setSceneImage(npc.images?.room);
+        setText('sceneBadgeOverlay', npc.name.toUpperCase());
+        this.setNpcChoices(view, npc, this.getNpcInteraction(npc), text);
+    }
+
+    setNpcChoices(view, npc, interaction, text) {
         view.setNarrative(
-            greeting,
+            text,
             interaction.choices.map(choice => ({
                 text: choice.text,
                 callback: () => this.onNpcChoice(npc, choice)
@@ -241,7 +254,20 @@ export class Exploration {
         );
     }
 
+    /** Abre la conversación; al despedirte vuelves al menú del PNJ sin repetir su saludo ni gastar la planta. */
+    openChat(npc) {
+        this.sceneToken++; // invalida cualquier respuesta que estuviera en camino para la escena anterior
+        return this.game.chat.open(npc, {
+            onClose: () => this.showNpcMenu(npc, `Te despides de ${npc.name}, que sigue esperando tu decisión.`)
+        });
+    }
+
     async onNpcChoice(npc, choice) {
+        if (choice.action === 'chat') {
+            await this.openChat(npc);
+            return;
+        }
+
         this.lockChoices();
 
         const mood = NPC_MOOD_BY_ACTION[choice.action] || 'talk';

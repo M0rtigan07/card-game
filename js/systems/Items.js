@@ -9,6 +9,15 @@ import { ITEM_CATALOG, LOOT } from '../data/itemCatalog.js';
 const BY_ID = new Map(ITEM_CATALOG.map(item => [item.id, item]));
 
 export const getItem = (id) => BY_ID.get(id);
+
+// Acciones de compra antiguas de npcs.js. Además vale "buy:<id>" con cualquier objeto del catálogo.
+const BUY_ALIASES = { buy_potion: 'health_potion', buy_mana: 'arcane_grimoire', buy_poison: 'blade_venom' };
+
+/** Id del objeto que compra una acción de tienda, o null si la acción no es una compra. */
+export function itemIdForAction(action) {
+    if (BUY_ALIASES[action]) return BUY_ALIASES[action];
+    return typeof action === 'string' && action.startsWith('buy:') ? action.slice(4) : null;
+}
 export const findEntry = (player, id) => player.inventory.find(entry => entry.id === id);
 export const owns = (player, id) => Boolean(findEntry(player, id));
 

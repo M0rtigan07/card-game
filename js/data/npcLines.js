@@ -3,6 +3,7 @@
 // Hay varias por personaje y tipo para que, aun sin IA, el diálogo no sea siempre igual.
 //
 // Tipos (key):  greeting · reaction · bought · no_gold · already_owned · caught · offended
+//               chat_open · chat_free · chat_<tema> (who, place, advice, rumors, boss y los propios de cada personaje)
 //               combat_start · combat_attack · combat_other · combat_hurt · combat_phase · combat_defeat · combat_victory
 // Se busca primero el banco del PNJ; si no tiene ese tipo, el de `default`.
 
@@ -76,6 +77,36 @@ export const FALLBACK_LINES = {
         combat_phase: [
             '¡Esto no ha terminado!',
             'Ahora te enseñaré mi verdadero poder.'
+        ],
+        chat_open: [
+            'Te escucho.',
+            'Habla, viajero.',
+            'Adelante, di lo que quieras.'
+        ],
+        chat_who: [
+            'Un habitante más de estas profundidades. Nada que contar.',
+            'Alguien que ha sobrevivido hasta aquí. Eso basta.'
+        ],
+        chat_place: [
+            'Un lugar peligroso. Ten cuidado.',
+            'Hay mucho que temer aquí abajo.'
+        ],
+        chat_advice: [
+            'Mira lo que va a hacer tu enemigo antes de actuar.',
+            'Cuida tu energía y tus pociones.'
+        ],
+        chat_rumors: [
+            'Dicen que cada cinco plantas hay un guardián.',
+            'Se murmura que los jefes cambian al estar heridos.'
+        ],
+        chat_boss: [
+            'Más adelante hay un jefe. Prepárate.',
+            'Un guardián espera. No vayas con la vida baja.'
+        ],
+        chat_free: [
+            'No sé qué decirte a eso.',
+            'Pregúntame otra cosa.',
+            'Eso se me escapa.'
         ]
     },
 
@@ -117,6 +148,39 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Tan frágil... igual que todos. Descansa, mortal.',
             'Otro más para mi colección de olvidados.'
+        ],
+        chat_open: [
+            'Habla, mortal. Mi paciencia es larga, pero mi sed no.',
+            'Te concedo unas palabras. Elígelas con elegancia.'
+        ],
+        chat_who: [
+            'Soy el Conde Valerius, señor de estas criptas desde antes de que tu reino tuviera nombre.',
+            'Un caballero de la noche, mortal. Algunos dicen vampiro; qué vulgar.'
+        ],
+        chat_place: [
+            'Esta mazmorra es un cuerpo vivo, mortal: cada planta, una cámara de su corazón podrido.',
+            'Aquí abajo todo tiene dueño. Y casi todo tiene hambre.'
+        ],
+        chat_advice: [
+            'Mira siempre la jugada de tu enemigo antes de actuar: la ignorancia es el lujo de los muertos.',
+            'Guarda tus pociones para cuando de verdad sangres, mortal. Y no malgastes la energía.'
+        ],
+        chat_rumors: [
+            'Dicen que un orco con delirios de grandeza manda en las plantas profundas. Qué pintoresco.',
+            'Se murmura que la Dama de la Noche no recibe visitas... salvo las que pueden alimentarla.'
+        ],
+        chat_boss: [
+            'Más abajo aguarda algo que ni yo desafiaría sin cena previa. Ve preparado.',
+            'Un guardián te espera, mortal. Trae paciencia para romper su armadura y para sus cambios.'
+        ],
+        chat_free: [
+            'Hmm. Qué ocurrencia. Pregúntame algo más digno de mi eternidad.',
+            'Divertido, mortal. Pero no tengo respuesta para eso.',
+            'Tus palabras me aburren y me entretienen a partes iguales. Prueba otra.'
+        ],
+        chat_eternity: [
+            'Tres siglos mirando la misma piedra. Por eso agradezco cualquier visita, aunque sea comida.',
+            'La eternidad es un banquete sin hambre, mortal. Lo difícil es no aburrirse.'
         ]
     },
 
@@ -173,6 +237,39 @@ export const FALLBACK_LINES = {
             'Jejeje, ya lo llevas, cariño. No seas goloso.',
             'Dos veces no funciona, cielo. La magia no se duplica.',
             'Mira en tu bolsa, tontorrón.'
+        ],
+        chat_open: [
+            'Dime, cielo, ¿qué se te ha perdido en mi pantano?',
+            'Jejeje, habla, habla... que el caldero escucha.'
+        ],
+        chat_who: [
+            'Soy Morgana, la bruja del pantano. Remedios, venenos y algún que otro secretillo, cariño.',
+            'Digamos que cocino lo que otros temen, cielo.'
+        ],
+        chat_place: [
+            'La mazmorra respira, cariño. Y a veces suspira por las plantas de abajo.',
+            'Cada piso guarda un hambre distinta. Yo me quedo con los hongos.'
+        ],
+        chat_advice: [
+            'Un veneno a tiempo vale más que diez espadas, cielo. Y un antídoto, más que veinte.',
+            'No gastes toda tu energía de golpe, cariño: la paciencia es la mejor receta.'
+        ],
+        chat_rumors: [
+            'Dicen que unos escorpiones con malas pulgas hacen contratos muy... definitivos.',
+            'Jejeje, se cuenta que un dragón duerme sobre un tesoro. Despertarlo es cosa tuya, cielo.'
+        ],
+        chat_boss: [
+            'Huelo algo grande más abajo, cariño: carne dura, armadura gorda y mal humor.',
+            'El guardián de la próxima planta no perdona, cielo. Llévate remedios.'
+        ],
+        chat_free: [
+            'Jejeje, qué cosas dices, cariño. Pregunta otra, anda.',
+            'Eso ni mi caldero lo sabe, cielo.',
+            'Ay, qué curioso... pero de eso no sé nada. Prueba con otra pregunta.'
+        ],
+        chat_cauldron: [
+            'Un poco de hongo, un poco de rencor y una pizca de olvido, cielo. No preguntes más.',
+            'Una sopa para quien llega sin invitación, cariño. Jejeje.'
         ]
     },
 
@@ -214,6 +311,39 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Cae con honor. Odín te recibirá.',
             'Buena pelea. Ahora descansa.'
+        ],
+        chat_open: [
+            'Habla. Sin rodeos.',
+            'Tienes un momento. Úsalo bien.'
+        ],
+        chat_who: [
+            'Astrid la Escudera. Guerrera. El resto no importa.',
+            'Escudo en una mano y hacha en la otra. Eso soy.'
+        ],
+        chat_place: [
+            'Un nido de cobardes y de bestias. Me gusta.',
+            'Fría, oscura y llena de enemigos. Perfecta para morir con honor.'
+        ],
+        chat_advice: [
+            'Escudo antes de golpe, si el enemigo golpea fuerte. Honor no es morir por tonto.',
+            'Mira lo que va a jugar el enemigo. Un buen guerrero lee a su rival.'
+        ],
+        chat_rumors: [
+            'Dicen que una dama de la noche baila con quien llega solo. No acabes en su baile.',
+            'Se habla de un jefe orco que grita mucho. Los que gritan, caen.'
+        ],
+        chat_boss: [
+            'Delante hay un jefe. Rómpele la armadura y no corras.',
+            'Un gran enemigo te espera. Llévalo al límite y él mismo cambiará.'
+        ],
+        chat_free: [
+            'No te entiendo, o no quiero. Pregunta claro.',
+            'Poca charla. Otra pregunta.',
+            'Eso no me importa. Prueba con algo útil.'
+        ],
+        chat_valhalla: [
+            'El Valhalla es la sala de los valientes. Allí no entra quien huye.',
+            'Un banquete eterno para quien muere con el arma en la mano. Eso espero.'
         ]
     },
 
@@ -270,6 +400,39 @@ export const FALLBACK_LINES = {
             'Ya portas ese veneno, viajero. Una flecha no se afila dos veces.',
             'Mira en tu aljaba: ya lo tienes.',
             'El halcón no pide lo que ya tiene.'
+        ],
+        chat_open: [
+            'Habla, viajero. El viento no tiene prisa.',
+            'Siéntate un momento. La estepa enseña a escuchar.'
+        ],
+        chat_who: [
+            'Batu Jan, arquero de las estepas. Hoy, nómada en una tierra sin cielo.',
+            'Un jinete sin caballo, viajero. Pero con buena puntería.'
+        ],
+        chat_place: [
+            'Un lugar sin viento y sin cielo. Por eso me inquieta.',
+            'Las paredes recuerdan a los que cayeron. Escúchalas con respeto.'
+        ],
+        chat_advice: [
+            'El que apunta con calma acierta. No gastes toda tu energía en un solo turno.',
+            'Mira la flecha del enemigo antes de que salga. El halcón lee el viento.'
+        ],
+        chat_rumors: [
+            'Dicen que un dragón vigila un tesoro mucho más abajo. Quizá sea solo viento.',
+            'Se cuenta que los escorpiones cobran por cada cabeza. Ve con cuidado, viajero.'
+        ],
+        chat_boss: [
+            'Más adelante camina algo grande. Rómpele la guardia con paciencia, como se doma un caballo salvaje.',
+            'El guardián de abajo cambia cuando sangra. Que no te sorprenda.'
+        ],
+        chat_free: [
+            'El viento no me trae esa respuesta, viajero.',
+            'No sé qué decirte. Pregunta otra cosa.',
+            'Hay preguntas que solo el cielo contesta. Esa es una.'
+        ],
+        chat_wind: [
+            'Dice que algo antiguo se despierta abajo, viajero. Y que no le gustan las visitas.',
+            'Aquí no hay viento, y eso es lo que más me asusta.'
         ]
     },
 
@@ -336,6 +499,39 @@ export const FALLBACK_LINES = {
             '¡Pero si ya tienes uno, amigo! Yo no vendo dos veces lo mismo.',
             'Ja, ¿te falla la memoria? Eso ya lo llevas encima.',
             'Guarda tu oro, que ese género ya es tuyo.'
+        ],
+        chat_open: [
+            '¿Conversación, amigo? Gratis; lo que hay detrás, no.',
+            'Venga, suelta: ¿qué quieres saber?'
+        ],
+        chat_who: [
+            'Barnaby el Buhonero, para servirle. Compro, vendo y cotilleo, por ese orden.',
+            'Un humilde comerciante, viajero. Con más deudas que escrúpulos.'
+        ],
+        chat_place: [
+            'Un mal sitio con buenos clientes, amigo. Todo el que baja necesita algo.',
+            'Peligroso, oscuro y bastante húmedo. Ni cobran alquiler, qué locura.'
+        ],
+        chat_advice: [
+            'Compra una poción antes de necesitarla, amigo: luego sube de precio, ja.',
+            'Los objetos se usan desde el inventario, viajero. No los dejes criando polvo.'
+        ],
+        chat_rumors: [
+            'Oí que un orco jefe tiene la mala costumbre de comerse a sus visitantes. Qué poco comercial.',
+            'Dicen que una vampira muy elegante invita a cenar... y el menú eres tú.'
+        ],
+        chat_boss: [
+            'Un pez gordo guarda la próxima planta, amigo. Lleva pociones. Yo vendo, por cierto.',
+            'Algo enorme te espera, viajero. Mi consejo: antídotos y buena guardia.'
+        ],
+        chat_free: [
+            'Ni idea, amigo, y no cobro por no saber. Pregunta otra.',
+            'Eso no lo vendo, viajero. Prueba con otra.',
+            'Mmm. Se me escapa. ¿Algo más?'
+        ],
+        chat_wares: [
+            'Pociones, frascos, antídotos... lo mío es lo útil, amigo. Mira qué te ofrezco.',
+            'Lo mejor del género, y casi todo legal. Echa un vistazo a mis precios.'
         ]
     },
 

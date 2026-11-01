@@ -12,6 +12,7 @@ import { PlayerDeck } from './systems/JugadorCards.js';
 import { TcgCombat } from './systems/TcgCombat.js';
 import { Exploration } from './systems/Exploration.js';
 import { NpcDialogue } from './systems/NpcDialogue.js';
+import { NpcChat } from './systems/NpcChat.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES } from './data/gameConfig.js';
@@ -29,6 +30,7 @@ export class Game {
 
         this.nameEntry = new NameEntry(this.audio);
         this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
+        this.chat = new NpcChat(this);           // conversaciones con PNJ estilo aventura gráfica
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
         this.ui.onUseItem = (id) => this.useItem(id); // botón "Usar" del inventario

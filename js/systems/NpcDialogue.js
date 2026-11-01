@@ -19,7 +19,7 @@ export class NpcDialogue {
      * Devuelve lo que dice el PNJ. Nunca falla y nunca repite una de sus últimas frases.
      *
      * @param {object} npc                  Entrada de NPC_DATABASE
-     * @param {'greeting' | 'reaction' | 'outcome' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_defeat' | 'combat_victory'} kind
+     * @param {'greeting' | 'reaction' | 'outcome' | 'chat_topic' | 'chat_free' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_phase' | 'combat_defeat' | 'combat_victory'} kind
      * @param {object} [context]
      * @param {string} [context.action]     (reaction) Lo que ha elegido el jugador
      * @param {string} [context.outcome]    (outcome) Clave del desenlace: bought | no_gold | caught | offended
@@ -28,6 +28,7 @@ export class NpcDialogue {
      * @param {string} [context.cardEffect] (combat_card) Su efecto, con números
      * @param {number} [context.enemyHpPercent] (combate) Vida que le queda al enemigo
      * @param {string} [context.poolKey]    Banco de respaldo a usar (por defecto, el del tipo de frase)
+     * @param {string[]} [context.facts]    (chat) Datos reales del juego que puede contar a su manera
      * @param {string[]} [context.extraFallback]  Frases de respaldo propias de la situación
      */
     async say(npc, kind, context = {}) {
@@ -46,6 +47,7 @@ export class NpcDialogue {
             cardName: context.cardName,
             cardEffect: context.cardEffect,
             enemyHpPercent: context.enemyHpPercent,
+            facts: context.facts,
             avoid: this.memory.recent(npc.id),
             timeoutMs: DIALOGUE.TIMEOUT_MS[kind]
         });
@@ -59,6 +61,13 @@ export class NpcDialogue {
             line = this.memory.pick(npc.id, pool) ?? LAST_RESORT_LINE;
         }
 
+        this.memory.remember(npc.id, line);
+        return line;
+    }
+
+    /** Frase del banco de respaldo (sin llamar a la IA) que no se haya dicho hace poco. */
+    fallbackLine(npc, key) {
+        const line = this.memory.pick(npc.id, fallbackPool(npc.id, key)) ?? LAST_RESORT_LINE;
         this.memory.remember(npc.id, line);
         return line;
     }

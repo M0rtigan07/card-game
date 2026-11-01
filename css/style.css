@@ -1372,3 +1372,115 @@ h1 {
 .speech-vampira_jefa { font-family: 'Cinzel', serif; color: #f9a8d4; border-color: #be185d; letter-spacing: 0.03em; }
 .speech-escorpiones_jefe { font-family: 'Courier New', monospace; font-style: normal; letter-spacing: 0.04em; color: #a5b4fc; border-color: #4338ca; }
 .speech-dragon_jefe { font-family: 'Cinzel', serif; font-size: 1.05em; font-weight: 700; font-style: normal; color: #fdba74; border-color: #b91c1c; text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }
+
+/* ═══════════ CONVERSACIONES (ESTILO AVENTURA GRÁFICA) ═══════════ */
+
+.chat-scene { height: 320px; }
+
+.chat-scene .chat-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.chat-scene .chat-portrait.talking { animation: chatBob 0.5s ease-in-out infinite; }
+
+@keyframes chatBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* .chat-scene delante: la regla genérica `.elvira-scene-frame img` fuerza width/height 100 % a toda imagen de la escena */
+.chat-scene .chat-hero-portrait {
+    position: absolute;
+    left: 10px;
+    bottom: 100px;
+    z-index: 2;
+    width: 62px;
+    height: 62px;
+    object-fit: cover;
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    opacity: 0.5;
+    filter: grayscale(0.6);
+    transition: opacity 0.2s, transform 0.2s, filter 0.2s;
+}
+
+.chat-scene .chat-hero-portrait.speaking {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.1);
+    border-color: #22d3ee;
+}
+
+.chat-dialogue-box {
+    min-height: 74px;
+    cursor: pointer;
+}
+
+.chat-dialogue-box b { color: var(--gold); }
+
+/* El héroe habla en azul claro y el personaje en dorado, como en las aventuras clásicas */
+.chat-dialogue-box.hero-speaking b,
+.chat-dialogue-box.hero-speaking p { color: #67e8f9; }
+
+.chat-continue {
+    position: absolute;
+    right: 12px;
+    bottom: 6px;
+    color: var(--gold);
+    visibility: hidden;
+    animation: chatBlink 1s steps(2) infinite;
+}
+
+.chat-continue.visible { visibility: visible; }
+
+@keyframes chatBlink {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.chat-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.chat-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chat-option { text-align: left; color: #7dd3fc; }
+.chat-option:hover:not(:disabled) { color: var(--gold); }
+.chat-option.asked { color: #64748b; }
+
+.chat-free-row { display: flex; gap: 8px; }
+
+.chat-input {
+    flex: 1;
+    background: #050a07;
+    cursor: text;
+}
+
+.chat-free-counter {
+    font-size: 0.7em;
+    text-align: right;
+    opacity: 0.7;
+}
+
+.chat-leave {
+    text-align: center;
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+@media screen and (max-width: 768px) {
+    .chat-scene { height: 240px; }
+}

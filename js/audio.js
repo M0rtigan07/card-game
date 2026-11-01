@@ -31,6 +31,13 @@ export class AudioManager {
             gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
             osc.start(); osc.stop(this.ctx.currentTime + 0.2);
+        } else if (type === 'blip') {
+            // Pitido corto de la máquina de escribir de las conversaciones
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(520 + Math.random() * 120, this.ctx.currentTime);
+            gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+            osc.start(); osc.stop(this.ctx.currentTime + 0.04);
         }
     }
 }
