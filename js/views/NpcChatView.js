@@ -50,7 +50,7 @@ export class NpcChatView {
                     <input type="text" id="playerChatInput" class="choice-btn chat-input" autocomplete="off" />
                     <button id="btnSendChat" class="fantasy-btn">Hablar 💬</button>
                 </div>
-                <div id="chatFreeCounter" class="chat-free-counter"></div>
+               
                 <button id="btnLeaveChat" class="choice-btn chat-leave">🚪 Despedirse y marchar</button>
             </div>
         `;
