@@ -1,0 +1,1486 @@
+:root {
+    --bg-dark: #08060c;
+    --panel-bg: linear-gradient(135deg, #1b1226 0%, #2a183d 100%);
+    --gold: #ffd700;
+    --gold-light: #f9e7c2;
+    --gold-border: #bfa76a;
+    --sega-blue: #0055ff;
+    --sega-red: #ff0044;
+    --text-main: #f3e8ff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    font-family: 'Cinzel', serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* OVERLAY CRT GLOBAL */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+        radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.6) 100%);
+    background-size: 100% 4px, 100% 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* SISTEMA DE PANTALLAS */
+.screen {
+    display: none !important;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--bg-dark);
+    z-index: 10;
+    filter: contrast(110%) saturate(120%);
+}
+
+.screen.active {
+    display: flex !important;
+}
+
+/* PANTALLA DE CARGA */
+#loadingScreen {
+    background: radial-gradient(circle, #1a0b2e 0%, #05020a 100%);
+    z-index: 999;
+}
+
+.loading-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background: rgba(12, 8, 24, 0.9);
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 35px 50px;
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.3);
+}
+
+.loading-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.85em;
+    color: var(--gold);
+    text-shadow: 2px 2px #000;
+}
+
+.loading-bar-container {
+    width: 280px;
+    height: 16px;
+    background: #000;
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 2px;
+}
+
+.loading-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #ffd700);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 4px solid rgba(255, 215, 0, 0.2);
+    border-top: 4px solid var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* PANTALLA DE TÍTULO */
+#titleScreen {
+    background: linear-gradient(rgba(10, 5, 20, 0.25), rgba(10, 5, 20, 0.65)),
+        url('../img/intro.jpg') no-repeat center center / cover;
+    text-align: center;
+    justify-content: flex-end;
+    padding-bottom: 70px;
+}
+
+.title-content-box {
+    background: rgba(12, 8, 24, 0.75);
+    padding: 25px 40px;
+    border-radius: 16px;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 215, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    z-index: 5;
+}
+
+.sega-logo {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1em;
+    color: #fff;
+    text-shadow: 3px 3px var(--sega-blue), -3px -3px var(--sega-red);
+    letter-spacing: 3px;
+}
+
+.game-title-retro {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 3.8em;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.9), 4px 4px 0px #000;
+    line-height: 1;
+}
+
+.press-start {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1em;
+    color: #fff;
+    cursor: pointer;
+    animation: blink 0.8s infinite;
+    padding: 14px 28px;
+    border: 3px solid var(--gold);
+    background: rgba(255, 215, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes blink {
+
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
+/* SELECCIÓN DE PERSONAJE */
+#charScreen {
+    background: radial-gradient(circle, #201035 0%, #08040d 100%);
+    padding: 20px;
+}
+
+.retro-heading {
+    font-family: 'Press Start 2P', cursive;
+    color: var(--gold);
+    font-size: 1.4em;
+    margin-bottom: 30px;
+    text-align: center;
+    text-shadow: 2px 2px #000;
+}
+
+.char-grid {
+    display: flex;
+    gap: 20px;
+    max-width: 1000px;
+    width: 100%;
+    justify-content: center;
+}
+
+.char-card {
+    flex: 1;
+    background: linear-gradient(145deg, #2a1a40 0%, #150b24 100%);
+    border: 3px solid var(--gold-border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.char-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: var(--gold);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+}
+
+.char-avatar {
+    width: 100%;
+    max-width: 180px;
+    margin-bottom: 10px;
+}
+
+.char-avatar img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid var(--gold-border);
+}
+
+.char-name {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9em;
+    color: var(--gold);
+    margin-bottom: 12px;
+}
+
+.char-desc {
+    font-size: 0.85em;
+    color: #d8b4fe;
+    line-height: 1.4;
+    margin-bottom: 15px;
+}
+
+.char-stats {
+    width: 100%;
+    font-size: 0.8em;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px;
+    border-radius: 6px;
+    text-align: left;
+}
+
+/* INTRO / LORE */
+#introScreen {
+    background: linear-gradient(rgba(10, 5, 20, 0.55), rgba(10, 5, 20, 0.85)),
+        url('../img/dungeon_intro_bg.png') no-repeat center center / cover;
+    padding: 20px;
+}
+
+.intro-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    max-width: 850px;
+    width: 90%;
+    background: rgba(12, 8, 24, 0.92);
+    border: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(4px);
+}
+
+.intro-hero-portrait {
+    flex: 0 0 200px;
+    width: 200px;
+    height: 280px;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+}
+
+.intro-hero-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.intro-narrative-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.intro-header-title {
+    font-family: 'Press Start 2P', cursive;
+    color: var(--gold);
+    font-size: 0.9em;
+}
+
+.typewriter-box {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75em;
+    color: #4ade80;
+    line-height: 1.8;
+    min-height: 140px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #22c55e;
+    border-radius: 6px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+/* TECLADO INGRESO DE NOMBRE GÓTICO */
+#nameEntryScreen {
+    background: linear-gradient(rgba(3, 8, 5, 0.65), rgba(3, 8, 5, 0.85)),
+        url('../img/introNombre.jpg') no-repeat center center / cover;
+    padding: 20px;
+    position: relative;
+}
+
+.castlevania-name-box {
+    background: linear-gradient(180deg, #18221c 0%, #0c140f 100%);
+    border: 4px solid #3e5045;
+    outline: 2px solid #111a14;
+    border-radius: 14px;
+    padding: 28px 24px;
+    width: 92%;
+    max-width: 580px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 35px rgba(22, 60, 42, 0.8), inset 0 0 25px rgba(0, 0, 0, 0.95);
+}
+
+.castlevania-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #92ab9d;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.castlevania-display-name {
+    width: 100%;
+    max-width: 380px;
+    background: #050a07;
+    border: 2px solid #33473b;
+    border-radius: 6px;
+    padding: 10px 15px;
+    text-align: center;
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 1.8em;
+    color: #e2f0e8;
+    letter-spacing: 4px;
+    margin-bottom: 18px;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9);
+}
+
+.castlevania-keyboard {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    width: 100%;
+    background: rgba(8, 15, 11, 0.85);
+    padding: 16px;
+    border: 2px solid #28382e;
+    border-radius: 8px;
+}
+
+.cv-key {
+    background: linear-gradient(180deg, #2c3831 0%, #161e19 100%);
+    border: 1px solid #4a5d51;
+    color: #c0d4c8;
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 1.3em;
+    padding: 8px 0;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.12s ease;
+}
+
+.cv-key:hover {
+    background: linear-gradient(180deg, #3f5247 0%, #223027 100%);
+    color: #ffffff;
+    border-color: #728c7d;
+}
+
+/* MAQUETACIÓN PRINCIPAL DEL JUEGO */
+#gameScreen {
+    padding: 10px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: 15px;
+    width: 100%;
+    max-width: 1350px;
+    height: 94vh;
+    height: 94dvh;
+    background: rgba(20, 15, 30, 0.95);
+    border: 3px solid var(--gold-border);
+    border-radius: 16px;
+    box-shadow: 0 0 30px rgba(191, 167, 106, 0.25);
+    padding: 15px;
+    overflow: hidden;
+}
+
+#leftSidebar,
+#rightSidebar {
+    background: var(--panel-bg);
+    padding: 14px;
+    border-radius: 12px;
+    border: 2px solid var(--gold-border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+/* BARRA DE SCROLL ESTILIZADA RETRO */
+#leftSidebar::-webkit-scrollbar,
+#rightSidebar::-webkit-scrollbar,
+#playerInventory::-webkit-scrollbar {
+    width: 6px;
+}
+
+#leftSidebar::-webkit-scrollbar-thumb,
+#rightSidebar::-webkit-scrollbar-thumb,
+#playerInventory::-webkit-scrollbar-thumb {
+    background: var(--gold-border);
+    border-radius: 4px;
+}
+
+#leftSidebar h2,
+#rightSidebar h2 {
+    color: var(--gold);
+    font-size: 1em;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--gold-border);
+    padding-bottom: 4px;
+}
+
+/* HOJA DE HÉROE (SIDEBAR IZQUIERDO) */
+.sidebar-header-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-class-subtitle {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold-light);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--gold-border);
+}
+
+.hero-card-frame {
+    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.hero-card-image-box {
+    width: 100%;
+    height: 140px;
+    background: #000;
+    border: 1px solid var(--gold-border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-card-image-box img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.character-tag {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6em;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--gold-border);
+    text-transform: uppercase;
+}
+
+.stat-item {
+    font-size: 0.85em;
+    background: rgba(30, 10, 50, 0.4);
+    border-left: 4px solid var(--gold);
+    border-radius: 6px;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.xp-container {
+    width: 100%;
+    background-color: #111;
+    border: 1px solid var(--gold-border);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.xp-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #8bc34a);
+}
+
+#playerInventory {
+    list-style: none;
+    max-height: 100px;
+    overflow-y: auto;
+    background: rgba(10, 5, 20, 0.5);
+    border: 1px solid var(--gold-border);
+    border-radius: 6px;
+    padding: 4px;
+}
+
+#playerInventory li {
+    font-size: 0.8em;
+    padding: 3px 5px;
+    margin-bottom: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* D-PAD SEGA */
+.dpad-container {
+    background: rgba(10, 6, 20, 0.8);
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: auto;
+}
+
+.dpad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 28px);
+    grid-template-rows: repeat(3, 28px);
+    gap: 2px;
+}
+
+.dpad-btn {
+    background: linear-gradient(135deg, #2a2a3a 0%, #15151a 100%);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.dpad-btn:active {
+    background: var(--gold);
+    color: #000;
+}
+
+.dpad-center {
+    background: #111;
+    border-radius: 50%;
+    border: 1px solid #333;
+}
+
+/* PANEL CENTRAL (ESTILO ELVIRA) */
+#mainContent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 4px 10px;
+    text-align: center;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+h1 {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 2em;
+    color: var(--gold);
+}
+
+/* 1. TEXTO DEL MASTER (ARRIBA) */
+.exploration-panel {
+    background: linear-gradient(135deg, rgba(27, 18, 38, 0.95), rgba(15, 10, 24, 0.95));
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 12px 16px;
+    width: 100%;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+#explorationText {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95em;
+    color: var(--gold-light);
+    line-height: 1.4;
+}
+
+.monkey-dialogue-box {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    background: rgba(10, 5, 15, 0.95);
+    border: 2px solid #ffd700;
+    color: #f3e8ff;
+    padding: 12px 16px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    z-index: 100;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.monkey-dialogue-box b {
+    color: #ff4d4d;
+    display: block;
+    margin-bottom: 4px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 2. ESCENA PIXEL ART (DEBAJO) */
+.elvira-scene-frame {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    height: 460px;
+    background: #000;
+    border: 3px solid #ffd700;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.elvira-scene-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;      /* Mantiene la proporción de la imagen completa sin recortarla */
+    background-color: #000;   /* Fondo negro lateral si la foto es más estrecha */
+    image-rendering: pixelated;
+    /* Hace que la imagen cubra todo el marco sin verse pequeña */
+}
+
+.vs-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.character-portrait {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.character-portrait img {
+    max-height: 120px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.vs-badge {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.3em;
+    color: #ef4444;
+}
+
+/* ENEMIGO Y ACCIONES */
+.enemy-card-status {
+    width: 100%;
+    background: linear-gradient(135deg, #370606 0%, #170303 100%);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+.enemy-stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    font-size: 0.8em;
+    color: #fca5a5;
+    margin-top: 2px;
+}
+
+.choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.choice-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 0.85em;
+    background: linear-gradient(90deg, #1f132e 0%, #2a1b3d 100%);
+    color: var(--gold);
+    border: 2px solid var(--gold-border);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.choice-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    background: linear-gradient(90deg, #2a1b3d 0%, #3b2352 100%);
+}
+
+.choice-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.fantasy-btn {
+    background: linear-gradient(90deg, #bfa76a 0%, #d4af37 100%);
+    border: 2px solid #fff;
+    border-radius: 8px;
+    color: #2c1602;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    font-size: 0.9em;
+    padding: 8px 18px;
+    cursor: pointer;
+}
+
+/* TABLERO DE CARTAS TCG */
+.tcg-hand {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+    min-height: 160px;
+    padding: 10px;
+    background: rgba(10, 5, 20, 0.6);
+    border: 2px solid var(--gold-border);
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+.tcg-card {
+    width: 100px;
+    height: 145px;
+    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.tcg-card:hover {
+    transform: translateY(-12px) scale(1.1) !important;
+    border-color: #fff176;
+}
+
+.tcg-card .cost-gem {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
+    border: 1px solid #93c5fd;
+    border-radius: 50%;
+    color: white;
+    font-size: 0.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tcg-card-img {
+    width: 100%;
+    height: 55px;
+    object-fit: cover;
+    border: 1px solid #d4af37;
+    border-radius: 4px;
+}
+
+.tcg-card .title {
+    font-size: 0.65em;
+    color: #fef08a;
+    font-weight: bold;
+}
+
+.tcg-card .desc {
+    font-size: 0.55em;
+    color: #cbd5e1;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px;
+    border-radius: 3px;
+    width: 100%;
+}
+
+/* DIARIO Y DRAGÓN */
+#eventList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#eventList li {
+    font-size: 0.78em;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 5px 7px;
+    border-radius: 6px;
+    border-left: 3px solid var(--gold-border);
+}
+
+.sidebar-dragon-box {
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid var(--gold-border);
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar-dragon-img {
+    width: 100%;
+    max-height: 130px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* MODALES */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background: rgba(10, 5, 20, 0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.fantasy-modal {
+    background: linear-gradient(145deg, #22172f 0%, #150d22 100%);
+    border: 4px solid var(--gold);
+    border-radius: 18px;
+    padding: 25px;
+    width: 90%;
+    max-width: 440px;
+    text-align: center;
+}
+
+/* 📱 ADAPTABILIDAD RESPONSIVA PARA TABLETS Y PANTALLAS PEQUEÑAS */
+@media screen and (max-width: 1024px) {
+    body {
+        overflow-y: auto;
+    }
+
+    .container {
+        grid-template-columns: 240px 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    #rightSidebar {
+        background: var(--panel-bg);
+        padding: 14px;
+        border-radius: 12px;
+        border: 2px solid var(--gold-border);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+        /* Fija el alto al contenedor principal */
+        max-height: 86vh;
+        /* Límite máximo para que no se desborde */
+        overflow: hidden;
+        /* Impide que el panel entero haga scroll global */
+        min-width: 0;
+    }
+
+    #eventList {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+        /* Toma estrictamente el espacio sobrante entre el título y el dragón */
+        overflow-y: auto;
+        /* El scroll vertical ocurre ÚNICAMENTE aquí */
+        padding-right: 4px;
+    }
+
+    #eventList::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    #eventList::-webkit-scrollbar-thumb {
+        background: var(--gold-border);
+        border-radius: 4px;
+    }
+
+    #eventList li {
+        font-size: 0.78em;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 5px 7px;
+        border-radius: 6px;
+        border-left: 3px solid var(--gold-border);
+    }
+
+    .sidebar-dragon-box {
+        margin-top: auto;
+        /* Lo empuja y ancla rígidamente al fondo del panel */
+        padding-top: 6px;
+        border-top: 1px solid var(--gold-border);
+        display: flex;
+        justify-content: center;
+        flex-shrink: 0;
+        /* Evita que el dragón se comprima o desaparezca */
+    }
+
+    .sidebar-dragon-img {
+        width: 100%;
+        max-height: 130px;
+        object-fit: contain;
+        image-rendering: pixelated;
+    }
+
+    .char-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .char-card {
+        width: 100%;
+        max-width: 380px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .elvira-scene-frame {
+        height: 160px;
+    }
+}
+
+/* ═══════════ COMBATE TCG: JUGADA ENEMIGA VISIBLE ═══════════ */
+
+.enemy-intent {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.enemy-intent-card {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    max-width: 440px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 2px solid #ef4444;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.intent-head {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.5em;
+    color: #fca5a5;
+}
+
+.intent-name {
+    color: var(--gold);
+    font-size: 1em;
+}
+
+.intent-desc {
+    color: var(--text-main);
+    font-size: 0.8em;
+}
+
+/* Color del borde según el tipo de jugada */
+.intent-def { border-color: #60a5fa; }
+.intent-heal { border-color: #4ade80; }
+.intent-poison { border-color: #c084fc; }
+.intent-buff { border-color: #fb923c; }
+.intent-drain { border-color: #f43f5e; }
+
+.enemy-intent-card.playing {
+    animation: intentPlay 0.9s ease-out;
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.7);
+}
+
+.combat-status-line {
+    min-height: 1.2em;
+    margin-top: 6px;
+    font-size: 0.75em;
+    color: #e9d5ff;
+    text-align: center;
+}
+
+/* Números flotantes sobre los retratos */
+.character-portrait {
+    position: relative;
+}
+
+.float-text {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    z-index: 5;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1em;
+    text-shadow: 2px 2px 0 #000;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: floatUp 1s ease-out forwards;
+}
+
+.float-dmg { color: #ef4444; }
+.float-heal { color: #4ade80; }
+.float-shield { color: #60a5fa; }
+.float-poison { color: #c084fc; }
+.float-buff { color: #fb923c; }
+
+.hit-shake {
+    animation: hitShake 0.4s;
+}
+
+@keyframes floatUp {
+    0% { opacity: 0; transform: translate(-50%, 10px); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -55px); }
+}
+
+@keyframes hitShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
+}
+
+@keyframes intentPlay {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+}
+
+/* Mientras juega el enemigo */
+.tcg-hand.locked {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.fantasy-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.6);
+}
+
+/* Etiqueta de la escena (ZONA DE DUELO, nombre del PNJ...): estaba sin estilo */
+.elvira-scene-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    padding: 4px 8px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55em;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.75);
+    border: 1px solid var(--gold-border);
+    border-radius: 4px;
+}
+
+/* ═══════════ COMBATE TCG: ENERGÍA POR TURNO ═══════════ */
+
+.energy-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.energy-label {
+    margin-right: 4px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.5em;
+    color: #93c5fd;
+}
+
+.energy-pip {
+    font-size: 1.3em;
+    filter: grayscale(1) brightness(0.35);
+    transition: filter 0.2s, transform 0.2s;
+}
+
+.energy-pip.full {
+    filter: drop-shadow(0 0 6px #facc15);
+    transform: scale(1.1);
+}
+
+/* Carta que no puedes pagar este turno */
+.tcg-card.unplayable {
+    filter: grayscale(0.8) brightness(0.55);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ═══════════ RECOMPENSA DE CARTAS Y RAREZAS ═══════════ */
+
+.energy-deck {
+    margin-left: 10px;
+    font-size: 0.7em;
+    color: var(--text-main);
+    opacity: 0.8;
+}
+
+.tcg-card.rarity-uncommon { border-color: #4ade80; }
+
+.tcg-card.rarity-rare {
+    border-color: #c084fc;
+    box-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
+}
+
+.reward-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    padding: 20px;
+    background: rgba(5, 2, 12, 0.94);
+}
+
+.reward-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9em;
+    color: var(--gold);
+    text-align: center;
+}
+
+.reward-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 22px;
+}
+
+.reward-card {
+    width: 150px;
+    height: 215px;
+    padding: 8px;
+}
+
+.reward-card .tcg-card-img { height: 85px; }
+.reward-card .title { font-size: 0.85em; }
+.reward-card .desc { font-size: 0.72em; }
+
+.rarity-tag {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.4em;
+    color: #cbd5e1;
+}
+
+.reward-skip {
+    padding: 8px 20px;
+}
+
+/* ═══════════ EL ENEMIGO HABLA (cada personaje con su estilo) ═══════════ */
+
+.enemy-speech {
+    min-height: 1.5em;
+    max-width: 460px;
+    margin: 8px auto 0;
+    padding: 6px 12px;
+    font-style: italic;
+    font-size: 0.85em;
+    text-align: center;
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.08);
+    border-left: 3px solid #ef4444;
+    border-right: 3px solid #ef4444;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.enemy-speech.visible {
+    opacity: 1;
+    animation: speechPop 0.35s ease-out;
+}
+
+@keyframes speechPop {
+    0% { transform: scale(0.92); }
+    60% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
+.speech-valerius { font-family: 'Cinzel', serif; color: #fca5a5; border-color: #9f1239; letter-spacing: 0.02em; }
+.speech-morgana { color: #d8b4fe; border-color: #a855f7; }
+.speech-vikinga { color: #fde68a; border-color: #d97706; font-style: normal; font-weight: 700; }
+.speech-mongol { color: #fdba74; border-color: #ea580c; }
+.speech-barnaby { color: #fcd34d; border-color: #ca8a04; }
+.speech-corrupto { color: #d1d5db; border-color: #6b7280; font-style: normal; }
+.speech-automata { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.08em; font-style: normal; color: #67e8f9; border-color: #06b6d4; }
+.speech-orco { text-transform: uppercase; font-style: normal; font-weight: 800; color: #86efac; border-color: #16a34a; }
+.speech-gargola { color: #cbd5e1; border-color: #64748b; letter-spacing: 0.1em; }
+.speech-hechicero { color: #93c5fd; border-color: #3b82f6; }
+.speech-dragon { font-family: 'Cinzel', serif; font-size: 1em; font-weight: 700; font-style: normal; color: #fb923c; border-color: #dc2626; }
+
+/* ═══════════ INVENTARIO: OBJETOS CON EFECTO ═══════════ */
+
+.inv-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3px 8px;
+    margin-bottom: 5px;
+    padding: 5px 8px;
+    font-size: 0.8em;
+    list-style: none;
+    background: rgba(30, 10, 50, 0.4);
+    border-left: 4px solid #a855f7;
+    border-radius: 6px;
+}
+
+.inv-consumable { border-left-color: #4ade80; }
+
+.inv-effect {
+    flex-basis: 100%;
+    color: #d8b4fe;
+}
+
+.inv-use-btn {
+    margin-left: auto;
+    padding: 2px 12px;
+    font-family: inherit;
+    font-size: 0.9em;
+    color: #0f0a1f;
+    background: var(--gold);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.inv-use-btn:hover { filter: brightness(1.15); }
+
+/* ═══════════ JEFES ═══════════ */
+
+.boss-title {
+    color: #ef4444;
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.8), 2px 2px 0 #000;
+    animation: bossPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes bossPulse {
+    0%, 100% { text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 2px 2px 0 #000; }
+    50% { text-shadow: 0 0 20px rgba(239, 68, 68, 1), 2px 2px 0 #000; }
+}
+
+/* Estilo de habla de los jefes */
+.speech-orco_jefe { text-transform: uppercase; font-style: normal; font-weight: 800; font-size: 0.95em; color: #86efac; border-color: #15803d; }
+.speech-vampira_jefa { font-family: 'Cinzel', serif; color: #f9a8d4; border-color: #be185d; letter-spacing: 0.03em; }
+.speech-escorpiones_jefe { font-family: 'Courier New', monospace; font-style: normal; letter-spacing: 0.04em; color: #a5b4fc; border-color: #4338ca; }
+.speech-dragon_jefe { font-family: 'Cinzel', serif; font-size: 1.05em; font-weight: 700; font-style: normal; color: #fdba74; border-color: #b91c1c; text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }
+
+/* ═══════════ CONVERSACIONES (ESTILO AVENTURA GRÁFICA) ═══════════ */
+
+.chat-scene { height: 320px; }
+
+.chat-scene .chat-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.chat-scene .chat-portrait.talking { animation: chatBob 0.5s ease-in-out infinite; }
+
+@keyframes chatBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* .chat-scene delante: la regla genérica `.elvira-scene-frame img` fuerza width/height 100 % a toda imagen de la escena */
+.chat-scene .chat-hero-portrait {
+    position: absolute;
+    left: 10px;
+    bottom: 100px;
+    z-index: 2;
+    width: 62px;
+    height: 62px;
+    object-fit: cover;
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    opacity: 0.5;
+    filter: grayscale(0.6);
+    transition: opacity 0.2s, transform 0.2s, filter 0.2s;
+}
+
+.chat-scene .chat-hero-portrait.speaking {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.1);
+    border-color: #22d3ee;
+}
+
+.chat-dialogue-box {
+    min-height: 74px;
+    cursor: pointer;
+}
+
+.chat-dialogue-box b { color: var(--gold); }
+
+/* El héroe habla en azul claro y el personaje en dorado, como en las aventuras clásicas */
+.chat-dialogue-box.hero-speaking b,
+.chat-dialogue-box.hero-speaking p { color: #67e8f9; }
+
+.chat-continue {
+    position: absolute;
+    right: 12px;
+    bottom: 6px;
+    color: var(--gold);
+    visibility: hidden;
+    animation: chatBlink 1s steps(2) infinite;
+}
+
+.chat-continue.visible { visibility: visible; }
+
+@keyframes chatBlink {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.chat-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.chat-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chat-option { text-align: left; color: #7dd3fc; }
+.chat-option:hover:not(:disabled) { color: var(--gold); }
+.chat-option.asked { color: #64748b; }
+
+.chat-free-row { display: flex; gap: 8px; }
+
+.chat-input {
+    flex: 1;
+    background: #050a07;
+    cursor: text;
+}
+
+.chat-free-counter {
+    font-size: 0.7em;
+    text-align: right;
+    opacity: 0.7;
+}
+
+.chat-leave {
+    text-align: center;
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+@media screen and (max-width: 768px) {
+    .chat-scene { height: 240px; }
+}

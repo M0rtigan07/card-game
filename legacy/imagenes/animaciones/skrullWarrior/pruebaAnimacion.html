@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Animación - Esqueleto en la Mazmorra</title>
+    <style>
+        body {
+            background-color: #111;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid #444;
+            image-rendering: pixelated; /* Mantiene nítidos los píxeles */
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Guerrero Esqueleto - Animación Idle</h2>
+    <!-- Canvas donde se dibujará la animación -->
+    <canvas id="gameCanvas" width="512" height="512"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let spriteData = null;
+        let spriteImage = new Image();
+        let currentFrame = 0;
+        let lastTime = 0;
+        const frameDuration = 80; // Duración de cada frame en ms (según tu JSON)
+
+        // 1. Cargar el archivo JSON con los datos de los recortes
+        fetch('skrullWarrior.json')
+            .then(response => response.json())
+            .then(data => {
+                spriteData = data;
+                // 2. Cargar la imagen del sprite sheet
+                spriteImage.src = data.meta.image;
+                spriteImage.onload = () => {
+                    requestAnimationFrame(updateAnimation);
+                };
+            })
+            .catch(error => console.error('Error al cargar el JSON:', error));
+
+        // 3. Bucle de animación
+        function updateAnimation(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+
+            if (deltaTime >= frameDuration) {
+                // Avanzar al siguiente fotograma y volver al inicio si llega al final
+                currentFrame = (currentFrame + 1) % spriteData.frames.length;
+                lastTime = timestamp;
+            }
+
+            // Limpiar el canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Obtener los datos del fotograma actual desde el JSON
+            const frameInfo = spriteData.frames[currentFrame].frame;
+
+            // Dibujar el trozo correspondiente de la hoja de sprites en el canvas
+            ctx.drawImage(
+                spriteImage,
+                frameInfo.x, frameInfo.y, frameInfo.w, frameInfo.h, // Coordenadas de recorte en la imagen grande
+                0, 0, canvas.width, canvas.height                  // Dónde y de qué tamaño se pinta en pantalla
+            );
+
+            requestAnimationFrame(updateAnimation);
+        }
+    </script>
+
+</body>
+</html>
