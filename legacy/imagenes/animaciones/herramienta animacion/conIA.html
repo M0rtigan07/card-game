@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpriteFrame Studio - Estudio Local Profesional</title>
+    <style>
+        :root {
+            --bg-color: #f7f5eb;
+            --card-bg: #ffffff;
+            --border-color: #1a1a1a;
+            --accent-blue: #0070f3;
+            --accent-green: #10b981;
+            --text-main: #111111;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 { margin: 0; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 4px 4px 0px var(--border-color);
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-tag {
+            background: #e2e8f0;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 13px;
+        }
+
+        .upload-box {
+            width: 100%;
+            height: 140px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fafafa;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .upload-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .upload-box.loaded {
+            border-color: var(--accent-green);
+            background-color: #ecfdf5;
+        }
+
+        /* Botonera de Acción Ampliada */
+        .motion-btn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn-motion {
+            background: #fff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-motion:hover {
+            background: #f1f5f9;
+        }
+
+        .btn-motion.active {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+
+        .mix-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .mix-box {
+            flex: 1;
+            height: 110px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .mix-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .mix-label {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.75);
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            padding: 3px;
+        }
+
+        .btn-action {
+            width: 100%;
+            background: var(--accent-blue);
+            color: white;
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: 2px 2px 0px var(--border-color);
+        }
+
+        .btn-action:hover { opacity: 0.95; }
+
+        #viewportCanvas {
+            width: 100%;
+            height: 400px;
+            background: #000;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            display: block;
+        }
+
+        .status-box {
+            background: #f1f5f9;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚡ SpriteFrame Studio <span>(Estudio Local)</span></h1>
+    </header>
+
+    <div class="container">
+        
+        <!-- COLUMNA IZQUIERDA: CONTROLES -->
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            
+            <!-- Paso 01: Personaje Aislado -->
+            <div class="card">
+                <div class="card-title"><span class="step-tag">01</span> Personaje Aislado (PNG Transparente)</div>
+                <div class="upload-box" id="charBox" onclick="document.getElementById('fileChar').click()">
+                    <img id="prevChar" style="display:none;">
+                    <span id="txtChar" style="color:#666; font-size:12px;">Haz clic para subir tu personaje (ej. barnaby_aislado.png)</span>
+                    <input type="file" id="fileChar" accept="image/*" style="display:none;" onchange="loadChar(event)">
+                </div>
+            </div>
+
+            <!-- Paso 02: Acciones Ampliadas -->
+            <div class="card">
+                <div class="card-title"><span class="step-tag">02</span> Seleccionar Acción de Movimiento</div>
+                <div class="motion-btn-grid">
+                    <button class="btn-motion active" onclick="setMotion('Reposo', 1)">🌀 Reposo</button>
+                    <button class="btn-motion" onclick="setMotion('Caminar', 2)">🚶 Caminar</button>
+                    <button class="btn-motion" onclick="setMotion('Correr', 3)">🏃 Correr</button>
+                    <button class="btn-motion" onclick="setMotion('Atacar', 4)">🗡️ Atacar</button>
+                    <button class="btn-motion" onclick="setMotion('Daño', 5)">💥 Daño</button>
+                    <button class="btn-motion" onclick="setMotion('Victoria', 6)">✨ Victoria</button>
+                </div>
+            </div>
+
+            <!-- Paso 02b: Fondo de Escenario Mejorado -->
+            <div class="card">
+                <div class="card-title"><span class="step-tag">02b</span> Fondo del Escenario (Mazmorra)</div>
+                <div class="mix-container">
+                    <div class="mix-box" id="bgBox" onclick="document.getElementById('fileBg').click()">
+                        <img id="prevBg" style="display:none;">
+                        <span id="txtBg" style="font-size:10px; text-align:center; color:#666;">Subir fondo_mazmorra.png</span>
+                        <div class="mix-label">Fondo Escenario</div>
+                        <input type="file" id="fileBg" accept="image/*" style="display:none;" onchange="loadBg(event)">
+                    </div>
+                </div>
+                <button class="btn-action" onclick="generateSpriteSheetAndJSON()">Generar Sprite Sheet & JSON (5x5)</button>
+            </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: VISUALIZACIÓN EN TIEMPO REAL -->
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+                <div class="card-title"><span class="step-tag">03</span> Previsualización Interactiva de Escena</div>
+                <canvas id="viewportCanvas" width="512" height="512"></canvas>
+            </div>
+
+            <div class="status-box" id="statusBox">
+                <strong>ESTADO:</strong> Sube tu personaje y el fondo de la mazmorra para comenzar la integración en tiempo real.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Canvas oculto para exportar la hoja de sprites -->
+    <canvas id="sheetCanvas" width="2560" height="2560" style="display:none;"></canvas>
+
+    <script>
+        const canvas = document.getElementById('viewportCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let charImg = null;
+        let bgImg = null;
+        let currentMotion = 'Reposo';
+        let motionType = 1;
+        let frameIndex = 0;
+        let animId = null;
+
+        function loadChar(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                charImg = new Image();
+                charImg.src = evt.target.result;
+                charImg.onload = () => {
+                    const p = document.getElementById('prevChar');
+                    p.src = evt.target.result;
+                    p.style.display = 'block';
+                    document.getElementById('charBox').classList.add('loaded');
+                    document.getElementById('txtChar').style.display = 'none';
+                    checkAndStart();
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function loadBg(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                bgImg = new Image();
+                bgImg.src = evt.target.result;
+                bgImg.onload = () => {
+                    const p = document.getElementById('prevBg');
+                    p.src = evt.target.result;
+                    p.style.display = 'block';
+                    document.getElementById('bgBox').classList.add('loaded');
+                    document.getElementById('txtBg').style.display = 'none';
+                    checkAndStart();
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function setMotion(name, type) {
+            currentMotion = name;
+            motionType = type;
+            document.querySelectorAll('.btn-motion').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('statusBox').innerHTML = `
+                <strong>ESTADO:</strong> Acción cambiada a <span style="color:var(--accent-blue);">${name}</span>.<br>
+                • Integración de fondo y luces activa en tiempo real.
+            `;
+        }
+
+        function checkAndStart() {
+            if (charImg && bgImg) {
+                document.getElementById('statusBox').innerHTML = `
+                    <strong style="color:green;">¡ESCENA INTEGRADA CON ÉXITO!</strong><br>
+                    • Fondo de mazmorra y personaje sincronizados.<br>
+                    • Sombra de contacto volumétrica e iluminación activas.
+                `;
+                startAnimationLoop();
+            }
+        }
+
+        function startAnimationLoop() {
+            if (animId) cancelAnimationFrame(animId);
+            
+            let lastTime = 0;
+            const fpsInterval = 1000 / 12; // Velocidad estándar fluida (12 FPS)
+
+            function loop(timestamp) {
+                if (!lastTime) lastTime = timestamp;
+                const elapsed = timestamp - lastTime;
+
+                if (elapsed > fpsInterval) {
+                    lastTime = timestamp;
+                    frameIndex = (frameIndex + 1) % 25;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 1. Dibujar el fondo de la mazmorra de alta calidad
+                if (bgImg) {
+                    ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                }
+
+                // 2. Efecto de iluminación ambiental y sombra de contacto en el suelo
+                ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+                ctx.beginPath();
+                ctx.ellipse(260, 485, 80, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 3. Modulación de movimiento según la acción seleccionada
+                let offsetY = 0;
+                let offsetX = 0;
+                if (motionType === 1) { // Reposo
+                    offsetY = Math.sin(frameIndex * 0.25) * 3;
+                } else if (motionType === 2) { // Caminar
+                    offsetY = Math.abs(Math.sin(frameIndex * 0.4)) * -6;
+                } else if (motionType === 3) { // Correr
+                    offsetY = Math.abs(Math.sin(frameIndex * 0.6)) * -10;
+                    offsetX = Math.sin(frameIndex * 0.3) * 4;
+                } else if (motionType === 4) { // Atacar
+                    offsetX = (frameIndex > 10 && frameIndex < 18) ? 15 : 0;
+                } else if (motionType === 5) { // Daño
+                    offsetX = (frameIndex % 4 < 2) ? -6 : 6;
+                } else if (motionType === 6) { // Victoria
+                    offsetY = Math.sin(frameIndex * 0.4) * 8;
+                }
+
+                // 4. Dibujar al personaje integrado con iluminación de su propia linterna
+                if (charImg) {
+                    ctx.drawImage(charImg, offsetX, offsetY, canvas.width, canvas.height);
+                }
+
+                // 5. Brillo cálido de la linterna interactuando con el entorno de la mazmorra
+                const lX = 390 + (motionType === 4 ? offsetX : 0);
+                const lY = 350 + offsetY;
+                const grad = ctx.createRadialGradient(lX, lY, 5, lX, lY, 120);
+                grad.addColorStop(0, 'rgba(255, 160, 40, 0.4)');
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                animId = requestAnimationFrame(loop);
+            }
+            animId = requestAnimationFrame(loop);
+        }
+
+        function generateSpriteSheetAndJSON() {
+            if (!charImg || !bgImg) {
+                alert("Por favor, sube tanto el personaje aislado como el fondo de la mazmorra antes de exportar.");
+                return;
+            }
+
+            const sheetCanvas = document.getElementById('sheetCanvas');
+            const sCtx = sheetCanvas.getContext('2d');
+            sCtx.clearRect(0, 0, sheetCanvas.width, sheetCanvas.height);
+
+            const cols = 5;
+            const size = 512;
+            const framesData = [];
+
+            for (let i = 0; i < 25; i++) {
+                const x = (i % cols) * size;
+                const y = Math.floor(i / cols) * size;
+
+                sCtx.save();
+                // Dibujar fondo en cada celda
+                sCtx.drawImage(bgImg, x, y, size, size);
+
+                // Sombra de contacto en celda
+                sCtx.fillStyle = "rgba(0, 0, 0, 0.55)";
+                sCtx.beginPath();
+                sCtx.ellipse(x + 260, y + 485, 80, 12, 0, 0, Math.PI * 2);
+                sCtx.fill();
+
+                // Animación de celda
+                let offsetY = Math.sin(i * 0.25) * 3;
+                sCtx.drawImage(charImg, x, y + offsetY, size, size);
+                sCtx.restore();
+
+                const frameName = `barnaby-${currentMotion.toLowerCase()}-${String(i + 1).padStart(3, '0')}`;
+                framesData.push({
+                    filename: frameName,
+                    frame: { x: x, y: y, w: size, h: size },
+                    rotated: false,
+                    trimmed: false,
+                    spriteSourceSize: { x: 0, y: 0, w: size, h: size },
+                    sourceSize: { w: size, h: size },
+                    duration: 80
+                });
+            }
+
+            // Descargar PNG
+            const linkPng = document.createElement('a');
+            linkPng.download = `barnaby_${currentMotion.toLowerCase()}_spritesheet.png`;
+            linkPng.href = sheetCanvas.toDataURL("image/png");
+            linkPng.click();
+
+            // Descargar JSON
+            const jsonOutput = {
+                frames: framesData,
+                meta: {
+                    app: "SpriteFrame Local Studio",
+                    image: `barnaby_${currentMotion.toLowerCase()}_spritesheet.png`,
+                    format: "RGBA8888",
+                    size: { w: 2560, h: 2560 },
+                    scale: "1",
+                    duration: 2000,
+                    frameTags: [{ name: currentMotion.toLowerCase(), from: 0, to: 24, direction: "forward" }]
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(jsonOutput, null, 2)], { type: "application/json" });
+            const linkJson = document.createElement('a');
+            linkJson.download = `barnaby_${currentMotion.toLowerCase()}.json`;
+            linkJson.href = URL.createObjectURL(blob);
+            linkJson.click();
+
+            document.getElementById('statusBox').innerHTML = `
+                <strong>EXPORTACIÓN EXITOSA:</strong><br>
+                • Archivo PNG y JSON de la acción <span style="color:var(--accent-green);">${currentMotion}</span> descargados correctamente.
+            `;
+        }
+    </script>
+</body>
+</html>
