@@ -101,7 +101,7 @@ export const NPC_DATABASE = {
         name: 'Barnaby el Buhonero',
         images: {
             room: 'img/buhonero_idle.gif',
-            talk: 'img/barnaby_talk.png',
+            talk: 'img/buhonero_habla.gif',
             enraged: 'img/buhonero_desafiante.gif'
         },
         type: 'merchant',
