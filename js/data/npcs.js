@@ -100,9 +100,9 @@ export const NPC_DATABASE = {
         id: 'barnaby',
         name: 'Barnaby el Buhonero',
         images: {
-            room: 'img/barnaby_room.png',
+            room: 'img/buhonero_idle.gif',
             talk: 'img/barnaby_talk.png',
-            enraged: 'img/barnaby_enfado.png'
+            enraged: 'img/buhonero_desafiante.gif'
         },
         type: 'merchant',
         archetype: 'Barnaby el Buhonero, un mercader callejero astuto, precavido, cotilla y un poco cascarrabias',
