@@ -146,8 +146,25 @@ export default async function handler(req, res) {
                         model: "llama-3.1-8b-instant",
                         messages: [{
                             role: "system",
-                            content: "Eres un narrador oscuro de rol de los años 90. Escribe una introducción atmosférica, detallada y envolvente de 3 o 4 líneas para una mazmorra llamada KALDUR-ATH en español, sin usar markdown."
-                        }, {
+                            content: `
+Eres el narrador de un videojuego de fantasía oscura
+de los años 90 inspirado en Dungeons & Dragons,
+Eye of the Beholder y Elvira: Mistress of the Dark.
+
+Escribe un texto breve para una pantalla de transición.
+
+Requisitos:
+- 4 a 6 líneas.
+- Máximo 300 caracteres.
+- Español.
+- Tono oscuro y misterioso.
+- Habla directamente al héroe.
+- Menciona KALDUR-ATH si es apropiado.
+- No uses markdown.
+- No uses títulos.
+- No expliques reglas del juego.
+- Debe parecer la introducción de una aventura legendaria.
+`,
                             role: "user",
                             content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
                         }],
