@@ -73,27 +73,27 @@ export class Game {
         document.getElementById('btnEnterDungeon').addEventListener('click', async () => {
             this.audio.play('sega');
 
-            // 1. Mostramos la pantalla de cinemática de descenso
             this.ui.showScreen('dungeonDescentScreen');
 
-            // 2. Buscamos la caja de texto y ponemos un mensaje inicial de carga
             const storyBox = document.getElementById('descentStoryText');
             if (storyBox) storyBox.textContent = "Forjando tu destino en las tinieblas...";
 
-            // 3. Llamamos a Groq para que cree la historia personalizada del descenso
             let descentLore = "Las leyendas cuentan que una antigua maldición ha despertado en las profundidades. Tu deber y tu espada te obligan a cruzar estas puertas.";
+
             try {
-                const heroIdentifier = (this.player && this.player.className) || this.playerName || "Valiente Aventurero";
+                const heroIdentifier = (this.player && this.player.className) || this.playerName || "Guerrero";
+                console.log("[DEBUG] Solicitando intro para:", heroIdentifier);
 
                 if (this.groq) {
                     const generated = await this.groq.generateIntroLore(heroIdentifier);
+                    console.log("[DEBUG] Respuesta recibida de Groq:", generated);
                     if (generated) descentLore = generated;
                 }
             } catch (e) {
-                console.warn("[Game] Usando texto alternativo para el descenso:", e);
+                console.error("[Game] Error crítico al obtener la intro de Groq:", e);
             }
 
-            // 4. Mostramos la historia con efecto máquina de escribir
+            if (storyBox) storyBox.textContent = "";
             this.ui.typewriterIntro(descentLore.toUpperCase());
         });
 
