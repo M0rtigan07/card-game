@@ -155,12 +155,14 @@ Escribe un texto para una pantalla de transición.
 
 Requisitos:
 - 6 frases como máximo.
-- 80-150 palabras máximo.
+- 80  palabras máximo.
 
 - Español.
 - Tono oscuro y misterioso.
 - Habla directamente al héroe.
 - Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
+- La mazmorra es peligrosa y está llena de secretos, trampas y enemigos.
+-La mision del héroe es descender a las profundidades de KALDUR-ATH y rescatar  a la  hija del rey.
 - No uses markdown.
 - No uses títulos.
 - No expliques reglas del juego.
