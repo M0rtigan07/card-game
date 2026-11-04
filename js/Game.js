@@ -83,15 +83,20 @@ export class Game {
             // 3. Llamamos a Groq para que cree la historia personalizada del descenso
             let descentLore = "Las leyendas cuentan que una antigua maldición ha despertado en las profundidades. Tu deber y tu espada te obligan a cruzar estas puertas.";
             try {
-                if (this.groq && this.player) {
-                    descentLore = await this.groq.generateCharacterLore(this.player.className);
+                // Verificamos si existe el servicio de groq y el nombre del jugador o su clase
+                const heroIdentifier = this.playerName || (this.player && this.player.className) || "Valiente Aventurero";
+
+                if (this.groq) {
+                    const generated = await this.groq.generateCharacterLore(heroIdentifier);
+                    if (generated) descentLore = generated;
                 }
             } catch (e) {
-                console.warn("[Game] Usando texto alternativo para el descenso.");
+                console.warn("[Game] Usando texto alternativo para el descenso:", e);
             }
 
             // 4. Mostramos la historia con efecto máquina de escribir
             this.ui.typewriterIntro(descentLore.toUpperCase());
+
         });
 
         document.getElementById('btnStartAdventure')?.addEventListener('click', () => {
