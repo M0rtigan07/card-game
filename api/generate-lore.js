@@ -154,7 +154,8 @@ Eye of the Beholder y Elvira: Mistress of the Dark.
 Escribe un texto para una pantalla de transición.
 
 Requisitos:
-- 10 líneas.
+- 6 frases como máximo.
+- 80-150 palabras máximo.
 
 - Español.
 - Tono oscuro y misterioso.
@@ -164,6 +165,17 @@ Requisitos:
 - No uses títulos.
 - No expliques reglas del juego.
 - Debe parecer la introducción de una aventura legendaria.
+
+NO uses:
+**
+*
+#
+-
+Markdown
+HTML
+
+Devuelve únicamente texto plano.
+
 `,
                             role: "user",
                             content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
