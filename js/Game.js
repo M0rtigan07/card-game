@@ -83,11 +83,10 @@ export class Game {
             // 3. Llamamos a Groq para que cree la historia personalizada del descenso
             let descentLore = "Las leyendas cuentan que una antigua maldición ha despertado en las profundidades. Tu deber y tu espada te obligan a cruzar estas puertas.";
             try {
-                // Verificamos si existe el servicio de groq y el nombre del jugador o su clase
-                const heroIdentifier = this.playerName || (this.player && this.player.className) || "Valiente Aventurero";
+                const heroIdentifier = (this.player && this.player.className) || this.playerName || "Valiente Aventurero";
 
                 if (this.groq) {
-                   const generated = await this.groq.generateIntroLore(heroIdentifier);
+                    const generated = await this.groq.generateIntroLore(heroIdentifier);
                     if (generated) descentLore = generated;
                 }
             } catch (e) {
@@ -96,7 +95,6 @@ export class Game {
 
             // 4. Mostramos la historia con efecto máquina de escribir
             this.ui.typewriterIntro(descentLore.toUpperCase());
-
         });
 
         document.getElementById('btnStartAdventure')?.addEventListener('click', () => {
