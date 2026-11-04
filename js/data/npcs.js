@@ -5,9 +5,9 @@ export const NPC_DATABASE = {
         name: 'Conde Valerius',
         images: {
             room: 'img/npcs/conde_valerius_lluvia.gif',
-            talk: 'img/npcs/conde_charla.jpg',
-            enraged: 'img/npcs/conde_enojado.jpg',
-            seductive: 'img/npcs/conde_seductor.jpg'
+            talk: 'img/npcs/conde_valerius_habla.gif',
+            enraged: 'img/npcs/conde_valerius_enojado.gif',
+            seductive: 'img/npcs/conde_valerius_seductor.gif'
         },
         cards: {
             combat: 'img/npcs/cartaConde.png'
