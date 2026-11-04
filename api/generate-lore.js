@@ -143,16 +143,16 @@ export default async function handler(req, res) {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "openai/gpt-oss-120b", // 👈 Modelo estable de Groq
+                        model: "llama-3.1-8b-instant",
                         messages: [{
                             role: "system",
-                            content: "Eres un narrador de D&D de los años 90. Genera introducciones épicas, oscuras y breves en español sin markdown."
+                            content: "Eres un narrador oscuro de rol de los años 90. Escribe una introducción atmosférica, detallada y envolvente de 3 o 4 líneas para una mazmorra llamada KALDUR-ATH en español, sin usar markdown."
                         }, {
                             role: "user",
-                            content: `Escribe una frase épica narrativa de inicio para el descenso a la mazmorra de KALDUR-ATH de un héroe de clase ${className}.`
+                            content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
                         }],
-                        temperature: 0.75,
-                        max_tokens: 120
+                        temperature: 0.8,
+                        max_tokens: 250 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
                     })
                 });
 
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
 
                 const data = await response.json();
                 const story = data.choices?.[0]?.message?.content?.trim() || fallbackIntro.story;
-                console.log('[generate-lore] intro generado:', story);
+
                 return res.status(200).json({ story });
             } catch (err) {
                 console.error('[generate-lore] intro error:', err.message);
@@ -180,7 +180,7 @@ export default async function handler(req, res) {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "openai/gpt-oss-120b",
+                        model: "llama-3.1-8b-instant",
                         messages: [{
                             role: "system",
                             content: "Eres un Dungeon Master de D&D. Genera un encuentro conversacional rico donde un PNJ hable directamente usando comillas. Devuelve EXCLUSIVAMENTE un objeto JSON sin markdown: {\"npcType\": \"warrior|mage|rogue\", \"description\": \"diálogo directo del PNJ (máx 35 palabras)\", \"choices\": [{\"text\": \"\\\"🗣️ o ⚔️ Respuesta hablada del héroe entre comillas\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 2\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 3\\\"\", \"action\": \"pass\"}]}"

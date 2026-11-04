@@ -44,16 +44,16 @@ export class GroqAI {
         }
     }
 
-async generateIntroLore(className) {
+    async generateIntroLore(className) {
         try {
-            const data = await this._post({ 
-                type: "intro", 
-                className: className 
+            const data = await this._post({
+                type: "intro",
+                className: className
             });
-            
+
             const lore = data.story || data.description;
             if (!lore) throw new Error("Respuesta sin texto de intro");
-            
+
             return lore.trim();
         } catch (error) {
             console.warn("[GroqAI] generateIntroLore error:", error.message);
