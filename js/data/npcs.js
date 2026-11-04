@@ -51,9 +51,10 @@ export const NPC_DATABASE = {
         id: 'vikinga',
         name: 'Astrid la Escudera',
         images: {
-            room: 'img/npcs/vikinga.jpg',
-            talk: 'img/npcs/vikinga_hablando.jpg',
-            enraged: 'img/npcs/vikinga_enojada.jpg'
+            room: 'img/npcs/vikinga.gif',
+            talk: 'img/npcs/vikinga_habla.gif',
+            romance: 'img/npcs/vikinga_romance.gif',
+            enraged: 'img/npcs/vikinga_enojada.gif'
         },
         type: 'warrior_viking',
         archetype: 'una guerrera vikinga feroz, orgullosa, de pocas palabras y sedienta de honor y batallas en el Valhalla',
