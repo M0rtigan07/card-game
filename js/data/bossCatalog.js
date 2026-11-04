@@ -24,7 +24,7 @@ export const BOSSES = [
     {
         id: 'orco_jefe',
         name: 'Gorgrim, Jefe Orco',
-        img: 'img/jefe_orco_hacha.jpg',
+        img: 'img/jefe_orco.gif',
         deckId: 'orco_jefe',
         baseHp: 165, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 6,
         archetype: 'Gorgrim, el jefe de una horda orca: brutal, orgulloso y fanfarrón, con ansias de aplastar cráneos',

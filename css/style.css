@@ -281,6 +281,18 @@ body::after {
     padding: 20px;
 }
 
+@keyframes pulseDungeon {
+    0% {
+        transform: scale(1);
+        filter: brightness(0.8);
+    }
+
+    100% {
+        transform: scale(1.05);
+        filter: brightness(1.2);
+    }
+}
+
 .intro-container {
     display: flex;
     flex-direction: row;
@@ -718,8 +730,10 @@ h1 {
 .elvira-scene-frame img {
     width: 100%;
     height: 100%;
-    object-fit: contain;      /* Mantiene la proporción de la imagen completa sin recortarla */
-    background-color: #000;   /* Fondo negro lateral si la foto es más estrecha */
+    object-fit: contain;
+    /* Mantiene la proporción de la imagen completa sin recortarla */
+    background-color: #000;
+    /* Fondo negro lateral si la foto es más estrecha */
     image-rendering: pixelated;
     /* Hace que la imagen cubra todo el marco sin verse pequeña */
 }
@@ -1084,11 +1098,25 @@ h1 {
 }
 
 /* Color del borde según el tipo de jugada */
-.intent-def { border-color: #60a5fa; }
-.intent-heal { border-color: #4ade80; }
-.intent-poison { border-color: #c084fc; }
-.intent-buff { border-color: #fb923c; }
-.intent-drain { border-color: #f43f5e; }
+.intent-def {
+    border-color: #60a5fa;
+}
+
+.intent-heal {
+    border-color: #4ade80;
+}
+
+.intent-poison {
+    border-color: #c084fc;
+}
+
+.intent-buff {
+    border-color: #fb923c;
+}
+
+.intent-drain {
+    border-color: #f43f5e;
+}
 
 .enemy-intent-card.playing {
     animation: intentPlay 0.9s ease-out;
@@ -1121,32 +1149,74 @@ h1 {
     animation: floatUp 1s ease-out forwards;
 }
 
-.float-dmg { color: #ef4444; }
-.float-heal { color: #4ade80; }
-.float-shield { color: #60a5fa; }
-.float-poison { color: #c084fc; }
-.float-buff { color: #fb923c; }
+.float-dmg {
+    color: #ef4444;
+}
+
+.float-heal {
+    color: #4ade80;
+}
+
+.float-shield {
+    color: #60a5fa;
+}
+
+.float-poison {
+    color: #c084fc;
+}
+
+.float-buff {
+    color: #fb923c;
+}
 
 .hit-shake {
     animation: hitShake 0.4s;
 }
 
 @keyframes floatUp {
-    0% { opacity: 0; transform: translate(-50%, 10px); }
-    15% { opacity: 1; }
-    100% { opacity: 0; transform: translate(-50%, -55px); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -55px);
+    }
 }
 
 @keyframes hitShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-7px); }
-    75% { transform: translateX(7px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-7px);
+    }
+
+    75% {
+        transform: translateX(7px);
+    }
 }
 
 @keyframes intentPlay {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.06); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Mientras juega el enemigo */
@@ -1220,7 +1290,9 @@ h1 {
     opacity: 0.8;
 }
 
-.tcg-card.rarity-uncommon { border-color: #4ade80; }
+.tcg-card.rarity-uncommon {
+    border-color: #4ade80;
+}
 
 .tcg-card.rarity-rare {
     border-color: #c084fc;
@@ -1260,9 +1332,17 @@ h1 {
     padding: 8px;
 }
 
-.reward-card .tcg-card-img { height: 85px; }
-.reward-card .title { font-size: 0.85em; }
-.reward-card .desc { font-size: 0.72em; }
+.reward-card .tcg-card-img {
+    height: 85px;
+}
+
+.reward-card .title {
+    font-size: 0.85em;
+}
+
+.reward-card .desc {
+    font-size: 0.72em;
+}
 
 .rarity-tag {
     font-family: 'Press Start 2P', cursive;
@@ -1299,22 +1379,90 @@ h1 {
 }
 
 @keyframes speechPop {
-    0% { transform: scale(0.92); }
-    60% { transform: scale(1.04); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(0.92);
+    }
+
+    60% {
+        transform: scale(1.04);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
-.speech-valerius { font-family: 'Cinzel', serif; color: #fca5a5; border-color: #9f1239; letter-spacing: 0.02em; }
-.speech-morgana { color: #d8b4fe; border-color: #a855f7; }
-.speech-vikinga { color: #fde68a; border-color: #d97706; font-style: normal; font-weight: 700; }
-.speech-mongol { color: #fdba74; border-color: #ea580c; }
-.speech-barnaby { color: #fcd34d; border-color: #ca8a04; }
-.speech-corrupto { color: #d1d5db; border-color: #6b7280; font-style: normal; }
-.speech-automata { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.08em; font-style: normal; color: #67e8f9; border-color: #06b6d4; }
-.speech-orco { text-transform: uppercase; font-style: normal; font-weight: 800; color: #86efac; border-color: #16a34a; }
-.speech-gargola { color: #cbd5e1; border-color: #64748b; letter-spacing: 0.1em; }
-.speech-hechicero { color: #93c5fd; border-color: #3b82f6; }
-.speech-dragon { font-family: 'Cinzel', serif; font-size: 1em; font-weight: 700; font-style: normal; color: #fb923c; border-color: #dc2626; }
+.speech-valerius {
+    font-family: 'Cinzel', serif;
+    color: #fca5a5;
+    border-color: #9f1239;
+    letter-spacing: 0.02em;
+}
+
+.speech-morgana {
+    color: #d8b4fe;
+    border-color: #a855f7;
+}
+
+.speech-vikinga {
+    color: #fde68a;
+    border-color: #d97706;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.speech-mongol {
+    color: #fdba74;
+    border-color: #ea580c;
+}
+
+.speech-barnaby {
+    color: #fcd34d;
+    border-color: #ca8a04;
+}
+
+.speech-corrupto {
+    color: #d1d5db;
+    border-color: #6b7280;
+    font-style: normal;
+}
+
+.speech-automata {
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-style: normal;
+    color: #67e8f9;
+    border-color: #06b6d4;
+}
+
+.speech-orco {
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: 800;
+    color: #86efac;
+    border-color: #16a34a;
+}
+
+.speech-gargola {
+    color: #cbd5e1;
+    border-color: #64748b;
+    letter-spacing: 0.1em;
+}
+
+.speech-hechicero {
+    color: #93c5fd;
+    border-color: #3b82f6;
+}
+
+.speech-dragon {
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    font-weight: 700;
+    font-style: normal;
+    color: #fb923c;
+    border-color: #dc2626;
+}
 
 /* ═══════════ INVENTARIO: OBJETOS CON EFECTO ═══════════ */
 
@@ -1333,7 +1481,9 @@ h1 {
     border-radius: 6px;
 }
 
-.inv-consumable { border-left-color: #4ade80; }
+.inv-consumable {
+    border-left-color: #4ade80;
+}
 
 .inv-effect {
     flex-basis: 100%;
@@ -1352,7 +1502,9 @@ h1 {
     cursor: pointer;
 }
 
-.inv-use-btn:hover { filter: brightness(1.15); }
+.inv-use-btn:hover {
+    filter: brightness(1.15);
+}
 
 /* ═══════════ JEFES ═══════════ */
 
@@ -1363,19 +1515,57 @@ h1 {
 }
 
 @keyframes bossPulse {
-    0%, 100% { text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 2px 2px 0 #000; }
-    50% { text-shadow: 0 0 20px rgba(239, 68, 68, 1), 2px 2px 0 #000; }
+
+    0%,
+    100% {
+        text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 2px 2px 0 #000;
+    }
+
+    50% {
+        text-shadow: 0 0 20px rgba(239, 68, 68, 1), 2px 2px 0 #000;
+    }
 }
 
 /* Estilo de habla de los jefes */
-.speech-orco_jefe { text-transform: uppercase; font-style: normal; font-weight: 800; font-size: 0.95em; color: #86efac; border-color: #15803d; }
-.speech-vampira_jefa { font-family: 'Cinzel', serif; color: #f9a8d4; border-color: #be185d; letter-spacing: 0.03em; }
-.speech-escorpiones_jefe { font-family: 'Courier New', monospace; font-style: normal; letter-spacing: 0.04em; color: #a5b4fc; border-color: #4338ca; }
-.speech-dragon_jefe { font-family: 'Cinzel', serif; font-size: 1.05em; font-weight: 700; font-style: normal; color: #fdba74; border-color: #b91c1c; text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }
+.speech-orco_jefe {
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 0.95em;
+    color: #86efac;
+    border-color: #15803d;
+}
+
+.speech-vampira_jefa {
+    font-family: 'Cinzel', serif;
+    color: #f9a8d4;
+    border-color: #be185d;
+    letter-spacing: 0.03em;
+}
+
+.speech-escorpiones_jefe {
+    font-family: 'Courier New', monospace;
+    font-style: normal;
+    letter-spacing: 0.04em;
+    color: #a5b4fc;
+    border-color: #4338ca;
+}
+
+.speech-dragon_jefe {
+    font-family: 'Cinzel', serif;
+    font-size: 1.05em;
+    font-weight: 700;
+    font-style: normal;
+    color: #fdba74;
+    border-color: #b91c1c;
+    text-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
+}
 
 /* ═══════════ CONVERSACIONES (ESTILO AVENTURA GRÁFICA) ═══════════ */
 
-.chat-scene { height: 320px; }
+.chat-scene {
+    height: 320px;
+}
 
 .chat-scene .chat-portrait {
     width: 100%;
@@ -1383,11 +1573,20 @@ h1 {
     object-fit: contain;
 }
 
-.chat-scene .chat-portrait.talking { animation: chatBob 0.5s ease-in-out infinite; }
+.chat-scene .chat-portrait.talking {
+    animation: chatBob 0.5s ease-in-out infinite;
+}
 
 @keyframes chatBob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
 }
 
 /* .chat-scene delante: la regla genérica `.elvira-scene-frame img` fuerza width/height 100 % a toda imagen de la escena */
@@ -1418,11 +1617,15 @@ h1 {
     cursor: pointer;
 }
 
-.chat-dialogue-box b { color: var(--gold); }
+.chat-dialogue-box b {
+    color: var(--gold);
+}
 
 /* El héroe habla en azul claro y el personaje en dorado, como en las aventuras clásicas */
 .chat-dialogue-box.hero-speaking b,
-.chat-dialogue-box.hero-speaking p { color: #67e8f9; }
+.chat-dialogue-box.hero-speaking p {
+    color: #67e8f9;
+}
 
 .chat-continue {
     position: absolute;
@@ -1433,11 +1636,18 @@ h1 {
     animation: chatBlink 1s steps(2) infinite;
 }
 
-.chat-continue.visible { visibility: visible; }
+.chat-continue.visible {
+    visibility: visible;
+}
 
 @keyframes chatBlink {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .chat-controls {
@@ -1456,11 +1666,23 @@ h1 {
     list-style: none;
 }
 
-.chat-option { text-align: left; color: #7dd3fc; }
-.chat-option:hover:not(:disabled) { color: var(--gold); }
-.chat-option.asked { color: #64748b; }
+.chat-option {
+    text-align: left;
+    color: #7dd3fc;
+}
 
-.chat-free-row { display: flex; gap: 8px; }
+.chat-option:hover:not(:disabled) {
+    color: var(--gold);
+}
+
+.chat-option.asked {
+    color: #64748b;
+}
+
+.chat-free-row {
+    display: flex;
+    gap: 8px;
+}
 
 .chat-input {
     flex: 1;
@@ -1482,5 +1704,7 @@ h1 {
 }
 
 @media screen and (max-width: 768px) {
-    .chat-scene { height: 240px; }
+    .chat-scene {
+        height: 240px;
+    }
 }
