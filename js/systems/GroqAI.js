@@ -44,6 +44,29 @@ export class GroqAI {
         }
     }
 
+
+    /**
+     * Genera la historia cinemática personalizada para la pantalla de introducción del héroe.
+     * @param {string} className - Clase del héroe (ej. "Guerrero", "Maga Arcana", etc.)
+     */
+    async generateIntroLore(className) {
+        try {
+            const data = await this._post({
+                type: "intro_lore",
+                className: className
+            });
+
+            const lore = data.story || data.description;
+            if (!lore) throw new Error("Respuesta sin texto de lore de intro");
+
+            return lore.trim();
+        } catch (error) {
+            console.warn("[GroqAI] generateIntroLore error:", error.message);
+            return LORE_FALLBACKS[className] || LORE_FALLBACKS["Guerrero"];
+        }
+    }
+
+
     /**
      * Frase de un PNJ generada por la IA, con el contexto de la situación.
      * Devuelve null si falla o tarda, para que el juego use una frase de respaldo.

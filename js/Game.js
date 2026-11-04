@@ -87,7 +87,7 @@ export class Game {
                 const heroIdentifier = this.playerName || (this.player && this.player.className) || "Valiente Aventurero";
 
                 if (this.groq) {
-                    const generated = await this.groq.generateCharacterLore(heroIdentifier);
+                   const generated = await this.groq.generateIntroLore(heroIdentifier);
                     if (generated) descentLore = generated;
                 }
             } catch (e) {
