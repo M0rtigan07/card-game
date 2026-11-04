@@ -8,7 +8,7 @@ async function requestNpcLine(apiKey, messages, npcName) {
         method: "POST",
         headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-            model: process.env.GROQ_NPC_MODEL || "llama-3.3-70b-versatile",
+            model: process.env.GROQ_NPC_MODEL || "openai/gpt-oss-120b",
             messages,
             temperature: 1,
             top_p: 0.95,
@@ -154,7 +154,7 @@ Eye of the Beholder y Elvira: Mistress of the Dark.
 Escribe un texto para una pantalla de transición.
 
 Requisitos:
-- 8 líneas.
+- 10 líneas.
 
 - Español.
 - Tono oscuro y misterioso.
@@ -197,7 +197,7 @@ Requisitos:
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
+                        model: "openai/gpt-oss-120b",
                         messages: [{
                             role: "system",
                             content: "Eres un Dungeon Master de D&D. Genera un encuentro conversacional rico donde un PNJ hable directamente usando comillas. Devuelve EXCLUSIVAMENTE un objeto JSON sin markdown: {\"npcType\": \"warrior|mage|rogue\", \"description\": \"diálogo directo del PNJ (máx 35 palabras)\", \"choices\": [{\"text\": \"\\\"🗣️ o ⚔️ Respuesta hablada del héroe entre comillas\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 2\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 3\\\"\", \"action\": \"pass\"}]}"
