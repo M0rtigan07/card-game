@@ -143,9 +143,10 @@ export const NPC_DATABASE = {
         id: 'morgana',
         name: 'Bruja Morgana',
         images: {
-            room: 'img/morgana_room.png',
-            talk: 'img/morgana_talk.png',
-            romance: 'img/morgana_romance.png' // Primer plano de seducción / romance oscuro
+            room: 'img/npcs/morgana_room.gif',
+            talk: 'img/npcs/morgana_habla.gif',
+            romance: 'img/npcs/morgana_romance.gif', // Primer plano de seducción / romance oscuro
+            enraged: 'img/npcs/morgana_enojada.gif'
         },
         type: 'witch',
         archetype: 'la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática',
