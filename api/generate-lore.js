@@ -151,7 +151,8 @@ Eres el narrador de un videojuego de fantasía oscura
 de los años 90 inspirado en Dungeons & Dragons,
 Eye of the Beholder y Elvira: Mistress of the Dark.
 
-Escribe un texto para una pantalla de transición.
+Escribe un breve  texto para una pantalla de transición.
+En el texto debes describir la mision del héroe de clase ${className} que desciende a la mazmorra KALDUR-ATH para rescatar a la hija del rey.
 
 Requisitos:
 - 6 frases como máximo.
@@ -162,7 +163,7 @@ Requisitos:
 - Habla directamente al héroe.
 - Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
 - La mazmorra es peligrosa y está llena de secretos, trampas y enemigos.
--La mision del héroe es descender a las profundidades de KALDUR-ATH y rescatar  a la  hija del rey.
+
 - No uses markdown.
 - No uses títulos.
 - No expliques reglas del juego.
