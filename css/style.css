@@ -294,30 +294,22 @@ body::after {
 }
 
 #dungeonDescentScreen {
-    background-image: url('img/fondo_intro.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: url('img/fondo_intro.jpg') no-repeat center center / cover;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
 }
 
-/* Opcional: Un leve velo oscuro semitransparente detrás de la caja de texto 
-   para que la historia generada por Groq se lea perfectamente sobre las calaveras y runas */
-#dungeonDescentScreen::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.65); /* Oscurece un 65% el fondo para destacar la interfaz */
-    z-index: 1;
-}
-
-/* Asegurar que el contenido (caja de texto y botones) quede por encima del velo oscuro */
+/* Sombra semitransparente para resaltar los textos e interfaz sobre el fondo */
 #dungeonDescentScreen .intro-container {
-    position: relative;
-    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 25px;
+    border: 2px solid #ffcc00;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+    border-radius: 8px;
 }
 
 .intro-container {
