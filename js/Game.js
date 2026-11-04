@@ -78,23 +78,30 @@ export class Game {
             const storyBox = document.getElementById('descentStoryText');
             if (storyBox) storyBox.textContent = "Forjando tu destino en las tinieblas...";
 
-            let descentLore = "Las leyendas cuentan que una antigua maldición ha despertado en las profundidades. Tu deber y tu espada te obligan a cruzar estas puertas.";
+            let descentLore = "LAS LEYENDAS CUENTAN QUE UNA ANTIGUA MALDICIÓN HA DESPERTADO EN LAS PROFUNDIDADES.";
 
             try {
                 const heroIdentifier = (this.player && this.player.className) || this.playerName || "Guerrero";
-                console.log("[DEBUG] Solicitando intro para:", heroIdentifier);
 
                 if (this.groq) {
                     const generated = await this.groq.generateIntroLore(heroIdentifier);
-                    console.log("[DEBUG] Respuesta recibida de Groq:", generated);
+                    console.log("[DEBUG] Texto final procesado:", generated);
                     if (generated) descentLore = generated;
                 }
             } catch (e) {
-                console.error("[Game] Error crítico al obtener la intro de Groq:", e);
+                console.warn("[Game] Usando texto alternativo:", e);
             }
 
-            if (storyBox) storyBox.textContent = "";
-            this.ui.typewriterIntro(descentLore.toUpperCase());
+            // Volcado directo y seguro en la caja de texto verde de la pantalla
+            if (storyBox) {
+                storyBox.textContent = "";
+                // Si tienes la función de máquina de escribir, úsala; si falla, asignamos textContent directamente:
+                if (typeof this.ui.typewriterIntro === 'function') {
+                    this.ui.typewriterIntro(descentLore.toUpperCase());
+                } else {
+                    storyBox.textContent = descentLore.toUpperCase();
+                }
+            }
         });
 
         document.getElementById('btnStartAdventure')?.addEventListener('click', () => {
