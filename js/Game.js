@@ -97,7 +97,10 @@ export class Game {
                 storyBox.textContent = "";
                 // Si tienes la función de máquina de escribir, úsala; si falla, asignamos textContent directamente:
                 if (typeof this.ui.typewriterIntro === 'function') {
-                    this.ui.typewriterIntro(descentLore.toUpperCase());
+                    this.ui.typewriterIntro(
+                        descentLore.toUpperCase(),
+                        'descentStoryText'
+                    );
                 } else {
                     storyBox.textContent = descentLore.toUpperCase();
                 }
@@ -147,7 +150,10 @@ export class Game {
         this.ui.typewriterIntro(`LOS DESTINOS SE ALINEAN PARA ${this.playerName}...`);
 
         const story = await this.groq.generateCharacterLore(this.player.className);
-        this.ui.typewriterIntro(story.toUpperCase());
+        this.ui.typewriterIntro(
+            story.toUpperCase(),
+            'introText'
+        );
     }
 
     async startMainGame() {

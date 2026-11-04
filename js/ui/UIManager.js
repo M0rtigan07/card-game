@@ -12,9 +12,13 @@ export class UIManager {
         }
     }
 
-    typewriterIntro(text, callback) {
-        const box = document.getElementById('introText');
-        if (!box) return;
+    typewriterIntro(text, elementId = 'introText', callback) {
+        const box = document.getElementById(elementId);
+
+        if (!box) {
+            console.error('No existe:', elementId);
+            return;
+        }
 
         if (this.typewriterTimer) {
             clearInterval(this.typewriterTimer);
@@ -22,6 +26,7 @@ export class UIManager {
         }
 
         box.textContent = '';
+
         let i = 0;
 
         this.typewriterTimer = setInterval(() => {
@@ -31,6 +36,7 @@ export class UIManager {
             } else {
                 clearInterval(this.typewriterTimer);
                 this.typewriterTimer = null;
+
                 if (callback) callback();
             }
         }, 30);
