@@ -294,7 +294,7 @@ body::after {
 }
 
 #dungeonDescentScreen {
-    background: url('img/fondo_intro.jpg') no-repeat center center / cover;
+    background: url('../img/fondo_intro.jpg') no-repeat center center / cover;
     width: 100vw;
     height: 100vh;
     display: flex;
