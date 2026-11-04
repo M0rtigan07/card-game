@@ -44,21 +44,16 @@ export class GroqAI {
         }
     }
 
-
-    /**
-     * Genera la historia cinemática personalizada para la pantalla de introducción del héroe.
-     * @param {string} className - Clase del héroe (ej. "Guerrero", "Maga Arcana", etc.)
-     */
-    async generateIntroLore(className) {
+async generateIntroLore(className) {
         try {
-            const data = await this._post({
-                type: "intro_lore",
-                className: className
+            const data = await this._post({ 
+                type: "intro", 
+                className: className 
             });
-
+            
             const lore = data.story || data.description;
-            if (!lore) throw new Error("Respuesta sin texto de lore de intro");
-
+            if (!lore) throw new Error("Respuesta sin texto de intro");
+            
             return lore.trim();
         } catch (error) {
             console.warn("[GroqAI] generateIntroLore error:", error.message);

@@ -131,6 +131,42 @@ export default async function handler(req, res) {
             }
         }
 
+        // LORE DE INTRO / DESCENSO
+        if (type === 'intro') {
+            if (!apiKey) return res.status(200).json(fallbackIntro);
+
+            try {
+                const response = await fetch(GROQ_URL, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "openai/gpt-oss-120b", // 👈 Modelo estable de Groq
+                        messages: [{
+                            role: "system",
+                            content: "Eres un narrador de D&D de los años 90. Genera introducciones épicas, oscuras y breves en español sin markdown."
+                        }, {
+                            role: "user",
+                            content: `Escribe una frase épica narrativa de inicio para el descenso a la mazmorra de KALDUR-ATH de un héroe de clase ${className}.`
+                        }],
+                        temperature: 0.75,
+                        max_tokens: 120
+                    })
+                });
+
+                if (!response.ok) return res.status(200).json(fallbackIntro);
+
+                const data = await response.json();
+                const story = data.choices?.[0]?.message?.content?.trim() || fallbackIntro.story;
+                return res.status(200).json({ story });
+            } catch (err) {
+                console.error('[generate-lore] intro error:', err.message);
+                return res.status(200).json(fallbackIntro);
+            }
+        }
+
         // EXPLORACIÓN PROCEDURAL
         if (type === 'exploration') {
             if (!apiKey) return res.status(200).json(fallbackEvent);
@@ -143,7 +179,7 @@ export default async function handler(req, res) {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
+                        model: "openai/gpt-oss-120b",
                         messages: [{
                             role: "system",
                             content: "Eres un Dungeon Master de D&D. Genera un encuentro conversacional rico donde un PNJ hable directamente usando comillas. Devuelve EXCLUSIVAMENTE un objeto JSON sin markdown: {\"npcType\": \"warrior|mage|rogue\", \"description\": \"diálogo directo del PNJ (máx 35 palabras)\", \"choices\": [{\"text\": \"\\\"🗣️ o ⚔️ Respuesta hablada del héroe entre comillas\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 2\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 3\\\"\", \"action\": \"pass\"}]}"
