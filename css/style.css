@@ -312,64 +312,7 @@ body::after {
     border-radius: 8px;
 }
 
-/* Ajuste de la imagen central para que no quede estrecha */
-.elvira-scene-frame {
-    width: 100% !important;
-    height: 240px !important;
-    /* Un poco más de altura para que luzca mejor */
-    max-height: none !important;
-    overflow: hidden;
-    border: 2px solid #332211;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
-    position: relative;
-    margin-bottom: 20px;
-}
 
-#descentAnimationImg {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    /* Llena todo el marco sin deformarse */
-    display: block;
-}
-
-/* Estilo épico de botón de piedra rúnica */
-#btnStartAdventure.fantasy-btn,
-#dungeonDescentScreen .fantasy-btn {
-    background: linear-gradient(to bottom, #4a4e51, #2b2e31) !important;
-    color: #e2d9c5 !important;
-    border: 3px solid #1a1c1e !important;
-    border-top-color: #6a6f73 !important;
-    /* Simula la luz cenital en la piedra */
-    border-left-color: #5a5f63 !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 6px 12px rgba(0, 0, 0, 0.8) !important;
-    text-shadow: 1px 1px 2px #000 !important;
-    font-family: inherit;
-    font-weight: bold;
-    letter-spacing: 1px;
-    padding: 14px 20px;
-    cursor: pointer;
-    transition: all 0.1s ease;
-}
-
-#btnStartAdventure.fantasy-btn:hover,
-#dungeonDescentScreen .fantasy-btn:hover {
-    background: linear-gradient(to bottom, #5a5f63, #35383b) !important;
-    color: #fff !important;
-    border-color: #ffcc00 !important;
-    /* Brillo místico al pasar el ratón */
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
-        0 0 15px rgba(255, 204, 0, 0.4) !important;
-    transform: translateY(-2px);
-}
-
-#btnStartAdventure.fantasy-btn:active,
-#dungeonDescentScreen .fantasy-btn:active {
-    background: linear-gradient(to bottom, #2b2e31, #1a1c1e) !important;
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9) !important;
-}
 
 .intro-container {
     display: flex;
