@@ -143,7 +143,7 @@ export default async function handler(req, res) {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
+                        model: "openai/gpt-oss-120b",
                         messages: [{
                             role: "system",
                             content: `
@@ -151,15 +151,15 @@ Eres el narrador de un videojuego de fantasía oscura
 de los años 90 inspirado en Dungeons & Dragons,
 Eye of the Beholder y Elvira: Mistress of the Dark.
 
-Escribe un texto breve para una pantalla de transición.
+Escribe un texto para una pantalla de transición.
 
 Requisitos:
-- 4 a 6 líneas.
-- Máximo 300 caracteres.
+- 8 líneas.
+
 - Español.
 - Tono oscuro y misterioso.
 - Habla directamente al héroe.
-- Menciona KALDUR-ATH si es apropiado.
+- Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
 - No uses markdown.
 - No uses títulos.
 - No expliques reglas del juego.
