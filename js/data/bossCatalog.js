@@ -73,7 +73,7 @@ export const BOSSES = [
     {
         id: 'dragon_jefe',
         name: 'Ignis, el Dragón Guardián',
-        img: 'img/dragon_lider.gif',
+        img: 'img/npcs/dragon_lider.gif',
         deckId: 'dragon_jefe',
         baseHp: 190, hpPerFloor: 9, baseAtk: 17, atkPerFloor: 0.5, armor: 12,
         archetype: 'Ignis, un dragón guardián milenario, majestuoso y orgulloso, dueño de un tesoro inmenso',

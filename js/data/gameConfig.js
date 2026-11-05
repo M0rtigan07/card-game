@@ -45,6 +45,18 @@ export const GENERIC_ENEMIES = [
         archetype: 'una gárgola de piedra milenaria, paciente, antigua y solemne',
         voice: 'Voz lenta y solemne. Habla de siglos, de piedra, de polvo y de ruinas. Frases pausadas y con peso.'
     },
+
+    {
+        keys: ['esqueleto', 'guerrero esquelético', 'no-muerto', 'cráneo'],
+        id: 'skrullWarrior',
+        deckId: 'skrullWarrior',
+        name: 'Guerrero Esquelético',
+        img: 'img/skrullWarrior2.jpg', // O usa 'skrullWarrior1.jpg' / 'skrullWarrior2.jpg' según prefieras para el combate
+        minLevel: 10, // A partir de la planta 10
+        archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
+        voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
+    },
+
     {
         keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechicero', deckId: 'hechicero', name: 'Hechicero Oscuro', img: 'img/hechicero.jpg',
         archetype: 'un hechicero oscuro erudito, arrogante y obsesionado con el conocimiento arcano',

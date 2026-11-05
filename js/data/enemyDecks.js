@@ -106,6 +106,13 @@ export const ENEMY_DECKS = {
         { name: '🪵 Escudo de Tronco', type: 'def', val: 10 },
         { name: '🥩 Festín Orco', type: 'heal', val: 12 }
     ],
+    skrullWarrior: [ // Guerrero Esquelético: golpes fríos, escudos óseos y drenaje espectral
+        { name: '⚔️ Espadazo Sepulcral', type: 'atk', power: 1.4, copies: 2 },
+        { name: '🦴 Filo Helado', type: 'atk', power: 1.8 },
+        { name: '🛡️ Muro de Huesos', type: 'def', val: 15, copies: 2 },
+        { name: '👻 Drenaje Espectral', type: 'drain', power: 1.1, leech: 1 },
+        { name: '❄️ Aura de la Tumba', type: 'poison', val: 4, turns: 3 }
+    ],
     gargola: [
         { name: '🗿 Garra de Piedra', type: 'atk', power: 1.3, copies: 2 },
         { name: '🪨 Piel de Roca', type: 'def', val: 14, copies: 2 },
