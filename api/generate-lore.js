@@ -89,19 +89,7 @@ export default async function handler(req, res) {
                 }
             ],
 
-            "Guerrero Esqueleto": [
-                {
 
-                    npcType: "skrullWarrior",
-                    description: "Un guerrero esquelético con ojos azules llameantes bloquea el pasillo con una espada crujiente: \"Nadie profana la cripta eterna...\"",
-                    choices: [
-                        { text: "⚔️ \"¡Vuelve a tu tumba, esqueleto!\"", action: "combat" },
-                        { text: "✨ \"Intento purificar su alma con magia.\"", action: "magic" }
-                    ]
-                }
-
-
-            ],
 
             "Pícaro": [
                 {
@@ -125,7 +113,17 @@ export default async function handler(req, res) {
                     { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
                     { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
                 ]
+            },
+            {
+                npcType: "skrullWarrior",
+                description: "Un guerrero esquelético con ojos azules llameantes custodia un altar de huesos: \"Nadie profana la cripta eterna...\"",
+                choices: [
+                    { text: "⚔️ \"¡Vuelve a tu tumba, maldito esqueleto!\"", action: "combat" },
+                    { text: "🚪 \"Evito el altar y sigo descendiendo en silencio.\"", action: "pass" }
+                ]
             }
+
+
         ];
 
         function getSmartFallback() {

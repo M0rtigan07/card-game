@@ -28,24 +28,28 @@ nuevo_personaje: {
 
     ///////////////////////////////////////////////////////////////
 
-// para los  enemigos geenricos ,  en  data/gameConfig.js, se puede añadir un nuevo enemigo siguiendo la estructura de los existentes. Por ejemplo, para crear un nuevo enemigo llamado "nuevo_enemigo", se puede añadir el siguiente bloque de código:
+//Para añadir al Guerrero Esquelético (y otros enemigos nuevos) a los encuentros
+//  profundos y que salgan con su propia identidad visual y sus respectivas elecciones, solo tienes que añadirlos 
+// dentro del array deepDungeonEncounters en tu archivo generate-lore.js:
 
-{
-        keys: ['palabra_clave', 'otra_clave'], // Palabras que el sistema buscará en la descripción del encuentro para activarlo
-        id: 'nuevo_enemigo',                   // ID único del enemigo
-        deckId: 'nuevo_enemigo',               // Mazo de cartas asociado en el sistema de combate
-        name: 'Nombre del Enemigo',            // Nombre visible en pantalla
-        img: 'img/nombre_imagen.jpg',          // Ruta de su ilustración
-        archetype: 'una descripción breve de su personalidad y aspecto para que la IA de Groq sepa cómo interpretarlo',
-        voice: 'Tono de voz y pautas de comportamiento al hablar o gritar en combate.'
-    },
-
-
-   // Imagen de escena según el npcType que devuelve el backend
-export const ENCOUNTER_IMAGES = {
-    warrior: 'img/veterano.jpg',
-    mage: 'img/mage.jpg',
-    rogue: 'img/gargola.png',
-    automata: 'img/automata.jpg',
-    
-};
+const deepDungeonEncounters = [
+            {
+                npcType: "mage",
+                description: "Un devorador de mentes te observa desde el techo: \"Siento la ambición de tu alma. Entrégame tus recuerdos de la superficie o perece.\"",
+                choices: [
+                    { text: "✨ [VOLUNTAD] \"Mi mente es una fortaleza inexpugnable.\"", action: "magic" },
+                    { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
+                    { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
+                ]
+            },
+            // 💀 NUEVO: Guerrero Esquelético para plantas profundas
+            {
+                npcType: "skrullWarrior",
+                description: "Un guerrero esquelético con ojos azules llameantes custodia un altar de huesos: \"Nadie profana la cripta eterna...\"",
+                choices: [
+                    { text: "⚔️ \"¡Vuelve a tu tumba, maldito esqueleto!\"", action: "combat" },
+                    { text: "✨ \"Intento purificar su alma con un ritual arcano.\"", action: "magic" },
+                    { text: "🚪 \"Evito el altar y sigo descendiendo en silencio.\"", action: "pass" }
+                ]
+            }
+        ];
