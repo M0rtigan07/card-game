@@ -26,6 +26,8 @@ export const ENCOUNTER_IMAGES = {
     rogue: 'img/gargola.png',
     automata: 'img/automata.jpg',
     skrullWarrior: 'img/skrullWarrior2.jpg',
+    draco: 'img/reptil.jpg',
+    CaballeroNegro: 'img/caballeroNegroEspada.jpg',
 
 };
 export const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
@@ -57,6 +59,7 @@ export const GENERIC_ENEMIES = [
         archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
         voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
     },
+    
 
     {
         keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechicero', deckId: 'hechicero', name: 'Hechicero Oscuro', img: 'img/hechicero.jpg',

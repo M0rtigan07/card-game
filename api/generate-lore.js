@@ -121,7 +121,30 @@ export default async function handler(req, res) {
                     { text: "⚔️ \"¡Vuelve a tu tumba, maldito esqueleto!\"", action: "combat" },
                     { text: "🚪 \"Evito el altar y sigo descendiendo en silencio.\"", action: "pass" }
                 ]
-            }
+            },
+
+            {
+                npcType: "draconian",
+                description: "Un draconiano de escamas bronceadas y alas coriáceas bloquea el corredor: \"La Reina Oscura no tolera intrusos. Rinde tu espada o enfrenta su furia.\"",
+                choices: [
+                    { text: "⚔️ \"¡No te temo maldito larto! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
+                    { text: "✨ \"Intento razonar con el draconiano y apelar a su honor.\"", action: "magic" },
+                    { text: "🚪 \"Busco un pasaje lateral para evitar al draconiano.\"", action: "pass" }
+                ]
+            },
+
+             {
+                npcType: "CaballeroNegro",
+                description: "Un caballero con armadura negra y runas de muerte te bloquea el paso: \"Mi juramento superó a la tumba. Tu alma pagará el tributo de la oscuridad eterna.\"",
+                choices: [
+                    { text: "⚔️ \"¡No te temo maldito larto! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
+                    { text: "✨ \"Intento ofrecerle una almaciga como ofrenda.\"", action: "magic" },
+                    { text: "🚪 \"Busco un pasaje lateral para evitar al Caballero Negro.\"", action: "pass" }
+                ]
+            },
+
+                
+            
 
 
         ];

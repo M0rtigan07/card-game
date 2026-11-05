@@ -113,6 +113,11 @@ export const ENEMY_DECKS = {
         { name: '👻 Drenaje Espectral', type: 'drain', power: 1.1, leech: 1 },
         { name: '❄️ Aura de la Tumba', type: 'poison', val: 4, turns: 3 }
     ],
+    draconian: [
+        { name: '🗡️ Espada de Takhisis', type: 'atk', power: 1.4, copies: 2 },
+        { name: '🛡️ Escamas de Bronce', type: 'def', val: 14, copies: 2 },
+        { name: '🦅 Zarpazo Aéreo', type: 'multi', power: 0.8, hits: 2 }
+    ],
     gargola: [
         { name: '🗿 Garra de Piedra', type: 'atk', power: 1.3, copies: 2 },
         { name: '🪨 Piel de Roca', type: 'def', val: 14, copies: 2 },
