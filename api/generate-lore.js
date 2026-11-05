@@ -137,7 +137,7 @@ export default async function handler(req, res) {
                 npcType: "CaballeroNegro",
                 description: "Un caballero con armadura negra y runas de muerte te bloquea el paso: \"Mi juramento superó a la tumba. Tu alma pagará el tributo de la oscuridad eterna.\"",
                 choices: [
-                    { text: "⚔️ \"¡No te temo maldito larto! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
+                    { text: "⚔️ \"¡Pues pasare por encima tuya! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
                     { text: "✨ \"Intento ofrecerle una almaciga como ofrenda.\"", action: "magic" },
                     { text: "🚪 \"Busco un pasaje lateral para evitar al Caballero Negro.\"", action: "pass" }
                 ]

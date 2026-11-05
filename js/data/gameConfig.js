@@ -59,6 +59,16 @@ export const GENERIC_ENEMIES = [
         archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
         voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
     },
+
+     {
+        keys: ['caballero', 'guerrero medieval', 'caballero oscuro', 'armadura negra'],
+        id: 'CaballeroNegro',
+        deckId: 'CaballeroNegro',
+        name: 'Caballero Negro',
+        img: 'img/caballeroNegroEspada.jpg',
+        archetype: 'un caballero con armadura negra y runas de muerte, custodio de la oscuridad eterna',
+        voice: 'Voz fría y sepulcral. Habla de juramentos rotos, de sombras y de la eternidad del dolor.'
+    },
     
 
     {
