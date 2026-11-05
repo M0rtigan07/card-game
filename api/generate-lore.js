@@ -182,8 +182,8 @@ HTML
 Devuelve únicamente texto plano.
 
 `,
-                            role: "user",
-                            content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
+                           
+                            
                         }],
                         temperature: 0.8,
                         max_tokens: 250 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
