@@ -163,11 +163,42 @@ de los años 90 inspirado en Dungeons & Dragons,
 Eye of the Beholder y Elvira: Mistress of the Dark.
 
 Escribe un breve  texto para una pantalla de transición.
-En el texto debes describir la mision del héroe de clase ${className} y nombre ${heroName} que desciende a la mazmorra KALDUR-ATH para rescatar a la hija del rey.
+En la historia, el héroe de clase ${className} se adentra en la mazmorra KALDUR-ATH, un lugar lleno de secretos, trampas y enemigos.
+                            El heróe debe rescatar a la hija del rey, que ha sido secuestrada y llevada a las profundidades de la mazmorra.
+El héroe se llama EXACTAMENTE "${heroName}".
+
+Debes mencionar el nombre "${heroName}"
+en la PRIMERA frase.
+
+NO inventes otro nombre.
+NO cambies el nombre.
+NO uses apodos.
+NO crees títulos alternativos.
+
+El héroe se llama únicamente "${heroName}".
 
 Requisitos:
 - 5 frases como máximo.
 - 80  palabras máximo.
+
+El héroe se llama EXACTAMENTE "${heroName}".
+Su clase es "${className}".
+
+Debes mencionar el nombre "${heroName}"
+en la primera frase.
+
+NO inventes nombres.
+NO inventes apodos.
+NO sustituyas el nombre.
+
+La historia debe:
+
+- máximo 3 frases
+- máximo 45 palabras
+- mencionar KALDUR-ATH
+- mencionar a la hija del rey
+- tono oscuro
+- texto plano
 
 - Español.
 - Tono oscuro y misterioso.
@@ -195,7 +226,7 @@ Devuelve únicamente texto plano.
                             content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
                         }],
                         temperature: 0.8,
-                        max_tokens: 200 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
+                        max_tokens: 80 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
                     })
                 });
 
