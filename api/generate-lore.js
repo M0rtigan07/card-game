@@ -143,10 +143,15 @@ export default async function handler(req, res) {
         }
 
         // LORE DE INTRO / DESCENSO
+        // LORE DE INTRO / DESCENSO
         if (type === 'intro') {
-            if (!apiKey) return res.status(200).json(fallbackIntro);
+
+            if (!apiKey) {
+                return res.status(200).json(fallbackIntro);
+            }
 
             try {
+
                 const response = await fetch(GROQ_URL, {
                     method: "POST",
                     headers: {
@@ -155,89 +160,82 @@ export default async function handler(req, res) {
                     },
                     body: JSON.stringify({
                         model: "openai/gpt-oss-120b",
-                        messages: [{
-                            role: "system",
-                            content: `
-Eres el narrador de un videojuego de fantasía oscura
-de los años 90 inspirado en Dungeons & Dragons,
-Eye of the Beholder y Elvira: Mistress of the Dark.
 
-Escribe un breve  texto para una pantalla de transición.
-En la historia, el héroe de clase ${className} se adentra en la mazmorra KALDUR-ATH, un lugar lleno de secretos, trampas y enemigos.
-                            El heróe debe rescatar a la hija del rey, que ha sido secuestrada y llevada a las profundidades de la mazmorra.
-El héroe se llama EXACTAMENTE "${heroName}".
+                        messages: [
 
-Debes mencionar el nombre "${heroName}"
-en la PRIMERA frase.
-
-NO inventes otro nombre.
-NO cambies el nombre.
-NO uses apodos.
-NO crees títulos alternativos.
-
-El héroe se llama únicamente "${heroName}".
-
-Requisitos:
-- 5 frases como máximo.
-- 80  palabras máximo.
+                            {
+                                role: "system",
+                                content: `
+Eres el narrador de un videojuego de fantasía oscura.
 
 El héroe se llama EXACTAMENTE "${heroName}".
-Su clase es "${className}".
+La clase del héroe es "${className}".
 
-Debes mencionar el nombre "${heroName}"
-en la primera frase.
-
-NO inventes nombres.
-NO inventes apodos.
-NO sustituyas el nombre.
+Debes usar SIEMPRE ese nombre.
+No puedes inventar nombres.
+No puedes inventar apodos.
+No puedes cambiar el nombre.
 
 La historia debe:
 
-- máximo 3 frases
-- máximo 45 palabras
+- mencionar "${heroName}" en la primera frase
 - mencionar KALDUR-ATH
 - mencionar a la hija del rey
+- máximo 3 frases
+- máximo 40 palabras
 - tono oscuro
+- español
 - texto plano
 
-- Español.
-- Tono oscuro y misterioso.
-- Habla directamente al héroe.
-- Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
-- La mazmorra es peligrosa y está llena de secretos, trampas y enemigos.
+No uses títulos.
+No uses markdown.
+No uses asteriscos.
+No uses HTML.
+`
+                            },
 
-- No uses markdown.
-- No uses títulos.
-- No expliques reglas del juego.
-- Debe parecer la introducción de una aventura legendaria.
+                            {
+                                role: "user",
+                                content: `
+Describe la entrada de ${heroName},
+un ${className},
+en KALDUR-ATH para rescatar
+a la hija del rey.
+`
+                            }
 
-NO uses:
-**
-*
-#
--
-Markdown
-HTML
+                        ],
 
-Devuelve únicamente texto plano.
+                        temperature: 0.7,
+                        max_tokens: 60
 
-`,
-                            role: "user",
-                            content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
-                        }],
-                        temperature: 0.8,
-                        max_tokens: 80 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
                     })
                 });
 
-                if (!response.ok) return res.status(200).json(fallbackIntro);
+                if (!response.ok) {
+                    return res.status(200).json(fallbackIntro);
+                }
 
                 const data = await response.json();
-                const story = data.choices?.[0]?.message?.content?.trim() || fallbackIntro.story;
+
+                console.log(
+                    "[INTRO IA]",
+                    data.choices?.[0]?.message?.content
+                );
+
+                const story =
+                    data.choices?.[0]?.message?.content?.trim()
+                    || fallbackIntro.story;
 
                 return res.status(200).json({ story });
+
             } catch (err) {
-                console.error('[generate-lore] intro error:', err.message);
+
+                console.error(
+                    '[generate-lore] intro error:',
+                    err.message
+                );
+
                 return res.status(200).json(fallbackIntro);
             }
         }
