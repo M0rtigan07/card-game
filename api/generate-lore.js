@@ -2,7 +2,7 @@ import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcProm
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const heroName = localStorage.getItem('mazo_hero_name');
+const heroName = this.playerName;
 
 // Pide una frase de PNJ a Groq. Se mandan penalizaciones de repetición; si el modelo las rechaza (400), se reintenta sin ellas.
 async function requestNpcLine(apiKey, messages, npcName) {
@@ -150,40 +150,28 @@ export default async function handler(req, res) {
                             role: "system",
                             content: `
 Eres el narrador de un videojuego de fantasía oscura
-de los años 90 inspirado en Dungeons & Dragons,
-Eye of the Beholder y Elvira: Mistress of the Dark.
+inspirado en Dungeons & Dragons, Eye of the Beholder
+y las aventuras de los años 90.
 
-Escribe un breve  texto para una pantalla de transición.
-En el texto debes describir la mision del héroe de clase ${className} y nombre ${heroName} que desciende a la mazmorra KALDUR-ATH para rescatar a la hija del rey.
+El héroe se llama "${heroName}".
+Su clase es "${className}".
 
-Requisitos:
-- 5 frases como máximo.
-- 80  palabras máximo.
+Tu trabajo es escribir una introducción épica
+y personalizada para ese héroe.
 
-- Español.
-- Tono oscuro y misterioso.
-- Habla directamente al héroe.
-- Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
-- La mazmorra es peligrosa y está llena de secretos, trampas y enemigos.
+La historia debe:
+- Mencionar el nombre del héroe.
+- Mencionar su clase.
+- Explicar que entra en KALDUR-ATH.
+- Explicar que busca rescatar a la hija del rey.
+- Tener tono oscuro y misterioso.
+- Máximo 5 frases.
+- Máximo 80 palabras.
+- Sin markdown.
+- Solo texto plano.
+`
 
-- No uses markdown.
-- No uses títulos.
-- No expliques reglas del juego.
-- Debe parecer la introducción de una aventura legendaria.
 
-NO uses:
-**
-*
-#
--
-Markdown
-HTML
-
-Devuelve únicamente texto plano.
-
-`,
-                           
-                            
                         }],
                         temperature: 0.8,
                         max_tokens: 250 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
