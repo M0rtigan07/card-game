@@ -2,6 +2,8 @@ import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcProm
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
+const heroName = localStorage.getItem('mazo_hero_name');
+
 // Pide una frase de PNJ a Groq. Se mandan penalizaciones de repetición; si el modelo las rechaza (400), se reintenta sin ellas.
 async function requestNpcLine(apiKey, messages, npcName) {
     const call = (extra) => fetch(GROQ_URL, {
@@ -152,10 +154,10 @@ de los años 90 inspirado en Dungeons & Dragons,
 Eye of the Beholder y Elvira: Mistress of the Dark.
 
 Escribe un breve  texto para una pantalla de transición.
-En el texto debes describir la mision del héroe de clase ${className} que desciende a la mazmorra KALDUR-ATH para rescatar a la hija del rey.
+En el texto debes describir la mision del héroe de clase ${className} y nombre ${heroName} que desciende a la mazmorra KALDUR-ATH para rescatar a la hija del rey.
 
 Requisitos:
-- 6 frases como máximo.
+- 5 frases como máximo.
 - 80  palabras máximo.
 
 - Español.
