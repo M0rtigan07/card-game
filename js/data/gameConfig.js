@@ -50,9 +50,8 @@ export const GENERIC_ENEMIES = [
         keys: ['esqueleto', 'guerrero esquelético', 'no-muerto', 'cráneo'],
         id: 'skrullWarrior',
         deckId: 'skrullWarrior',
-        name: 'Guerrero Esquelético',
+        name: 'Guerrero Esqueleto',
         img: 'img/skrullWarrior2.jpg', // O usa 'skrullWarrior1.jpg' / 'skrullWarrior2.jpg' según prefieras para el combate
-        minLevel: 10, // A partir de la planta 10
         archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
         voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
     },
