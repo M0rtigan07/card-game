@@ -42,7 +42,7 @@ export const BOSSES = [
     {
         id: 'vampira_jefa',
         name: 'La Dama de la Noche',
-        img: 'img/npcs/vampira.jpg',
+        img: 'img/npcs/vampira.gif',
         deckId: 'vampira_jefa',
         baseHp: 160, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 8,
         archetype: 'la Dama de la Noche, una vampira ancestral, seductora, elegante y cruel, que juega con sus presas',
@@ -50,7 +50,7 @@ export const BOSSES = [
         phases: [
             { at: 0.6, announce: 'se alimenta de las sombras', atkBonus: 3, shield: 20 },
             {
-                at: 0.3, announce: 'muestra su verdadera forma', atkBonus: 4, heal: 30, img: 'img/npcs/vampira_enojada.jpg',
+                at: 0.3, announce: 'muestra su verdadera forma', atkBonus: 4, heal: 30, img: 'img/npcs/vampira_enojada.gif',
                 addCards: [{ name: '🩸 Sed Insaciable', type: 'drain', power: 1.8, leech: 1, copies: 2 }]
             }
         ]
@@ -58,14 +58,14 @@ export const BOSSES = [
     {
         id: 'escorpiones_jefe',
         name: 'El Líder de los Escorpiones Negros',
-        img: 'img/npcs/escorpionesNegros_lider.jpg',
+        img: 'img/npcs/escorpionesNegros_lider.gif',
         deckId: 'escorpiones_jefe',
         baseHp: 150, hpPerFloor: 10, baseAtk: 17, atkPerFloor: 0.6, armor: 10,
         archetype: 'el líder de los Escorpiones Negros, un asesino a sueldo frío, profesional y sin piedad',
         voice: 'Frío y profesional. Habla de contratos, de sombras y de testigos. Frases cortas, secas y sin emoción.',
         phases: [
             {
-                at: 0.5, announce: 'desenvaina sus dagas gemelas', atkBonus: 4, img: 'img/npcs/escorpionesNegros_lider_daga.jpg',
+                at: 0.5, announce: 'desenvaina sus dagas gemelas', atkBonus: 4, img: 'img/npcs/escorpiones_dagas.gif',
                 addCards: [{ name: '🗡️ Lluvia de Dagas', type: 'multi', power: 0.5, hits: 5, copies: 2 }]
             }
         ]
@@ -73,7 +73,7 @@ export const BOSSES = [
     {
         id: 'dragon_jefe',
         name: 'Ignis, el Dragón Guardián',
-        img: 'img/dragon.png',
+        img: 'img/dragon_lider.gif',
         deckId: 'dragon_jefe',
         baseHp: 190, hpPerFloor: 9, baseAtk: 17, atkPerFloor: 0.5, armor: 12,
         archetype: 'Ignis, un dragón guardián milenario, majestuoso y orgulloso, dueño de un tesoro inmenso',

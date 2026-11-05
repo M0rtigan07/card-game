@@ -77,9 +77,10 @@ export const NPC_DATABASE = {
         id: 'mongol',
         name: 'Batu Jan el Nómada',
         images: {
-            room: 'img/npcs/mongol.jpg',
-            talk: 'img/npcs/mongol_habla.jpg',
-            action: 'img/npcs/mongol_arco.jpg'
+            room: 'img/npcs/mongol.gif',
+            talk: 'img/npcs/mongol_habla.gif',
+            enraged: 'img/npcs/mongol_enojado.gif',
+            action: 'img/npcs/mongol_arco.gif'
         },
         type: 'nomad_archer',
         archetype: 'un arquero nómada de las estepas, sabio, curtido en tormentas de arena y misterioso',
