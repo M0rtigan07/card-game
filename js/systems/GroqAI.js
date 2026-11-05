@@ -44,10 +44,11 @@ export class GroqAI {
         }
     }
 
-    async generateIntroLore(className) {
+    async generateIntroLore(heroName, className) {
         try {
             const data = await this._post({
                 type: "intro",
+                 heroName,
                 className: className
             });
 

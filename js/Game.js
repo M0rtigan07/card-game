@@ -81,10 +81,16 @@ export class Game {
             let descentLore = "LAS LEYENDAS CUENTAN QUE UNA ANTIGUA MALDICIÓN HA DESPERTADO EN LAS PROFUNDIDADES.";
 
             try {
-                const heroIdentifier = (this.player && this.player.className) || this.playerName || "Guerrero";
+
 
                 if (this.groq) {
-                    const generated = await this.groq.generateIntroLore(heroIdentifier);
+
+                    const generated =
+                        await this.groq.generateIntroLore(
+                            this.playerName,
+                            this.player?.className || "Guerrero"
+                        );
+
                     console.log("[DEBUG] Texto final procesado:", generated);
                     if (generated) descentLore = generated;
                 }

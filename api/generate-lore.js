@@ -2,7 +2,7 @@ import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcProm
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const heroName = this.playerName;
+
 
 // Pide una frase de PNJ a Groq. Se mandan penalizaciones de repetición; si el modelo las rechaza (400), se reintenta sin ellas.
 async function requestNpcLine(apiKey, messages, npcName) {
@@ -43,7 +43,16 @@ export default async function handler(req, res) {
         }
         body = body || {};
 
-        const { type, className = "Guerrero", dungeonLevel = 1, npc, npcName, npcArchetype, action } = body;
+        const {
+            type,
+            heroName = "Héroe",
+            className = "Guerrero",
+            dungeonLevel = 1,
+            npc,
+            npcName,
+            npcArchetype,
+            action
+        } = body;
         const apiKey = process.env.GROQ_API_KEY;
 
         // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
@@ -150,31 +159,43 @@ export default async function handler(req, res) {
                             role: "system",
                             content: `
 Eres el narrador de un videojuego de fantasía oscura
-inspirado en Dungeons & Dragons, Eye of the Beholder
-y las aventuras de los años 90.
+de los años 90 inspirado en Dungeons & Dragons,
+Eye of the Beholder y Elvira: Mistress of the Dark.
 
-El héroe se llama "${heroName}".
-Su clase es "${className}".
+Escribe un breve  texto para una pantalla de transición.
+En el texto debes describir la mision del héroe de clase ${className} y nombre ${heroName} que desciende a la mazmorra KALDUR-ATH para rescatar a la hija del rey.
 
-Tu trabajo es escribir una introducción épica
-y personalizada para ese héroe.
+Requisitos:
+- 5 frases como máximo.
+- 80  palabras máximo.
 
-La historia debe:
-- Mencionar el nombre del héroe.
-- Mencionar su clase.
-- Explicar que entra en KALDUR-ATH.
-- Explicar que busca rescatar a la hija del rey.
-- Tener tono oscuro y misterioso.
-- Máximo 5 frases.
-- Máximo 80 palabras.
-- Sin markdown.
-- Solo texto plano.
-`
+- Español.
+- Tono oscuro y misterioso.
+- Habla directamente al héroe.
+- Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
+- La mazmorra es peligrosa y está llena de secretos, trampas y enemigos.
 
+- No uses markdown.
+- No uses títulos.
+- No expliques reglas del juego.
+- Debe parecer la introducción de una aventura legendaria.
 
+NO uses:
+**
+*
+#
+-
+Markdown
+HTML
+
+Devuelve únicamente texto plano.
+
+`,
+                            role: "user",
+                            content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
                         }],
                         temperature: 0.8,
-                        max_tokens: 250 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
+                        max_tokens: 200 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
                     })
                 });
 
