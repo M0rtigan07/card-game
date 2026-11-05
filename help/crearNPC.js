@@ -39,3 +39,13 @@ nuevo_personaje: {
         archetype: 'una descripción breve de su personalidad y aspecto para que la IA de Groq sepa cómo interpretarlo',
         voice: 'Tono de voz y pautas de comportamiento al hablar o gritar en combate.'
     },
+
+
+   // Imagen de escena según el npcType que devuelve el backend
+export const ENCOUNTER_IMAGES = {
+    warrior: 'img/veterano.jpg',
+    mage: 'img/mage.jpg',
+    rogue: 'img/gargola.png',
+    automata: 'img/automata.jpg',
+    
+};

@@ -88,6 +88,21 @@ export default async function handler(req, res) {
                     ]
                 }
             ],
+
+            "Guerrero Esqueleto": [
+                {
+
+                    npcType: "skrullWarrior",
+                    description: "Un guerrero esquelético con ojos azules llameantes bloquea el pasillo con una espada crujiente: \"Nadie profana la cripta eterna...\"",
+                    choices: [
+                        { text: "⚔️ \"¡Vuelve a tu tumba, esqueleto!\"", action: "combat" },
+                        { text: "✨ \"Intento purificar su alma con magia.\"", action: "magic" }
+                    ]
+                }
+
+
+            ],
+
             "Pícaro": [
                 {
                     npcType: "rogue",
