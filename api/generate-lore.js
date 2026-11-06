@@ -1,35 +1,7 @@
 import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcPrompt.js';
-import { MONJE_LOCO_STORY } from '../js/stories/monjeLocoStory.js';
+
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-// Comprobador de historias activas
-function getStoryEncounter(playerProgress, dungeonLevel) {
-    // Si la partida no tiene registros de historia, inicializamos el objeto
-    const storyState = playerProgress || {};
-    const currentChapterId = storyState[MONJE_LOCO_STORY.id] || 1;
-
-    // 🛑 Si el jugador decidió ignorar al personaje (-1), no aparece más
-    if (currentChapterId === -1) {
-        return null;
-    }
-
-    // Buscamos el capítulo actual
-    const chapter = MONJE_LOCO_STORY.chapters.find(c => c.chapterId === currentChapterId);
-
-    // Si existe el capítulo y el jugador ha alcanzado la planta necesaria
-    if (chapter && dungeonLevel >= chapter.minDungeonLevel) {
-        return {
-            storyId: MONJE_LOCO_STORY.id,
-            chapterId: chapter.chapterId,
-            img: chapter.img,
-            description: chapter.description,
-            choices: chapter.choices
-        };
-    }
-
-    return null; // Si no le toca historia, devuelve null
-}
 
 
 
@@ -156,7 +128,7 @@ export default async function handler(req, res) {
                 npcType: "draco",
                 description: "Un draconiano de escamas bronceadas y alas coriáceas bloquea el corredor: \"El reino de la oscuridad no tolera intrusos. Rinde tu espada o enfrenta mi furia.\"",
                 choices: [
-                    { text: "⚔️ \"¡No te temo maldito larto! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
+                    { text: "⚔️ \"¡No te temo, asqueroso lagarto! Enfrentaré  tu acero.\"", action: "combat" },
                     { text: "✨ \"Intento razonar con el draconiano y apelar a su honor.\"", action: "magic" },
                     { text: "🚪 \"Busco un pasaje lateral para evitar al draconiano.\"", action: "pass" }
                 ]
