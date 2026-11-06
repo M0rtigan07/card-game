@@ -11,6 +11,7 @@ export const MONJE_LOCO_STORY = {
         {
             chapterId: 1,
             minDungeonLevel: 18,
+            type: "story_encounter",
             img: "img/monjeLoco.gif",
             description: "Un monje despeinado aparece en la penumbra: \"¡Ah, al fin una visita...\"",
             choices: [
@@ -43,6 +44,7 @@ export const MONJE_LOCO_STORY = {
         {
             chapterId: 2,
             minDungeonLevel: 27,
+            type: "story_encounter",
             img: "img/monjeloco_baul1.jpg",
             description: "Te vuelves a cruzar con el monje, que ahora abraza un baúl con cadenas: \"¡Mi viejo amigo! El cofre guarda el saber de las eras... si respondes a mi enigma.\"",
             choices: [
@@ -74,6 +76,7 @@ export const MONJE_LOCO_STORY = {
         // -------------------------------------------------------------
         {
             chapterId: 3,
+            type: "story_encounter",
             minDungeonLevel: 32,
             img: "img/monjesLocos.jpg",
             description: "El monje encabeza una extraña ceremonia rodeado de acólitos: \"¡Has demostrado gran valor, viajero! Elige tu última bendición antes del abismo.\"",

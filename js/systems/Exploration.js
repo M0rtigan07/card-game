@@ -7,6 +7,7 @@ import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
 import { getBossForFloor, isBossFloor } from './Bosses.js';
 import { setText, wait } from '../ui/helpers.js';
+import { MONJE_LOCO_STORY } from '../stories/monjeLocoStory.js';
 
 export class Exploration {
     /** @param {import('../Game.js').Game} game */
@@ -75,6 +76,26 @@ export class Exploration {
             this.log(`⚠️ Una presencia enorme aguarda en la planta siguiente...`);
         }
 
+        // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
+        const storyEncounter = this.getStoryEncounter(level);
+        if (storyEncounter) {
+            const view = this.render();
+            this.setSceneImage(storyEncounter.img);
+            setText('sceneBadgeOverlay', `HISTORIA - PLANTA ${level}`);
+
+            view.setNarrative(
+                storyEncounter.description,
+                storyEncounter.choices.map(choice => ({
+                    text: choice.text,
+                    callback: () => {
+                        this.lockChoices();
+                        return this.onStoryChoice(choice, storyEncounter.storyId);
+                    }
+                }))
+            );
+            return;
+        }
+
         // 1. PNJ fijo de planta (Barnaby, Valerius, Morgana, Astrid, Batu Jan)
         const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === level);
         if (npcKey) {
@@ -108,6 +129,42 @@ export class Exploration {
                 }
             }))
         );
+    }
+
+    async onStoryChoice(choice, storyId) {
+        this.game.audio.play('card');
+        const player = this.player;
+
+        if (!player.storyProgress) player.storyProgress = {};
+
+        // Actualizar fase de la historia o bloqueo (-1)
+        if (choice.nextChapter !== undefined) {
+            player.storyProgress[storyId] = choice.nextChapter;
+        }
+
+        // Aplicar recompensas de la elección
+        if (choice.reward) {
+            if (choice.reward.hp) {
+                player.health = Math.min(player.maxHealth, player.health + choice.reward.hp);
+            }
+            if (choice.reward.gold) {
+                player.gold += choice.reward.gold;
+            }
+            if (choice.reward.cardId && this.game.deck) {
+                this.game.deck.addCard(choice.reward.cardId);
+            }
+        }
+
+        if (choice.log) {
+            this.log(choice.log);
+        }
+
+        this.game.ui.updateStats(player, this.game.dungeonLevel);
+
+        // Avanzar de planta tras la interacción narrativa
+        this.game.dungeonLevel++;
+        await wait(1400);
+        await this.game.loadNextEvent();
     }
 
     /** Elección en un encuentro procedural: combate, compra, huida o tirada de habilidad. */
@@ -285,5 +342,26 @@ export class Exploration {
 
         await wait(2200);
         await this.npcActions.run(npc, choice.action);
+    }
+
+    /** Comprueba si hay una historia de PNJ activa para el nivel actual. */
+    getStoryEncounter(dungeonLevel) {
+        const player = this.player;
+        if (!player.storyProgress) player.storyProgress = {};
+
+        const currentChapterId = player.storyProgress[MONJE_LOCO_STORY.id] || 1;
+        if (currentChapterId === -1) return null; // Si fue ignorado, no sale
+
+        const chapter = MONJE_LOCO_STORY.chapters.find(c => c.chapterId === currentChapterId);
+        if (chapter && dungeonLevel >= chapter.minDungeonLevel) {
+            return {
+                storyId: MONJE_LOCO_STORY.id,
+                chapterId: chapter.chapterId,
+                img: chapter.img,
+                description: chapter.description,
+                choices: chapter.choices
+            };
+        }
+        return null;
     }
 }

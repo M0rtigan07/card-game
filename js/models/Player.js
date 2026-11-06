@@ -22,6 +22,9 @@ export class Player {
         this.xp = 0;
         this.maxXp = 100;
         this.inventory = [];
+        this.storyProgress = {
+            monjeLoco: 1 // Empieza en el capítulo 1 de la misión del Monje Loco
+        };
     }
 
     addGold(amount) {
