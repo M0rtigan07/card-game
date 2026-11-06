@@ -35,3 +35,31 @@ export const NPC_TOPICS = {
     vikinga: ['valhalla'],
     mongol: ['wind']
 };
+
+// js/data/topicCatalog.js (o sección de NPCs)
+
+// Añade los temas específicos para el monje loco dentro de NPC_TOPICS:
+NPC_TOPICS['monjeLoco'] = [
+    'monje_origen',
+    'monje_caldero',
+    'monje_tesoro'
+];
+
+// Define qué significa cada etiqueta y qué datos (facts) le pasa al sistema de IA:
+CHAT_TOPICS['monje_origen'] = {
+    id: 'monje_origen',
+    label: '“¿Por qué habitas estas criptas oscuras?”',
+    facts: 'none'
+};
+
+CHAT_TOPICS['monje_caldero'] = {
+    id: 'monje_caldero',
+    label: '“¿Qué ingredientes usas en tu extraño estofado?”',
+    facts: 'none'
+};
+
+CHAT_TOPICS['monje_tesoro'] = {
+    id: 'monje_tesoro',
+    label: '“Háblame acerca del cofre y los enigmas.”',
+    facts: 'none'
+};

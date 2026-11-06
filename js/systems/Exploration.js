@@ -77,6 +77,7 @@ export class Exploration {
         }
 
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
+        // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
         const storyEncounter = this.getStoryEncounter(level);
         if (storyEncounter) {
             const view = this.render();
@@ -85,13 +86,27 @@ export class Exploration {
 
             view.setNarrative(
                 storyEncounter.description,
-                storyEncounter.choices.map(choice => ({
-                    text: choice.text,
-                    callback: () => {
-                        this.lockChoices();
-                        return this.onStoryChoice(choice, storyEncounter.storyId);
+                storyEncounter.choices.map(choice => {
+                    // Si el usuario elige hablar, abrimos el chat modular del NPC
+                    if (choice.action === 'chat') {
+                        return {
+                            text: choice.text,
+                            callback: () => {
+                                this.game.audio.play('sega');
+                                this.openChat(NPC_DATABASE.monjeLoco);
+                            }
+                        };
                     }
-                }))
+
+                    // Elecciones normales del monje (estofado, ignorar, etc.)
+                    return {
+                        text: choice.text,
+                        callback: () => {
+                            this.lockChoices();
+                            return this.onStoryChoice(choice, storyEncounter.storyId);
+                        }
+                    };
+                })
             );
             return;
         }

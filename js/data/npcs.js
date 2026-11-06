@@ -182,5 +182,25 @@ export const NPC_DATABASE = {
                 ]
             }
         }
+    },
+
+    monjeLoco: {
+        id: 'monjeLoco',
+        name: 'El Monje Loco',
+        archetype: 'un monje excéntrico, desquiciado y ermitaño que habita las profundidades de la mazmorra',
+        voice: 'Voz rápida, errática y llena de risas socarronas. Habla de hongos, alucinaciones y secretos.',
+        images: {
+            room: 'img/monjeLoco.gif',
+            talk: 'img/monjeLoco_habla.gif',
+        },
+        interactions: {
+            choices: [
+                { text: "🍲 \"Aceptar un plato de estofado (+20 HP).\"", action: 'eat_stew' },
+                { text: "✨ [ARCANO] \"Inspeccionar el brebaje por si tiene veneno.\"", action: 'inspect_stew' },
+                { text: "🚪 \"Ignorar al chiflado y seguir caminando.\"", action: 'pass' }
+            ]
+        }
     }
+
+
 };

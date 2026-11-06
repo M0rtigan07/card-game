@@ -21,13 +21,15 @@ export const HERO_IMAGES = {
 
 // Imagen de escena según el npcType que devuelve el backend
 export const ENCOUNTER_IMAGES = {
-    warrior: 'img/veterano.jpg',
+  //  warrior: 'img/veterano.jpg',
     mage: 'img/mage.jpg',
+   
     rogue: 'img/gargola.png',
+
     automata: 'img/automata.jpg',
     skrullWarrior: 'img/skrullWarrior2.jpg',
     draco: 'img/draco.gif',
-    CaballeroNegro: 'img/caballeroNegroEspada.jpg',
+    CaballeroNegro: 'img/caballeroNegro.gif',
 
 
 };
