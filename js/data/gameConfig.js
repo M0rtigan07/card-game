@@ -26,8 +26,10 @@ export const ENCOUNTER_IMAGES = {
     rogue: 'img/gargola.png',
     automata: 'img/automata.jpg',
     skrullWarrior: 'img/skrullWarrior2.jpg',
-    draco: 'img/reptil.jpg',
+    draco: 'img/draco.jpg',
     CaballeroNegro: 'img/caballeroNegroEspada.jpg',
+
+    monjeLoco: 'img/monjeLoco.jpg',
 
 };
 export const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
