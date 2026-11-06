@@ -1302,7 +1302,69 @@ h1 {
     pointer-events: none;
 }
 
+/* Pantalla de Victoria TCG: por defecto oculta, solo se muestra cuando el script la activa */
+#victoryAnimationModal.modal {
+    background: rgba(8, 5, 15, 0.92) !important;
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    /* Eliminamos el display flex forzado para que respete el show/hide de tu lógica */
+}
 
+/* Si tu motor usa un contenedor activo o clase de bloque, aseguramos su caja */
+.victory-modal-box {
+    background: linear-gradient(145deg, #1b1226 0%, #0f0a18 100%);
+    border: 4px solid var(--gold);
+    border-radius: 14px;
+    padding: 30px;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.victory-modal-box h2 {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 2.2em;
+    color: var(--gold);
+    text-shadow: 2px 2px #000;
+    margin-bottom: 5px;
+}
+
+.pixel-gif-container {
+    width: 100%;
+    max-height: 170px;
+    overflow: hidden;
+    border: 2px solid var(--gold-border);
+    border-radius: 8px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.victory-pixel-gif {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+#victoryRewardText {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95em;
+    color: var(--gold-light);
+    line-height: 1.5;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px;
+    border-radius: 6px;
+    width: 100%;
+    border-left: 3px solid var(--gold);
+    text-align: left;
+}
 
 /* ═══════════ RECOMPENSA DE CARTAS Y RAREZAS ═══════════ */
 
