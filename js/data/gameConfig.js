@@ -62,7 +62,19 @@ export const GENERIC_ENEMIES = [
         voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
     },
 
-     {
+    {
+        keys: ['hombre lagarto', 'lagarto', 'draco', 'reptil'],
+        id: 'draco', 
+        deckId: 'draco', 
+        name: 'Draco de las Profundidades', 
+        img: 'img/draco.gif',
+        archetype: 'un draco de las profundidades, astuto, ágil y con un aliento venenoso',
+        voice: 'Voz sibilante y reptiliana. Habla de presas, de veneno y de la caza. Frases rápidas y con siseos.'
+    },
+
+
+
+    {
         keys: ['caballero', 'guerrero medieval', 'caballero oscuro', 'armadura negra'],
         id: 'CaballeroNegro',
         deckId: 'CaballeroNegro',
@@ -71,7 +83,7 @@ export const GENERIC_ENEMIES = [
         archetype: 'un caballero con armadura negra y runas de muerte, custodio de la oscuridad eterna',
         voice: 'Voz fría y sepulcral. Habla de juramentos rotos, de sombras y de la eternidad del dolor.'
     },
-    
+
 
     {
         keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechicero', deckId: 'hechicero', name: 'Hechicero Oscuro', img: 'img/hechicero.jpg',

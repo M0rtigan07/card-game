@@ -153,8 +153,8 @@ export default async function handler(req, res) {
             },
 
             {
-                npcType: "draconian",
-                description: "Un draconiano de escamas bronceadas y alas coriáceas bloquea el corredor: \"La Reina Oscura no tolera intrusos. Rinde tu espada o enfrenta su furia.\"",
+                npcType: "draco",
+                description: "Un draconiano de escamas bronceadas y alas coriáceas bloquea el corredor: \"El reino de la oscuridad no tolera intrusos. Rinde tu espada o enfrenta mi furia.\"",
                 choices: [
                     { text: "⚔️ \"¡No te temo maldito larto! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
                     { text: "✨ \"Intento razonar con el draconiano y apelar a su honor.\"", action: "magic" },
