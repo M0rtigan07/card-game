@@ -1,5 +1,4 @@
-// js/stories/monjeLocoStory.js
-import { MONJE_LOCO_NPC } from '../data/npcs.js'; // O donde tengas definido al NPC
+//import { NPC_DATABASE } from '../data/npcs.js';
 
 export const MONJE_LOCO_STORY = {
     id: "monjeLoco",
@@ -8,12 +7,12 @@ export const MONJE_LOCO_STORY = {
         {
             chapterId: 1,
             minDungeonLevel: 3,
-            img: "img/monjeloco_ofreceComida.jpg",
+            img: "img/monjeLoco.gif",
             description: "Un monje despeinado revuelve un caldero humeante en la penumbra: \"¡Ah, carne fresca! Prueba mi estofado de champiñones o lárgate...\"",
             choices: [
                 {
-                    text: "💬 \"Hablar e interrogar al monje loco.\"",
-                    action: "chat", // 👈 Acción dedicada a abrir la aventura gráfica de chat
+                    text: "💬 \"Conversar e interrogar al monje loco.\"",
+                    action: "chat" // 👈 Acción que abre la aventura gráfica de diálogo
                 },
                 {
                     text: "🍲 \"Aceptar un plato de estofado (+20 HP).\"",
