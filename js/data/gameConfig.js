@@ -26,7 +26,7 @@ export const ENCOUNTER_IMAGES = {
     rogue: 'img/gargola.png',
     automata: 'img/automata.jpg',
     skrullWarrior: 'img/skrullWarrior2.jpg',
-    draco: 'img/draco.jpg',
+    draco: 'img/draco.gif',
     CaballeroNegro: 'img/caballeroNegroEspada.jpg',
 
     monjeLoco: 'img/monjeLoco.jpg',

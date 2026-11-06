@@ -1,6 +1,35 @@
 import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcPrompt.js';
+import { MONJE_LOCO_STORY } from './js/stories/monjeLocoStory.js';
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+// Comprobador de historias activas
+function getStoryEncounter(playerProgress, dungeonLevel) {
+    // Si la partida no tiene registros de historia, inicializamos el objeto
+    const storyState = playerProgress || {};
+    const currentChapterId = storyState[MONJE_LOCO_STORY.id] || 1;
+
+    // 🛑 Si el jugador decidió ignorar al personaje (-1), no aparece más
+    if (currentChapterId === -1) {
+        return null;
+    }
+
+    // Buscamos el capítulo actual
+    const chapter = MONJE_LOCO_STORY.chapters.find(c => c.chapterId === currentChapterId);
+
+    // Si existe el capítulo y el jugador ha alcanzado la planta necesaria
+    if (chapter && dungeonLevel >= chapter.minDungeonLevel) {
+        return {
+            storyId: MONJE_LOCO_STORY.id,
+            chapterId: chapter.chapterId,
+            img: chapter.img,
+            description: chapter.description,
+            choices: chapter.choices
+        };
+    }
+
+    return null; // Si no le toca historia, devuelve null
+}
 
 
 
@@ -133,7 +162,7 @@ export default async function handler(req, res) {
                 ]
             },
 
-             {
+            {
                 npcType: "CaballeroNegro",
                 description: "Un caballero con armadura negra y runas de muerte te bloquea el paso: \"Mi juramento superó a la tumba. Tu alma pagará el tributo de la oscuridad eterna.\"",
                 choices: [
@@ -143,8 +172,8 @@ export default async function handler(req, res) {
                 ]
             },
 
-                
-            
+
+
 
 
         ];
@@ -279,7 +308,15 @@ Devuelve únicamente texto plano.
         }
 
         // EXPLORACIÓN PROCEDURAL
+        // EXPLORACIÓN PROCEDURAL
         if (type === 'exploration') {
+            // 1. COMPROBAR SI HAY UNA HISTORIA ACTIVA (Ej. Monje Loco)
+            const storyEncounter = getStoryEncounter(body.storyProgress, dungeonLevel);
+            if (storyEncounter) {
+                return res.status(200).json(storyEncounter);
+            }
+
+            // 2. FLUJO HABITUAL SI NO HAY HISTORIA ACTIVA
             if (!apiKey) return res.status(200).json(fallbackEvent);
 
             try {

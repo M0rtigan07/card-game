@@ -207,6 +207,8 @@ export class Game {
         return true;
     }
 
+
+
     // Cierre común de un encuentro: refresca stats, comprueba muerte y avanza
     finishEncounter(delay) {
         this.ui.updateStats(this.player, this.dungeonLevel);
@@ -216,4 +218,21 @@ export class Game {
         }
         this.advanceFloor(delay);
     }
+}
+
+// Al hacer clic en un botón de la interfaz de encuentro:
+function handleChoiceClick(selectedChoice, currentEncounter) {
+    // Si la opción requiere combate, redirige al motor TCG
+    if (selectedChoice.action === 'combat') {
+        startTcgCombat(selectedChoice.npcType || currentEncounter.npcType);
+        return;
+    }
+
+    // Si es un encuentro de historia, procesa las consecuencias
+    if (currentEncounter.storyId) {
+        resolveStoryChoice(selectedChoice, currentEncounter.storyId, gameState.player);
+    }
+
+    // Continuar con el avance de la mazmorra
+    advanceDungeonStep();
 }
