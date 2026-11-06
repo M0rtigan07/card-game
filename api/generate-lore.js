@@ -1,5 +1,5 @@
 import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcPrompt.js';
-import { MONJE_LOCO_STORY } from './js/stories/monjeLocoStory.js';
+import { MONJE_LOCO_STORY } from '../js/stories/monjeLocoStory.js';
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
