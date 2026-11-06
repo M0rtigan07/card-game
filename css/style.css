@@ -1333,6 +1333,7 @@ h1 {
         transform: scale(0.8);
         opacity: 0;
     }
+
     100% {
         transform: scale(1);
         opacity: 1;
@@ -1404,49 +1405,134 @@ h1 {
     box-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
 }
 
+/* ═══════════ PANTALLA DE RECOMPENSA DE CARTAS ÉPICA ═══════════ */
+
 .reward-overlay {
     position: fixed;
     inset: 0;
-    z-index: 60;
+    z-index: 10001;
+    /* Por encima de todo */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 26px;
-    padding: 20px;
-    background: rgba(5, 2, 12, 0.94);
+    gap: 30px;
+    padding: 30px;
+    /* Fondo oscuro denso con viñeta mágica para aislar las cartas */
+    background: radial-gradient(circle, rgba(15, 8, 25, 0.96) 0%, rgba(3, 1, 6, 0.99) 100%);
+    backdrop-filter: blur(6px);
+    animation: fadeInReward 0.3s ease-out;
+}
+
+@keyframes fadeInReward {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .reward-title {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.9em;
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 2.2em;
     color: var(--gold);
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 3px 3px #000;
     text-align: center;
+    letter-spacing: 2px;
+    border-bottom: 2px solid var(--gold-border);
+    padding-bottom: 10px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .reward-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 22px;
+    gap: 25px;
 }
 
+/* Estilo mejorado para las cartas en la pantalla de recompensa */
 .reward-card {
-    width: 150px;
-    height: 215px;
-    padding: 8px;
+    width: 160px;
+    height: 230px;
+    padding: 10px;
+    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
+    border: 3px solid var(--gold);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reward-card:hover {
+    transform: translateY(-10px) scale(1.08);
+    border-color: #fff176;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
 }
 
 .reward-card .tcg-card-img {
-    height: 85px;
+    height: 95px;
+    border: 1px solid var(--gold-border);
+    border-radius: 6px;
+    object-fit: cover;
 }
 
 .reward-card .title {
-    font-size: 0.85em;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8em;
+    color: var(--gold-light);
+    font-weight: bold;
+    text-align: center;
 }
 
 .reward-card .desc {
-    font-size: 0.72em;
+    font-size: 0.7em;
+    color: #cbd5e1;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.rarity-tag {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.45em;
+    color: #cbd5e1;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Botón de saltar recompensa estilo clásico */
+.reward-skip {
+    background: linear-gradient(to bottom, #5a4521, #2d1f0d);
+    color: var(--gold);
+    border: 2px solid var(--gold);
+    padding: 12px 28px;
+    font-family: 'Cinzel', serif;
+    font-size: 1.05em;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    transition: all 0.2s ease;
+}
+
+.reward-skip:hover {
+    background: linear-gradient(to bottom, #75592b, #3d2912);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    transform: translateY(-2px);
 }
 
 .rarity-tag {
