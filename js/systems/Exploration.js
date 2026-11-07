@@ -7,7 +7,7 @@ import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
 import { getBossForFloor, isBossFloor } from './Bosses.js';
 import { setText, wait } from '../ui/helpers.js';
-import { MONJE_LOCO_STORY } from '../stories/monjeLocoStory.js';
+//import { MONJE_LOCO_STORY } from '../stories/monjeLocoStory.js';
 
 export class Exploration {
     /** @param {import('../Game.js').Game} game */
@@ -79,37 +79,7 @@ export class Exploration {
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
       //  const storyEncounter = this.getStoryEncounter(level);
-        if (storyEncounter) {
-            const view = this.render();
-            this.setSceneImage(storyEncounter.img);
-            setText('sceneBadgeOverlay', `HISTORIA - PLANTA ${level}`);
-
-            view.setNarrative(
-                storyEncounter.description,
-                storyEncounter.choices.map(choice => {
-                    // Si el usuario elige hablar, abrimos el chat modular del NPC
-                    if (choice.action === 'chat') {
-                        return {
-                            text: choice.text,
-                            callback: () => {
-                                this.game.audio.play('sega');
-                                this.openChat(NPC_DATABASE.monjeLoco);
-                            }
-                        };
-                    }
-
-                    // Elecciones normales del monje (estofado, ignorar, etc.)
-                    return {
-                        text: choice.text,
-                        callback: () => {
-                            this.lockChoices();
-                            return this.onStoryChoice(choice, storyEncounter.storyId);
-                        }
-                    };
-                })
-            );
-            return;
-        }
+       
 
         // 1. PNJ fijo de planta (Barnaby, Valerius, Morgana, Astrid, Batu Jan)
         const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === level);
@@ -359,24 +329,4 @@ export class Exploration {
         await this.npcActions.run(npc, choice.action);
     }
 
-    /** Comprueba si hay una historia de PNJ activa para el nivel actual. */
-    getStoryEncounter(dungeonLevel) {
-        const player = this.player;
-        if (!player.storyProgress) player.storyProgress = {};
-
-        const currentChapterId = player.storyProgress[MONJE_LOCO_STORY.id] || 1;
-        if (currentChapterId === -1) return null; // Si fue ignorado, no sale
-
-        const chapter = MONJE_LOCO_STORY.chapters.find(c => c.chapterId === currentChapterId);
-        if (chapter && dungeonLevel >= chapter.minDungeonLevel) {
-            return {
-                storyId: MONJE_LOCO_STORY.id,
-                chapterId: chapter.chapterId,
-                img: chapter.img,
-                description: chapter.description,
-                choices: chapter.choices
-            };
-        }
-        return null;
-    }
 }
