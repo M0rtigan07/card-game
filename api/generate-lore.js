@@ -59,7 +59,9 @@ export default async function handler(req, res) {
         // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
         const dndEncounterDatabase = {
           
-         /*    "Guerrero": [
+             "Guerrero": [
+
+                /*
                 {
                     npcType: "warrior",
                     description: "Un veterano malherido apoya su espadón en una pira: \"Mi escuadra cayó ante el Capitán Orco... Toma mi escudo o avanza a vengar nuestras vidas.\"",
@@ -69,6 +71,9 @@ export default async function handler(req, res) {
                         { text: "⚔️ \"Examino el pasillo en busca de los orcos. ¡A las armas!\"", action: "combat" }
                     ]
                 },
+
+                */
+
                 {
                     npcType: "automata",
                     description: "Un autómata de bronce guardián bloquea el puente de piedra: \"Solo aquellos dignos en el arte del combate atravesarán los portones del rey.\"",
@@ -78,7 +83,7 @@ export default async function handler(req, res) {
                         { text: "🚪 \"Buscaré un paso subterráneo alternativo.\"", action: "pass" }
                     ]
                 }
-            ], */
+            ], 
 
 
             "Maga Arcana": [

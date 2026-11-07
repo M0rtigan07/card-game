@@ -16,6 +16,7 @@ import { NpcChat } from './systems/NpcChat.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES } from './data/gameConfig.js';
+import { StoryManager } from './stories/StoryManager.js';
 
 export class Game {
     constructor() {
@@ -24,6 +25,7 @@ export class Game {
         this.ui = new UIManager();
 
         this.player = null;
+        this.storyManager = null;
         this.playerName = 'HÉROE';
         this.deck = null;           // PlayerDeck: tu colección de cartas (crece con las recompensas)
         this.dungeonLevel = 1;
@@ -137,11 +139,13 @@ export class Game {
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
+        this.storyManager =  new StoryManager(this.player);
 
         this.playerName = localStorage.getItem('mazo_hero_name') || this.playerName;
         this.player.name = this.playerName;
         this.player.img = HERO_IMAGES[classKey] || HERO_IMAGES.warrior;
         this.deck = new PlayerDeck(STARTER_DECKS[classKey] || STARTER_DECKS.warrior);
+        
 
         setText('heroClassTag', this.playerName.toUpperCase());
         setText('introHeroTitle', `${this.playerName} - ${this.player.className.toUpperCase()}`);

@@ -76,10 +76,16 @@ export class Exploration {
             this.log(`⚠️ Una presencia enorme aguarda en la planta siguiente...`);
         }
 
+        const story = this.game.storyManager?.getStoryEncounter(level);
+
+        if (story) {
+            return this.showStory(story);
+        }
+
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
-      //  const storyEncounter = this.getStoryEncounter(level);
-       
+        //  const storyEncounter = this.getStoryEncounter(level);
+
 
         // 1. PNJ fijo de planta (Barnaby, Valerius, Morgana, Astrid, Batu Jan)
         const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === level);
