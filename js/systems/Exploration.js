@@ -78,7 +78,7 @@ export class Exploration {
 
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
         // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
-        const storyEncounter = this.getStoryEncounter(level);
+      //  const storyEncounter = this.getStoryEncounter(level);
         if (storyEncounter) {
             const view = this.render();
             this.setSceneImage(storyEncounter.img);
