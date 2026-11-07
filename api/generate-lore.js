@@ -58,7 +58,8 @@ export default async function handler(req, res) {
 
         // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
         const dndEncounterDatabase = {
-            "Guerrero": [
+          
+         /*    "Guerrero": [
                 {
                     npcType: "warrior",
                     description: "Un veterano malherido apoya su espadón en una pira: \"Mi escuadra cayó ante el Capitán Orco... Toma mi escudo o avanza a vengar nuestras vidas.\"",
@@ -77,7 +78,9 @@ export default async function handler(req, res) {
                         { text: "🚪 \"Buscaré un paso subterráneo alternativo.\"", action: "pass" }
                     ]
                 }
-            ],
+            ], */
+
+
             "Maga Arcana": [
                 {
                     npcType: "mage",
@@ -282,11 +285,7 @@ Devuelve únicamente texto plano.
         // EXPLORACIÓN PROCEDURAL
         // EXPLORACIÓN PROCEDURAL
         if (type === 'exploration') {
-            // 1. COMPROBAR SI HAY UNA HISTORIA ACTIVA (Ej. Monje Loco)
-            const storyEncounter = getStoryEncounter(body.storyProgress, dungeonLevel);
-            if (storyEncounter) {
-                return res.status(200).json(storyEncounter);
-            }
+           
 
             // 2. FLUJO HABITUAL SI NO HAY HISTORIA ACTIVA
             if (!apiKey) return res.status(200).json(fallbackEvent);
