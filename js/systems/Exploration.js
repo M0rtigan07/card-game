@@ -122,6 +122,40 @@ export class Exploration {
         );
     }
 
+    showStory(story) {
+
+        const view = this.render();
+
+        this.setSceneImage(
+            story.img
+        );
+
+        setText(
+            'sceneBadgeOverlay',
+            story.storyTitle || 'HISTORIA'
+        );
+
+        view.setNarrative(
+
+            story.description,
+
+            story.choices.map(choice => ({
+
+                text: choice.text,
+
+                callback: () => {
+
+                    console.log(
+                        "Story choice:",
+                        choice
+                    );
+
+                }
+
+            }))
+        );
+    }
+
     async onStoryChoice(choice, storyId) {
         this.game.audio.play('card');
         const player = this.player;
