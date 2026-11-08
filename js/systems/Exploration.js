@@ -7,7 +7,7 @@ import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
 import { getBossForFloor, isBossFloor } from './Bosses.js';
 import { setText, wait } from '../ui/helpers.js';
-//import { MONJE_LOCO_STORY } from '../stories/monjeLocoStory.js';
+import { StoryResolver } from '../stories/StoryResolver.js';
 
 export class Exploration {
     /** @param {import('../Game.js').Game} game */
