@@ -6,6 +6,13 @@ export const MONJE_LOCO = {
 
     title: "El Monje Loco",
 
+    npc: {
+        id: "monjeLoco",
+        name: "El Monje Loco",
+        role: "Ermitaño de Kaldur-Ath"
+    },
+
+
     chapters: [
 
         {
@@ -21,25 +28,24 @@ export const MONJE_LOCO = {
             choices: [
 
                 {
-                    text:
-                        '🍲 Comer el estofado',
+                    text: "💬 Hablar con el monje",
+                    action: "talk"
+                },
 
+                {
+                    text: "🍲 Comer el estofado",
                     hp: 20,
-
                     storyId: "monjeLoco",
-
                     nextChapter: 2
                 },
 
                 {
-                    text:
-                        '🚪 Ignorarlo',
-
+                    text: "🚪 Ignorarlo",
                     storyId: "monjeLoco",
-
                     nextChapter: -1
                 }
             ]
+
         },
 
         {

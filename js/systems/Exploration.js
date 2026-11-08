@@ -8,6 +8,7 @@ import { NpcActions } from './NpcActions.js';
 import { getBossForFloor, isBossFloor } from './Bosses.js';
 import { setText, wait } from '../ui/helpers.js';
 import { StoryResolver } from '../stories/StoryResolver.js';
+import { MONJE_LOCO_NPC } from '../stories/npcs/monjeLocoNpc.js';
 
 export class Exploration {
     /** @param {import('../Game.js').Game} game */
@@ -144,6 +145,22 @@ export class Exploration {
                 text: choice.text,
 
                 callback: () => {
+
+                    if (choice.action === "talk") {
+
+                        return this.game.chat.open(
+                            MONJE_LOCO_NPC,
+                            {
+                                onClose: () => {
+
+                                    this.showStory(story);
+
+                                }
+                            }
+                        );
+                    }
+
+
 
                     console.log(
                         "Story choice:",
