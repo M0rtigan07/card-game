@@ -152,11 +152,11 @@ export class Exploration {
 
                     StoryResolver.applyChoice(
 
-                        this.exploration.player,
+                        this.player,
 
                         choice,
 
-                        this.exploration.game
+                        this.game
 
                     );
 
