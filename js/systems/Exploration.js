@@ -150,6 +150,21 @@ export class Exploration {
                         choice
                     );
 
+                    StoryResolver.applyChoice(
+
+                        this.exploration.player,
+
+                        choice,
+
+                        this.exploration.game
+
+                    );
+
+                    this.exploration.game.ui
+                        ?.updateStats?.();
+
+                    this.exploration.loadNext();
+
                 }
 
             }))

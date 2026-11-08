@@ -1,4 +1,7 @@
 // js/views/StoryView.js
+import { StoryResolver }
+from '../stories/StoryResolver.js';
+
 
 export class StoryView {
 
