@@ -150,20 +150,22 @@ export class Exploration {
                         choice
                     );
 
+
                     StoryResolver.applyChoice(
-
                         this.player,
-
                         choice,
-
                         this.game
-
                     );
 
-                    this.exploration.game.ui
-                        ?.updateStats?.();
+                    this.game.ui.updateStats(
+                        this.player,
+                        this.game.dungeonLevel
+                    );
 
-                    this.exploration.loadNext();
+                    this.game.dungeonLevel++;
+
+                    this.game.loadNextEvent();
+
 
                 }
 
