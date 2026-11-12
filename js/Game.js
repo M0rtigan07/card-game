@@ -225,7 +225,7 @@ export class Game {
 }
 
 // Al hacer clic en un botón de la interfaz de encuentro:
-function handleChoiceClick(selectedChoice, currentEncounter) {
+/* function handleChoiceClick(selectedChoice, currentEncounter) {
     // Si la opción requiere combate, redirige al motor TCG
     if (selectedChoice.action === 'combat') {
         startTcgCombat(selectedChoice.npcType || currentEncounter.npcType);
@@ -239,4 +239,4 @@ function handleChoiceClick(selectedChoice, currentEncounter) {
 
     // Continuar con el avance de la mazmorra
     advanceDungeonStep();
-}
+} */

@@ -3,6 +3,7 @@ export const MONJE_LOCO_NPC = {
     id: "monjeLoco",
 
     name: "El Monje Loco",
+    trueName: "Fray Aldren",
 
     npcType: "storyNpc",
 

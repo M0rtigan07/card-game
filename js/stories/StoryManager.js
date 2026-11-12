@@ -9,7 +9,10 @@ export class StoryManager {
         this.player = player;
 
         if (!this.player.storyState) {
-            this.player.storyState = {};
+            this.player.storyState = {
+                monjeTrust: 0,
+                monjeNameKnown: false
+            };
         }
     }
 
@@ -94,6 +97,22 @@ export class StoryManager {
 
         return null;
     }
+
+    // gestionar nombre  de personajes
+
+    getMonkName() {
+
+        if (
+            this.player.storyState
+                ?.monjeNameKnown
+        ) {
+            return "Fray Aldren";
+        }
+
+        return "El Monje Loco";
+    }
+    
+    
 
     /**
      * Devuelve el capítulo actual de una historia.

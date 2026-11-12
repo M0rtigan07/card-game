@@ -35,7 +35,17 @@ export const MONJE_LOCO = {
                 {
                     text: "🍲 Comer el estofado",
                     hp: 20,
+                    trust: 2,
                     storyId: "monjeLoco",
+                    nextChapter: 2
+                },
+                {
+                    text: "😒 Tu comida parece veneno",
+
+                    trust: -3,
+
+                    storyId: "monjeLoco",
+
                     nextChapter: 2
                 },
 

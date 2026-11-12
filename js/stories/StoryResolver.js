@@ -9,6 +9,39 @@ export class StoryResolver {
             choice.text
         );
 
+        if (choice.trust) {
+
+            player.storyState =
+                player.storyState || {};
+
+            player.storyState.monjeTrust =
+                (player.storyState.monjeTrust || 0)
+                + choice.trust;
+
+
+
+            if (
+
+                player.storyState.monjeTrust >= 10 &&
+
+                !player.storyState.monjeNameKnown
+
+            ) {
+
+                player.storyState.monjeNameKnown = true;
+
+                console.log(
+                    "[MONJE] Nombre desbloqueado"
+                );
+
+            }
+
+            console.log(
+                "[TRUST]",
+                player.storyState.monjeTrust
+            );
+        }
+
         // VIDA
 
         if (choice.hp) {
