@@ -7,8 +7,6 @@ import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
 import { getBossForFloor, isBossFloor } from './Bosses.js';
 import { setText, wait } from '../ui/helpers.js';
-import { StoryResolver } from '../stories/StoryResolver.js';
-import { MONJE_LOCO_NPC } from '../stories/npcs/monjeLocoNpc.js';
 
 export class Exploration {
     /** @param {import('../Game.js').Game} game */
@@ -77,17 +75,6 @@ export class Exploration {
             this.log(`⚠️ Una presencia enorme aguarda en la planta siguiente...`);
         }
 
-        const story = this.game.storyManager?.getStoryEncounter(level);
-
-        if (story) {
-            return this.showStory(story);
-        }
-
-        // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
-        // 🌟 0.5. HISTORIA NARRATIVA ACTIVA (Ej. Monje Loco)
-        //  const storyEncounter = this.getStoryEncounter(level);
-
-
         // 1. PNJ fijo de planta (Barnaby, Valerius, Morgana, Astrid, Batu Jan)
         const npcKey = Object.keys(NPC_DATABASE).find(k => NPC_DATABASE[k].dungeonLevel === level);
         if (npcKey) {
@@ -121,109 +108,6 @@ export class Exploration {
                 }
             }))
         );
-    }
-
-    showStory(story) {
-
-        const view = this.render();
-
-        this.setSceneImage(
-            story.img
-        );
-
-        setText(
-            'sceneBadgeOverlay',
-            story.storyTitle || 'HISTORIA'
-        );
-
-        view.setNarrative(
-
-            story.description,
-
-            story.choices.map(choice => ({
-
-                text: choice.text,
-
-                callback: () => {
-
-                    if (choice.action === "talk") {
-
-                        return this.game.chat.open(
-                            MONJE_LOCO_NPC,
-                            {
-                                onClose: () => {
-
-                                    this.showStory(story);
-
-                                }
-                            }
-                        );
-                    }
-
-
-
-                    console.log(
-                        "Story choice:",
-                        choice
-                    );
-
-
-                    StoryResolver.applyChoice(
-                        this.player,
-                        choice,
-                        this.game
-                    );
-
-                    this.game.ui.updateStats(
-                        this.player,
-                        this.game.dungeonLevel
-                    );
-
-                    this.game.dungeonLevel++;
-
-                    this.game.loadNextEvent();
-
-
-                }
-
-            }))
-        );
-    }
-
-    async onStoryChoice(choice, storyId) {
-        this.game.audio.play('card');
-        const player = this.player;
-
-        if (!player.storyProgress) player.storyProgress = {};
-
-        // Actualizar fase de la historia o bloqueo (-1)
-        if (choice.nextChapter !== undefined) {
-            player.storyProgress[storyId] = choice.nextChapter;
-        }
-
-        // Aplicar recompensas de la elección
-        if (choice.reward) {
-            if (choice.reward.hp) {
-                player.health = Math.min(player.maxHealth, player.health + choice.reward.hp);
-            }
-            if (choice.reward.gold) {
-                player.gold += choice.reward.gold;
-            }
-            if (choice.reward.cardId && this.game.deck) {
-                this.game.deck.addCard(choice.reward.cardId);
-            }
-        }
-
-        if (choice.log) {
-            this.log(choice.log);
-        }
-
-        this.game.ui.updateStats(player, this.game.dungeonLevel);
-
-        // Avanzar de planta tras la interacción narrativa
-        this.game.dungeonLevel++;
-        await wait(1400);
-        await this.game.loadNextEvent();
     }
 
     /** Elección en un encuentro procedural: combate, compra, huida o tirada de habilidad. */
@@ -374,8 +258,22 @@ export class Exploration {
     openChat(npc) {
         this.sceneToken++; // invalida cualquier respuesta que estuviera en camino para la escena anterior
         return this.game.chat.open(npc, {
-            onClose: () => this.showNpcMenu(npc, `Te despides de ${npc.name}, que sigue esperando tu decisión.`)
+            onClose: () => this.game.party.has(npc.id)
+                ? this.showAllyJoined(npc)
+                : this.showNpcMenu(npc, `Te despides de ${npc.name}, que sigue esperando tu decisión.`)
         });
+    }
+
+    /** Tras convencer a un personaje: ya forma parte de tu grupo y solo queda seguir adelante. */
+    showAllyJoined(npc) {
+        const view = this.render();
+        this.setSceneImage(npc.images?.talk ?? npc.images?.room);
+        setText('sceneBadgeOverlay', npc.name.toUpperCase());
+
+        view.setNarrative(
+            `${npc.name} se une a tu grupo y te acompañará por la mazmorra.`,
+            [{ text: '➡️ Seguir adelante', callback: () => { this.lockChoices(); this.game.finishEncounter(600); } }]
+        );
     }
 
     async onNpcChoice(npc, choice) {
@@ -402,5 +300,4 @@ export class Exploration {
         await wait(2200);
         await this.npcActions.run(npc, choice.action);
     }
-
 }

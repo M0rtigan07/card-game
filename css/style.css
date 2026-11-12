@@ -281,39 +281,6 @@ body::after {
     padding: 20px;
 }
 
-@keyframes pulseDungeon {
-    0% {
-        transform: scale(1);
-        filter: brightness(0.8);
-    }
-
-    100% {
-        transform: scale(1.05);
-        filter: brightness(1.2);
-    }
-}
-
-#dungeonDescentScreen {
-    background: url('../img/fondo_intro.jpg') no-repeat center center / cover;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-/* Sombra semitransparente para resaltar los textos e interfaz sobre el fondo */
-#dungeonDescentScreen .intro-container {
-    background-color: rgba(0, 0, 0, 0.75);
-    padding: 25px;
-    border: 2px solid #ffcc00;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
-    border-radius: 8px;
-}
-
-
-
 .intro-container {
     display: flex;
     flex-direction: row;
@@ -751,10 +718,8 @@ h1 {
 .elvira-scene-frame img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    /* Mantiene la proporción de la imagen completa sin recortarla */
-    background-color: #000;
-    /* Fondo negro lateral si la foto es más estrecha */
+    object-fit: contain;      /* Mantiene la proporción de la imagen completa sin recortarla */
+    background-color: #000;   /* Fondo negro lateral si la foto es más estrecha */
     image-rendering: pixelated;
     /* Hace que la imagen cubra todo el marco sin verse pequeña */
 }
@@ -1119,25 +1084,11 @@ h1 {
 }
 
 /* Color del borde según el tipo de jugada */
-.intent-def {
-    border-color: #60a5fa;
-}
-
-.intent-heal {
-    border-color: #4ade80;
-}
-
-.intent-poison {
-    border-color: #c084fc;
-}
-
-.intent-buff {
-    border-color: #fb923c;
-}
-
-.intent-drain {
-    border-color: #f43f5e;
-}
+.intent-def { border-color: #60a5fa; }
+.intent-heal { border-color: #4ade80; }
+.intent-poison { border-color: #c084fc; }
+.intent-buff { border-color: #fb923c; }
+.intent-drain { border-color: #f43f5e; }
 
 .enemy-intent-card.playing {
     animation: intentPlay 0.9s ease-out;
@@ -1170,74 +1121,32 @@ h1 {
     animation: floatUp 1s ease-out forwards;
 }
 
-.float-dmg {
-    color: #ef4444;
-}
-
-.float-heal {
-    color: #4ade80;
-}
-
-.float-shield {
-    color: #60a5fa;
-}
-
-.float-poison {
-    color: #c084fc;
-}
-
-.float-buff {
-    color: #fb923c;
-}
+.float-dmg { color: #ef4444; }
+.float-heal { color: #4ade80; }
+.float-shield { color: #60a5fa; }
+.float-poison { color: #c084fc; }
+.float-buff { color: #fb923c; }
 
 .hit-shake {
     animation: hitShake 0.4s;
 }
 
 @keyframes floatUp {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, 10px);
-    }
-
-    15% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -55px);
-    }
+    0% { opacity: 0; transform: translate(-50%, 10px); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -55px); }
 }
 
 @keyframes hitShake {
-
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-7px);
-    }
-
-    75% {
-        transform: translateX(7px);
-    }
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
 }
 
 @keyframes intentPlay {
-    0% {
-        transform: scale(1);
-    }
-
-    40% {
-        transform: scale(1.06);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
 }
 
 /* Mientras juega el enemigo */
@@ -1302,99 +1211,6 @@ h1 {
     pointer-events: none;
 }
 
-/* ═══════════ PANTALLA DE VICTORIA TCG ÉPICA ═══════════ */
-
-#victoryAnimationModal.modal {
-    /* Fondo translúcido oscuro con un toque de viñeta mágica */
-    background: radial-gradient(circle, rgba(20, 10, 35, 0.85) 0%, rgba(5, 2, 10, 0.96) 100%) !important;
-    backdrop-filter: blur(5px);
-    z-index: 10000;
-}
-
-.victory-modal-box {
-    /* Fondo con textura o degradado profundo y marco dorado brillante estilo medieval */
-    background: linear-gradient(160deg, #1f1429 0%, #0a0612 100%);
-    border: 4px solid var(--gold);
-    border-radius: 16px;
-    padding: 35px 30px;
-    max-width: 460px;
-    width: 92%;
-    text-align: center;
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5), inset 0 0 25px rgba(138, 43, 226, 0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-    animation: victoryPopup 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes victoryPopup {
-    0% {
-        transform: scale(0.8);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.victory-modal-box h2 {
-    font-family: 'UnifrakturCook', cursive;
-    font-size: 2.4em;
-    color: var(--gold);
-    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8), 3px 3px #000;
-    letter-spacing: 2px;
-    margin-bottom: 2px;
-}
-
-
-
-.victory-pixel-gif {
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
-}
-
-/* ═══════════ CORRECCIÓN DE ESPACIADO EN PANTALLA DE VICTORIA ═══════════ */
-
-.pixel-gif-container {
-    width: 100%;
-    max-height: 180px;
-    overflow: hidden;
-    border: 2px solid var(--gold-border);
-    border-radius: 10px;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
-    margin-bottom: 8px;
-    /* 👈 Añadimos separación inferior respecto al cuadro de texto */
-}
-
-#victoryRewardText {
-    font-family: 'Cinzel', serif;
-    font-size: 0.9em;
-    color: var(--gold-light);
-    line-height: 1.5;
-    background: rgba(12, 8, 20, 0.9);
-    padding: 14px 16px;
-    border-radius: 8px;
-    width: 100%;
-    border-left: 4px solid var(--gold);
-    border-top: 1px solid rgba(255, 215, 0, 0.25);
-    border-right: 1px solid rgba(255, 215, 0, 0.25);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.25);
-    text-align: left;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
-    margin-top: 10px;
-    /* 👈 Empuja el cuadro de texto hacia abajo para que no esté pegado */
-}
-
 /* ═══════════ RECOMPENSA DE CARTAS Y RAREZAS ═══════════ */
 
 .energy-deck {
@@ -1404,144 +1220,49 @@ h1 {
     opacity: 0.8;
 }
 
-.tcg-card.rarity-uncommon {
-    border-color: #4ade80;
-}
+.tcg-card.rarity-uncommon { border-color: #4ade80; }
 
 .tcg-card.rarity-rare {
     border-color: #c084fc;
     box-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
 }
 
-/* ═══════════ PANTALLA DE RECOMPENSA DE CARTAS ÉPICA ═══════════ */
-
 .reward-overlay {
     position: fixed;
     inset: 0;
-    z-index: 10001;
-    /* Por encima de todo */
+    z-index: 60;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 30px;
-    padding: 30px;
-    /* Fondo oscuro denso con viñeta mágica para aislar las cartas */
-    background: radial-gradient(circle, rgba(15, 8, 25, 0.96) 0%, rgba(3, 1, 6, 0.99) 100%);
-    backdrop-filter: blur(6px);
-    animation: fadeInReward 0.3s ease-out;
-}
-
-@keyframes fadeInReward {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    gap: 26px;
+    padding: 20px;
+    background: rgba(5, 2, 12, 0.94);
 }
 
 .reward-title {
-    font-family: 'UnifrakturCook', cursive;
-    font-size: 2.2em;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9em;
     color: var(--gold);
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 3px 3px #000;
     text-align: center;
-    letter-spacing: 2px;
-    border-bottom: 2px solid var(--gold-border);
-    padding-bottom: 10px;
-    width: 100%;
-    max-width: 600px;
 }
 
 .reward-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 25px;
+    gap: 22px;
 }
 
-/* Estilo mejorado para las cartas en la pantalla de recompensa */
 .reward-card {
-    width: 160px;
-    height: 230px;
-    padding: 10px;
-    background: linear-gradient(160deg, #2a1b3d 0%, #0f0a18 100%);
-    border: 3px solid var(--gold);
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-    transition: all 0.25s ease;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    width: 150px;
+    height: 215px;
+    padding: 8px;
 }
 
-.reward-card:hover {
-    transform: translateY(-10px) scale(1.08);
-    border-color: #fff176;
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-}
-
-.reward-card .tcg-card-img {
-    height: 95px;
-    border: 1px solid var(--gold-border);
-    border-radius: 6px;
-    object-fit: cover;
-}
-
-.reward-card .title {
-    font-family: 'Cinzel', serif;
-    font-size: 0.8em;
-    color: var(--gold-light);
-    font-weight: bold;
-    text-align: center;
-}
-
-.reward-card .desc {
-    font-size: 0.7em;
-    color: #cbd5e1;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 4px;
-    border-radius: 4px;
-    width: 100%;
-}
-
-.rarity-tag {
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.45em;
-    color: #cbd5e1;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-/* Botón de saltar recompensa estilo clásico */
-.reward-skip {
-    background: linear-gradient(to bottom, #5a4521, #2d1f0d);
-    color: var(--gold);
-    border: 2px solid var(--gold);
-    padding: 12px 28px;
-    font-family: 'Cinzel', serif;
-    font-size: 1.05em;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 8px;
-    text-transform: uppercase;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-    transition: all 0.2s ease;
-}
-
-.reward-skip:hover {
-    background: linear-gradient(to bottom, #75592b, #3d2912);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    transform: translateY(-2px);
-}
+.reward-card .tcg-card-img { height: 85px; }
+.reward-card .title { font-size: 0.85em; }
+.reward-card .desc { font-size: 0.72em; }
 
 .rarity-tag {
     font-family: 'Press Start 2P', cursive;
@@ -1578,90 +1299,22 @@ h1 {
 }
 
 @keyframes speechPop {
-    0% {
-        transform: scale(0.92);
-    }
-
-    60% {
-        transform: scale(1.04);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(0.92); }
+    60% { transform: scale(1.04); }
+    100% { transform: scale(1); }
 }
 
-.speech-valerius {
-    font-family: 'Cinzel', serif;
-    color: #fca5a5;
-    border-color: #9f1239;
-    letter-spacing: 0.02em;
-}
-
-.speech-morgana {
-    color: #d8b4fe;
-    border-color: #a855f7;
-}
-
-.speech-vikinga {
-    color: #fde68a;
-    border-color: #d97706;
-    font-style: normal;
-    font-weight: 700;
-}
-
-.speech-mongol {
-    color: #fdba74;
-    border-color: #ea580c;
-}
-
-.speech-barnaby {
-    color: #fcd34d;
-    border-color: #ca8a04;
-}
-
-.speech-corrupto {
-    color: #d1d5db;
-    border-color: #6b7280;
-    font-style: normal;
-}
-
-.speech-automata {
-    font-family: 'Courier New', monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-style: normal;
-    color: #67e8f9;
-    border-color: #06b6d4;
-}
-
-.speech-orco {
-    text-transform: uppercase;
-    font-style: normal;
-    font-weight: 800;
-    color: #86efac;
-    border-color: #16a34a;
-}
-
-.speech-gargola {
-    color: #cbd5e1;
-    border-color: #64748b;
-    letter-spacing: 0.1em;
-}
-
-.speech-hechicero {
-    color: #93c5fd;
-    border-color: #3b82f6;
-}
-
-.speech-dragon {
-    font-family: 'Cinzel', serif;
-    font-size: 1em;
-    font-weight: 700;
-    font-style: normal;
-    color: #fb923c;
-    border-color: #dc2626;
-}
+.speech-valerius { font-family: 'Cinzel', serif; color: #fca5a5; border-color: #9f1239; letter-spacing: 0.02em; }
+.speech-morgana { color: #d8b4fe; border-color: #a855f7; }
+.speech-vikinga { color: #fde68a; border-color: #d97706; font-style: normal; font-weight: 700; }
+.speech-mongol { color: #fdba74; border-color: #ea580c; }
+.speech-barnaby { color: #fcd34d; border-color: #ca8a04; }
+.speech-corrupto { color: #d1d5db; border-color: #6b7280; font-style: normal; }
+.speech-automata { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 0.08em; font-style: normal; color: #67e8f9; border-color: #06b6d4; }
+.speech-orco { text-transform: uppercase; font-style: normal; font-weight: 800; color: #86efac; border-color: #16a34a; }
+.speech-gargola { color: #cbd5e1; border-color: #64748b; letter-spacing: 0.1em; }
+.speech-hechicero { color: #93c5fd; border-color: #3b82f6; }
+.speech-dragon { font-family: 'Cinzel', serif; font-size: 1em; font-weight: 700; font-style: normal; color: #fb923c; border-color: #dc2626; }
 
 /* ═══════════ INVENTARIO: OBJETOS CON EFECTO ═══════════ */
 
@@ -1680,9 +1333,7 @@ h1 {
     border-radius: 6px;
 }
 
-.inv-consumable {
-    border-left-color: #4ade80;
-}
+.inv-consumable { border-left-color: #4ade80; }
 
 .inv-effect {
     flex-basis: 100%;
@@ -1701,9 +1352,7 @@ h1 {
     cursor: pointer;
 }
 
-.inv-use-btn:hover {
-    filter: brightness(1.15);
-}
+.inv-use-btn:hover { filter: brightness(1.15); }
 
 /* ═══════════ JEFES ═══════════ */
 
@@ -1714,57 +1363,22 @@ h1 {
 }
 
 @keyframes bossPulse {
-
-    0%,
-    100% {
-        text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 2px 2px 0 #000;
-    }
-
-    50% {
-        text-shadow: 0 0 20px rgba(239, 68, 68, 1), 2px 2px 0 #000;
-    }
+    0%, 100% { text-shadow: 0 0 8px rgba(239, 68, 68, 0.6), 2px 2px 0 #000; }
+    50% { text-shadow: 0 0 20px rgba(239, 68, 68, 1), 2px 2px 0 #000; }
 }
 
 /* Estilo de habla de los jefes */
-.speech-orco_jefe {
-    text-transform: uppercase;
-    font-style: normal;
-    font-weight: 800;
-    font-size: 0.95em;
-    color: #86efac;
-    border-color: #15803d;
-}
-
-.speech-vampira_jefa {
-    font-family: 'Cinzel', serif;
-    color: #f9a8d4;
-    border-color: #be185d;
-    letter-spacing: 0.03em;
-}
-
-.speech-escorpiones_jefe {
-    font-family: 'Courier New', monospace;
-    font-style: normal;
-    letter-spacing: 0.04em;
-    color: #a5b4fc;
-    border-color: #4338ca;
-}
-
-.speech-dragon_jefe {
-    font-family: 'Cinzel', serif;
-    font-size: 1.05em;
-    font-weight: 700;
-    font-style: normal;
-    color: #fdba74;
-    border-color: #b91c1c;
-    text-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
-}
+.speech-orco_jefe { text-transform: uppercase; font-style: normal; font-weight: 800; font-size: 0.95em; color: #86efac; border-color: #15803d; }
+.speech-skull_jefe { font-family: 'Courier New', monospace; font-weight: 700; font-style: normal; letter-spacing: 0.06em; color: #67e8f9; border-color: #0891b2; text-shadow: 0 0 8px rgba(34, 211, 238, 0.6); }
+.speech-necro { color: #a78bfa; border-color: #6d28d9; }
+.speech-pirata { color: #fcd34d; border-color: #d97706; font-style: normal; font-weight: 700; }
+.speech-vampira { font-family: 'Cinzel', serif; color: #f9a8d4; border-color: #be185d; letter-spacing: 0.03em; }
+.speech-escorpiones_jefe { font-family: 'Courier New', monospace; font-style: normal; letter-spacing: 0.04em; color: #a5b4fc; border-color: #4338ca; }
+.speech-dragon_jefe { font-family: 'Cinzel', serif; font-size: 1.05em; font-weight: 700; font-style: normal; color: #fdba74; border-color: #b91c1c; text-shadow: 0 0 8px rgba(249, 115, 22, 0.6); }
 
 /* ═══════════ CONVERSACIONES (ESTILO AVENTURA GRÁFICA) ═══════════ */
 
-.chat-scene {
-    height: 320px;
-}
+.chat-scene { height: 320px; }
 
 .chat-scene .chat-portrait {
     width: 100%;
@@ -1772,20 +1386,11 @@ h1 {
     object-fit: contain;
 }
 
-.chat-scene .chat-portrait.talking {
-    animation: chatBob 0.5s ease-in-out infinite;
-}
+.chat-scene .chat-portrait.talking { animation: chatBob 0.5s ease-in-out infinite; }
 
 @keyframes chatBob {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-4px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
 }
 
 /* .chat-scene delante: la regla genérica `.elvira-scene-frame img` fuerza width/height 100 % a toda imagen de la escena */
@@ -1816,15 +1421,11 @@ h1 {
     cursor: pointer;
 }
 
-.chat-dialogue-box b {
-    color: var(--gold);
-}
+.chat-dialogue-box b { color: var(--gold); }
 
 /* El héroe habla en azul claro y el personaje en dorado, como en las aventuras clásicas */
 .chat-dialogue-box.hero-speaking b,
-.chat-dialogue-box.hero-speaking p {
-    color: #67e8f9;
-}
+.chat-dialogue-box.hero-speaking p { color: #67e8f9; }
 
 .chat-continue {
     position: absolute;
@@ -1835,18 +1436,11 @@ h1 {
     animation: chatBlink 1s steps(2) infinite;
 }
 
-.chat-continue.visible {
-    visibility: visible;
-}
+.chat-continue.visible { visibility: visible; }
 
 @keyframes chatBlink {
-    0% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
+    0% { opacity: 1; }
+    100% { opacity: 0; }
 }
 
 .chat-controls {
@@ -1865,23 +1459,11 @@ h1 {
     list-style: none;
 }
 
-.chat-option {
-    text-align: left;
-    color: #7dd3fc;
-}
+.chat-option { text-align: left; color: #7dd3fc; }
+.chat-option:hover:not(:disabled) { color: var(--gold); }
+.chat-option.asked { color: #64748b; }
 
-.chat-option:hover:not(:disabled) {
-    color: var(--gold);
-}
-
-.chat-option.asked {
-    color: #64748b;
-}
-
-.chat-free-row {
-    display: flex;
-    gap: 8px;
-}
+.chat-free-row { display: flex; gap: 8px; }
 
 .chat-input {
     flex: 1;
@@ -1903,7 +1485,62 @@ h1 {
 }
 
 @media screen and (max-width: 768px) {
-    .chat-scene {
-        height: 240px;
-    }
+    .chat-scene { height: 240px; }
 }
+
+/* ═══════════ ALIADOS: PANEL "GRUPO" Y ARGUMENTOS ═══════════ */
+
+.party-member {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 4px 6px;
+    background: rgba(30, 10, 50, 0.4);
+    border: 1px solid var(--gold-border);
+    border-radius: 6px;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.party-member.acting {
+    transform: scale(1.04);
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+}
+
+.party-card {
+    width: 46px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.party-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.7em;
+}
+
+.party-info small { color: #d8b4fe; }
+
+.party-dismiss {
+    color: #fca5a5;
+    background: transparent;
+    border: 1px solid #ef4444;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chat-arguments { margin-top: 4px; }
+
+.chat-arguments-title {
+    margin-bottom: 4px;
+    font-size: 0.8em;
+    color: var(--gold);
+}
+
+/* Los argumentos para convencer se distinguen de los temas por su color */
+.chat-argument { color: #fdba74; }
+.chat-argument.asked { color: #64748b; }
+

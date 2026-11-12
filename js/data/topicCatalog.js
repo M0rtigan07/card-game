@@ -7,6 +7,7 @@
 //             advice  estado de tu héroe y trucos del combate
 //             boss    cómo es el próximo jefe y a cuántas plantas está
 //             wares   lo que ese personaje vende de verdad
+//             values  lo que valora y desprecia un posible aliado (pista para convencerle)
 //
 // El banco de frases de respaldo de cada tema está en data/npcLines.js con la clave "chat_<id>".
 // Para añadir un tema: una entrada aquí, su id en GENERAL_TOPICS (para todos) o en NPC_TOPICS (para uno) y sus frases.
@@ -23,7 +24,13 @@ export const CHAT_TOPICS = {
     eternity: { id: 'eternity', label: '¿Cuánto tiempo llevas encerrado aquí?', xp: 10 },
     cauldron: { id: 'cauldron', label: '¿Qué cocinas en ese caldero?', xp: 10 },
     valhalla: { id: 'valhalla', label: '¿Qué significa el Valhalla para ti?', xp: 10 },
-    wind: { id: 'wind', label: '¿Qué te dice el viento de este lugar?', xp: 10 }
+    wind: { id: 'wind', label: '¿Qué te dice el viento de este lugar?', xp: 10 },
+    tomes: { id: 'tomes', label: '¿Qué buscas entre los muertos?', xp: 10 },
+    treasure: { id: 'treasure', label: '¿Qué tesoro persigues?', xp: 10 },
+    dance: { id: 'dance', label: '¿Quién baila contigo en este salón?', xp: 10 },
+
+    // Solo con los personajes que pueden unirse a tu grupo: la pista para convencerles
+    values: { id: 'values', label: '¿Qué es lo que más valoras?', xp: 10, facts: 'values' }
 };
 
 export const GENERAL_TOPICS = ['who', 'place', 'advice', 'rumors', 'boss'];
@@ -33,10 +40,8 @@ export const NPC_TOPICS = {
     valerius: ['eternity'],
     morgana: ['cauldron'],
     vikinga: ['valhalla'],
-    mongol: ['wind']
+    mongol: ['wind'],
+    necro: ['tomes'],
+    pirata: ['treasure'],
+    vampira: ['dance']
 };
-
-// js/data/topicCatalog.js (o sección de NPCs)
-
-
-

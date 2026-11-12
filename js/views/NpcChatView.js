@@ -46,11 +46,15 @@ export class NpcChatView {
             <!-- MENÚ DE TEMAS, ENTRADA LIBRE Y DESPEDIDA -->
             <div class="chat-controls">
                 <ul id="chatOptions" class="chat-options"></ul>
+                <div id="chatArguments" class="chat-arguments" style="display:none">
+                    <div id="chatArgumentsTitle" class="chat-arguments-title"></div>
+                    <ul id="chatArgumentList" class="chat-options"></ul>
+                </div>
                 <div class="chat-free-row">
                     <input type="text" id="playerChatInput" class="choice-btn chat-input" autocomplete="off" />
                     <button id="btnSendChat" class="fantasy-btn">Hablar 💬</button>
                 </div>
-               
+                <div id="chatFreeCounter" class="chat-free-counter"></div>
                 <button id="btnLeaveChat" class="choice-btn chat-leave">🚪 Despedirse y marchar</button>
             </div>
         `;
@@ -152,6 +156,39 @@ export class NpcChatView {
             item.appendChild(button);
             list.appendChild(item);
         });
+    }
+
+    /**
+     * Zona de argumentos para convencer a un personaje de que se una a tu grupo.
+     * `section` = { title, args: [{ id, label, used }] } o null para ocultarla.
+     */
+    renderArguments(section, onPick, { disabled = false } = {}) {
+        const box = this.el('chatArguments');
+        const title = this.el('chatArgumentsTitle');
+        const list = this.el('chatArgumentList');
+        if (!box || !title || !list) return;
+
+        list.replaceChildren();
+        box.style.display = section ? '' : 'none';
+        if (!section) return;
+
+        title.textContent = section.title;
+        section.args.forEach(arg => {
+            const item = document.createElement('li');
+            const button = document.createElement('button');
+            button.className = `choice-btn chat-option chat-argument${arg.used ? ' asked' : ''}`;
+            button.textContent = `• ${arg.label}${arg.used ? ' (ya lo dijiste)' : ''}`;
+            button.disabled = arg.used || disabled;
+            button.addEventListener('click', () => onPick(arg.id));
+
+            item.appendChild(button);
+            list.appendChild(item);
+        });
+    }
+
+    setLeaveLabel(text) {
+        const button = this.el('btnLeaveChat');
+        if (button) button.textContent = text;
     }
 
     /** Estado de la entrada libre: cuántos mensajes quedan y si se puede escribir. */

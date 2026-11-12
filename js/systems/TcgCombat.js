@@ -31,6 +31,7 @@ export class TcgCombat {
         this.rng = Math.random;  // se puede sustituir en los tests
         this.intentLine = null;  // grito del enemigo para su próxima carta, ya pedido a la IA
         this.hurtSpoken = false; // ya protestó al verse herido en este combate
+        this.turn = 0;           // tu turno dentro de este combate (marca la cadencia de los aliados)
     }
 
     get player() { return this.game.player; }
@@ -72,6 +73,7 @@ export class TcgCombat {
         this.heroPoison = null;
         this.busy = false;
         this.inCombat = true;
+        this.turn = 1;
 
         this.brain = new EnemyBrain(this.enemy.deckId);
         this.brain.drawIntent(this.enemy, { poison: null });
@@ -94,6 +96,7 @@ export class TcgCombat {
 
         this.speak('combat_start');
         this.prepareIntentLine();
+        this.runAllies();
     }
 
     createEnemy(enemyData) {
@@ -391,6 +394,8 @@ export class TcgCombat {
         }
 
         this.energy = this.maxEnergy();
+        this.turn += 1;
+        if (this.runAllies()) return; // tus aliados acaban con el enemigo
         this.brain.drawIntent(this.enemy, { poison: this.heroPoison });
         this.prepareIntentLine();
         this.renderIntent();
@@ -485,6 +490,27 @@ export class TcgCombat {
                 }
             });
         });
+    }
+
+    // ───────────── ALIADOS ─────────────
+
+    /** Los aliados de tu grupo actúan al empezar tu turno, gratis. Devuelve true si el enemigo cae. */
+    runAllies() {
+        const enemy = this.enemy;
+        const actions = this.game.party.actionsFor({ turn: this.turn, level: this.player.level });
+
+        for (const { ally, card } of actions) {
+            this.game.ui.flashAlly(ally.id);
+            const events = this.applyEffect(card);
+            this.applyHandEffects(events);
+
+            if (enemy.hp <= 0) {
+                this.win();
+                return true;
+            }
+        }
+        if (actions.length > 0) this.refresh();
+        return false;
     }
 
     // ───────────── JEFES ─────────────

@@ -24,7 +24,7 @@ export const BOSSES = [
     {
         id: 'orco_jefe',
         name: 'Gorgrim, Jefe Orco',
-        img: 'img/jefe_orco.gif',
+        img: 'img/jefe_orco_hacha.jpg',
         deckId: 'orco_jefe',
         baseHp: 165, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 6,
         archetype: 'Gorgrim, el jefe de una horda orca: brutal, orgulloso y fanfarrón, con ansias de aplastar cráneos',
@@ -40,32 +40,32 @@ export const BOSSES = [
         ]
     },
     {
-        id: 'vampira_jefa',
-        name: 'La Dama de la Noche',
-        img: 'img/npcs/vampira.gif',
-        deckId: 'vampira_jefa',
+        id: 'skull_jefe',
+        name: 'Skrull, el Guerrero Esqueleto',
+        img: 'img/skrullWarrior.jpg',
+        deckId: 'skull_jefe',
         baseHp: 160, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 8,
-        archetype: 'la Dama de la Noche, una vampira ancestral, seductora, elegante y cruel, que juega con sus presas',
-        voice: 'Seductora y aristocrática. Llama "querido" al héroe con un cariño letal. Habla de la noche, la sangre y el aburrimiento de los siglos.',
+        archetype: 'Skrull, un guerrero esquelético inmortal, implacable y orgulloso, condenado a guardar la mazmorra desde hace siglos',
+        voice: 'Sepulcral, seco y marcial. Habla de huesos, de batallas olvidadas, de juramentos y del frío de la tumba. Frases cortas y graves.',
         phases: [
-            { at: 0.6, announce: 'se alimenta de las sombras', atkBonus: 3, shield: 20 },
+            { at: 0.6, announce: 'se quita el yelmo y sus cuencas arden en azul', atkBonus: 3, shield: 20, img: 'img/skrullWarrior1.jpg' },
             {
-                at: 0.3, announce: 'muestra su verdadera forma', atkBonus: 4, heal: 30, img: 'img/npcs/vampira_enojada.gif',
-                addCards: [{ name: '🩸 Sed Insaciable', type: 'drain', power: 1.8, leech: 1, copies: 2 }]
+                at: 0.3, announce: 'invoca el portal de los caídos', atkBonus: 4, heal: 30, img: 'img/skrullWarrior2.jpg',
+                addCards: [{ name: '💀 Legión de Huesos', type: 'multi', power: 0.5, hits: 4, copies: 2 }]
             }
         ]
     },
     {
         id: 'escorpiones_jefe',
         name: 'El Líder de los Escorpiones Negros',
-        img: 'img/npcs/escorpionesNegros_lider.gif',
+        img: 'img/npcs/escorpionesNegros_lider.jpg',
         deckId: 'escorpiones_jefe',
         baseHp: 150, hpPerFloor: 10, baseAtk: 17, atkPerFloor: 0.6, armor: 10,
         archetype: 'el líder de los Escorpiones Negros, un asesino a sueldo frío, profesional y sin piedad',
         voice: 'Frío y profesional. Habla de contratos, de sombras y de testigos. Frases cortas, secas y sin emoción.',
         phases: [
             {
-                at: 0.5, announce: 'desenvaina sus dagas gemelas', atkBonus: 4, img: 'img/npcs/escorpiones_dagas.gif',
+                at: 0.5, announce: 'desenvaina sus dagas gemelas', atkBonus: 4, img: 'img/npcs/escorpionesNegros_lider_daga.jpg',
                 addCards: [{ name: '🗡️ Lluvia de Dagas', type: 'multi', power: 0.5, hits: 5, copies: 2 }]
             }
         ]
@@ -73,7 +73,7 @@ export const BOSSES = [
     {
         id: 'dragon_jefe',
         name: 'Ignis, el Dragón Guardián',
-        img: 'img/npcs/dragon_lider.gif',
+        img: 'img/dragon.png',
         deckId: 'dragon_jefe',
         baseHp: 190, hpPerFloor: 9, baseAtk: 17, atkPerFloor: 0.5, armor: 12,
         archetype: 'Ignis, un dragón guardián milenario, majestuoso y orgulloso, dueño de un tesoro inmenso',

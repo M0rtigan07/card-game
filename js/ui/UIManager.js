@@ -2,6 +2,9 @@ export class UIManager {
     constructor() {
         this.typewriterTimer = null;
         this.onUseItem = null; // lo asigna Game: se llama con el id del objeto al pulsar "Usar"
+        this.getParty = null;  // lo asigna Game: devuelve los aliados del grupo
+        this.onDismissAlly = null; // lo asigna Game: se llama con el id del aliado al pulsar ✕
+        this.acting = new Set(); // aliados que están actuando ahora mismo (se resaltan)
     }
 
     showScreen(screenId) {
@@ -12,13 +15,9 @@ export class UIManager {
         }
     }
 
-    typewriterIntro(text, elementId = 'introText', callback) {
-        const box = document.getElementById(elementId);
-
-        if (!box) {
-            console.error('No existe:', elementId);
-            return;
-        }
+    typewriterIntro(text, callback) {
+        const box = document.getElementById('introText');
+        if (!box) return;
 
         if (this.typewriterTimer) {
             clearInterval(this.typewriterTimer);
@@ -26,7 +25,6 @@ export class UIManager {
         }
 
         box.textContent = '';
-
         let i = 0;
 
         this.typewriterTimer = setInterval(() => {
@@ -36,7 +34,6 @@ export class UIManager {
             } else {
                 clearInterval(this.typewriterTimer);
                 this.typewriterTimer = null;
-
                 if (callback) callback();
             }
         }, 30);
@@ -100,6 +97,67 @@ export class UIManager {
                 invList.appendChild(li);
             });
         }
+
+        this.renderParty(this.getParty?.() ?? []);
+    }
+
+    /** Panel "Grupo": la carta de cada aliado, lo que hace por ti y un botón para despedirle. */
+    renderParty(members) {
+        const sidebar = document.getElementById('leftSidebar');
+        if (!sidebar) return;
+
+        let host = document.getElementById('allyParty');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'allyParty';
+            sidebar.appendChild(host);
+        }
+        host.replaceChildren();
+        if (members.length === 0) return;
+
+        const title = document.createElement('h2');
+        title.textContent = 'Grupo';
+        host.appendChild(title);
+
+        members.forEach(ally => {
+            const card = document.createElement('div');
+            card.id = `ally-card-${ally.id}`;
+            card.className = `party-member${this.acting.has(ally.id) ? ' acting' : ''}`;
+
+            const image = document.createElement('img');
+            image.className = 'party-card';
+            image.alt = ally.name;
+            image.onerror = () => { image.onerror = null; image.src = 'img/guerrero.png'; };
+            image.src = ally.card;
+
+            const info = document.createElement('div');
+            info.className = 'party-info';
+            const name = document.createElement('b');
+            name.textContent = ally.name;
+            const ability = document.createElement('small');
+            ability.textContent = `${ally.ability.name}: ${ally.ability.text}`;
+            info.append(name, ability);
+
+            const dismiss = document.createElement('button');
+            dismiss.className = 'party-dismiss';
+            dismiss.title = 'Despedir';
+            dismiss.textContent = '✕';
+            dismiss.addEventListener('click', () => this.onDismissAlly?.(ally.id));
+
+            card.append(image, info, dismiss);
+            host.appendChild(card);
+        });
+    }
+
+    /** Resalta un momento la carta del aliado que acaba de actuar. */
+    flashAlly(id) {
+        this.acting.add(id);
+        document.getElementById(`ally-card-${id}`)?.classList.add('acting');
+
+        setTimeout(() => {
+            this.acting.delete(id);
+            document.getElementById(`ally-card-${id}`)?.classList.remove('acting');
+        }, 900);
     }
 
     logEvent(msg) {

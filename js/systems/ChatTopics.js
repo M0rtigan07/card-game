@@ -5,13 +5,14 @@
 import { CHAT_TOPICS, GENERAL_TOPICS, NPC_TOPICS } from '../data/topicCatalog.js';
 import { BOSS, CHAT } from '../data/gameConfig.js';
 import { ENEMY_DECKS } from '../data/enemyDecks.js';
+import { ALLIES } from '../data/allyCatalog.js';
 import { getBossForFloor } from './Bosses.js';
 import { getItem, itemIdForAction } from './Items.js';
 
-/** Temas que ofrece ese personaje: los generales y los suyos. Cada tema trae `pool`, la clave de su banco de respaldo. */
+/** Temas que ofrece ese personaje: los generales, los suyos y, si puede ser tu aliado, el de sus valores. Cada tema trae `pool`, la clave de su banco de respaldo. */
 export function topicsFor(npc) {
-    return [...GENERAL_TOPICS, ...(NPC_TOPICS[npc.id] ?? [])]
-        .map(id => ({ ...CHAT_TOPICS[id], pool: `chat_${id}` }));
+    const ids = [...GENERAL_TOPICS, ...(NPC_TOPICS[npc.id] ?? []), ...(ALLIES[npc.id] ? ['values'] : [])];
+    return ids.map(id => ({ ...CHAT_TOPICS[id], pool: `chat_${id}` }));
 }
 
 /** Planta del próximo jefe (la propia planta si es de jefe). */
@@ -71,6 +72,7 @@ export function buildFacts(topic, { npc, player, floor }) {
         case 'advice': return adviceFacts(player);
         case 'boss': return bossFacts(floor);
         case 'wares': return waresFacts(npc, player.classKey);
+        case 'values': return ALLIES[npc.id]?.values ?? [];
         default: return [];
     }
 }

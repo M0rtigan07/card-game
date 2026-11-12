@@ -21,17 +21,10 @@ export const HERO_IMAGES = {
 
 // Imagen de escena según el npcType que devuelve el backend
 export const ENCOUNTER_IMAGES = {
-  //  warrior: 'img/veterano.jpg',
+    warrior: 'img/veterano.jpg',
     mage: 'img/mage.jpg',
-   
     rogue: 'img/gargola.png',
-
-    automata: 'img/automata.jpg',
-    skrullWarrior: 'img/skrullWarrior2.jpg',
-    draco: 'img/draco.gif',
-    CaballeroNegro: 'img/caballeroNegro.gif',
-
-
+    automata: 'img/automata.jpg'
 };
 export const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
 
@@ -52,40 +45,6 @@ export const GENERIC_ENEMIES = [
         archetype: 'una gárgola de piedra milenaria, paciente, antigua y solemne',
         voice: 'Voz lenta y solemne. Habla de siglos, de piedra, de polvo y de ruinas. Frases pausadas y con peso.'
     },
-
-    {
-        keys: ['esqueleto', 'guerrero esquelético', 'no-muerto', 'cráneo'],
-        id: 'skrullWarrior',
-        deckId: 'skrullWarrior',
-        name: 'Guerrero Esqueleto',
-        img: 'img/skrullWarrior2.jpg', // O usa 'skrullWarrior1.jpg' / 'skrullWarrior2.jpg' según prefieras para el combate
-        archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
-        voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
-    },
-
-    {
-        keys: ['hombre lagarto', 'lagarto', 'draco', 'reptil'],
-        id: 'draco', 
-        deckId: 'draco', 
-        name: 'Draco de las Profundidades', 
-        img: 'img/draco.gif',
-        archetype: 'un draco de las profundidades, astuto, ágil y con un aliento venenoso',
-        voice: 'Voz sibilante y reptiliana. Habla de presas, de veneno y de la caza. Frases rápidas y con siseos.'
-    },
-
-
-
-    {
-        keys: ['caballero', 'guerrero medieval', 'caballero oscuro', 'armadura negra'],
-        id: 'CaballeroNegro',
-        deckId: 'CaballeroNegro',
-        name: 'Caballero Negro',
-        img: 'img/caballeroNegroEspada.jpg',
-        archetype: 'un caballero con armadura negra y runas de muerte, custodio de la oscuridad eterna',
-        voice: 'Voz fría y sepulcral. Habla de juramentos rotos, de sombras y de la eternidad del dolor.'
-    },
-
-
     {
         keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechicero', deckId: 'hechicero', name: 'Hechicero Oscuro', img: 'img/hechicero.jpg',
         archetype: 'un hechicero oscuro erudito, arrogante y obsesionado con el conocimiento arcano',
@@ -129,6 +88,17 @@ export const CHAT = {
     BLIP_EVERY: 2          // suena un pitido cada tantas letras
 };
 
+// Aliados: personajes que se unen a tu grupo si los convences hablando
+export const PARTY = {
+    MAX: 2,          // aliados que pueden acompañarte a la vez
+    RECRUIT_XP: 30   // experiencia al conseguir un aliado
+};
+export const PERSUASION = {
+    RAPPORT_TOPICS: 2,  // temas que hay que haber hablado con él antes de poder pedirle nada
+    NEEDED: 2,          // argumentos buenos para convencerle
+    BAD_LIMIT: 2        // argumentos malos tras los que deja de escucharte
+};
+
 // Frases de los PNJ y de los enemigos generadas por Groq
 export const DIALOGUE = {
     MEMORY_LINES: 6,           // últimas frases de cada personaje que se recuerdan (y se piden no repetir)
@@ -144,6 +114,7 @@ export const DIALOGUE = {
         combat_card: 4000,
         chat_topic: 6000,
         chat_free: 6000,
+        chat_persuade: 6000,
         combat_hurt: 2500,
         combat_phase: 2500,
         combat_defeat: 3000,

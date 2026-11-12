@@ -19,7 +19,7 @@ export class NpcDialogue {
      * Devuelve lo que dice el PNJ. Nunca falla y nunca repite una de sus últimas frases.
      *
      * @param {object} npc                  Entrada de NPC_DATABASE
-     * @param {'greeting' | 'reaction' | 'outcome' | 'chat_topic' | 'chat_free' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_phase' | 'combat_defeat' | 'combat_victory'} kind
+     * @param {'greeting' | 'reaction' | 'outcome' | 'chat_topic' | 'chat_free' | 'chat_persuade' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_phase' | 'combat_defeat' | 'combat_victory'} kind
      * @param {object} [context]
      * @param {string} [context.action]     (reaction) Lo que ha elegido el jugador
      * @param {string} [context.outcome]    (outcome) Clave del desenlace: bought | no_gold | caught | offended

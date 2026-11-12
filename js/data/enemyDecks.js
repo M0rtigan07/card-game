@@ -62,13 +62,14 @@ export const ENEMY_DECKS = {
         { name: '🥩 Banquete de Horda', type: 'heal', val: 25 },
         { name: '🛡️ Escudo de Cráneos', type: 'def', val: 16 }
     ],
-    vampira_jefa: [ // Roba vida, maldice y se esconde en las sombras
-        { name: '🦇 Beso Sangriento', type: 'drain', power: 1.3, leech: 1, copies: 2 },
-        { name: '🩸 Danza Carmesí', type: 'multi', power: 0.55, hits: 3 },
-        { name: '🦇 Nube de Murciélagos', type: 'multi', power: 0.45, hits: 4 },
-        { name: '🌫️ Velo de Sombras', type: 'def', val: 18 },
-        { name: '🩸 Maldición Eterna', type: 'poison', val: 6, turns: 3 },
-        { name: '💋 Hechizo de Seducción', type: 'buff', val: 3 }
+    skull_jefe: [ // Huesos, frío de tumba y una armadura que se rehace sola
+        { name: '💀 Tajo Espectral', type: 'atk', power: 1.6, copies: 2 },
+        { name: '🦴 Lluvia de Huesos', type: 'multi', power: 0.6, hits: 4 },
+        { name: '⚔️ Furia de los Caídos', type: 'buff', val: 3 },
+        { name: '🛡️ Armadura de Huesos', type: 'def', val: 20 },
+        { name: '☠️ Aliento Sepulcral', type: 'poison', val: 6, turns: 3 },
+        { name: '💙 Llama Fría', type: 'drain', power: 1.2, leech: 1 },
+        { name: '🦴 Reconstrucción', type: 'heal', val: 20 }
     ],
     escorpiones_jefe: [ // Veneno y golpes rápidos
         { name: '🦂 Aguijón', type: 'atk', power: 1.6, copies: 2 },
@@ -84,6 +85,31 @@ export const ENEMY_DECKS = {
         { name: '🛡️ Escamas de Obsidiana', type: 'def', val: 22 },
         { name: '🔥 Furia Ancestral', type: 'buff', val: 4 },
         { name: '💢 Rugido Aterrador', type: 'atk', power: 1.5 }
+    ],
+
+    // ───── PNJ nuevos (también pueden ser tus aliados) ─────
+    necro: [ // Veneno, drenaje y huesos
+        { name: '☠️ Toque Mortal', type: 'poison', val: 5, turns: 3 },
+        { name: '💀 Rayo Necrótico', type: 'atk', power: 1.5, copies: 2 },
+        { name: '🦴 Muralla de Huesos', type: 'def', val: 14 },
+        { name: '🩸 Drenar Alma', type: 'drain', power: 1.0, leech: 1 },
+        { name: '⚰️ Alzar Cadáveres', type: 'buff', val: 3 },
+        { name: '🕯️ Rito Oscuro', type: 'heal', val: 15 }
+    ],
+    pirata: [ // Cañones, sablazos y ron
+        { name: '💣 Cañonazo', type: 'atk', power: 1.8 },
+        { name: '🗡️ Sablazo', type: 'atk', power: 1.3, copies: 2 },
+        { name: '🏴‍☠️ Abordaje', type: 'multi', power: 0.7, hits: 3 },
+        { name: '🍺 Ron de Capitana', type: 'heal', val: 14 },
+        { name: '🛢️ Parapeto de Barriles', type: 'def', val: 12 },
+        { name: '📣 ¡Todos a cubierta!', type: 'buff', val: 3 }
+    ],
+    vampira: [ // Elegante y letal: roba vida y maldice
+        { name: '🦇 Beso Sombrío', type: 'drain', power: 1.2, leech: 1, copies: 2 },
+        { name: '🩸 Danza Carmesí', type: 'multi', power: 0.55, hits: 3 },
+        { name: '🌫️ Velo de Sombras', type: 'def', val: 14 },
+        { name: '🩸 Maldición Eterna', type: 'poison', val: 5, turns: 3 },
+        { name: '💋 Hechizo de Seducción', type: 'buff', val: 3 }
     ],
 
     // ───── Enemigos genéricos ─────
@@ -105,18 +131,6 @@ export const ENEMY_DECKS = {
         { name: '😡 Rugido', type: 'buff', val: 3 },
         { name: '🪵 Escudo de Tronco', type: 'def', val: 10 },
         { name: '🥩 Festín Orco', type: 'heal', val: 12 }
-    ],
-    skrullWarrior: [ // Guerrero Esquelético: golpes fríos, escudos óseos y drenaje espectral
-        { name: '⚔️ Espadazo Sepulcral', type: 'atk', power: 1.4, copies: 2 },
-        { name: '🦴 Filo Helado', type: 'atk', power: 1.8 },
-        { name: '🛡️ Muro de Huesos', type: 'def', val: 15, copies: 2 },
-        { name: '👻 Drenaje Espectral', type: 'drain', power: 1.1, leech: 1 },
-        { name: '❄️ Aura de la Tumba', type: 'poison', val: 4, turns: 3 }
-    ],
-    draco: [
-        { name: '🗡️ Espada de Takhisis', type: 'atk', power: 1.4, copies: 2 },
-        { name: '🛡️ Escamas de Bronce', type: 'def', val: 14, copies: 2 },
-        { name: '🦅 Zarpazo Aéreo', type: 'multi', power: 0.8, hits: 2 }
     ],
     gargola: [
         { name: '🗿 Garra de Piedra', type: 'atk', power: 1.3, copies: 2 },

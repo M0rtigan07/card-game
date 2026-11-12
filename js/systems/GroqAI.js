@@ -44,31 +44,12 @@ export class GroqAI {
         }
     }
 
-    async generateIntroLore(heroName, className) {
-        try {
-            const data = await this._post({
-                type: "intro",
-                 heroName,
-                className: className
-            });
-
-            const lore = data.story || data.description;
-            if (!lore) throw new Error("Respuesta sin texto de intro");
-
-            return lore.trim();
-        } catch (error) {
-            console.warn("[GroqAI] generateIntroLore error:", error.message);
-            return LORE_FALLBACKS[className] || LORE_FALLBACKS["Guerrero"];
-        }
-    }
-
-
     /**
      * Frase de un PNJ generada por la IA, con el contexto de la situación.
      * Devuelve null si falla o tarda, para que el juego use una frase de respaldo.
      *
      * @param {object} request
-     * @param {'greeting' | 'reaction' | 'outcome' | 'chat_topic' | 'chat_free' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_phase' | 'combat_defeat' | 'combat_victory'} request.kind
+     * @param {'greeting' | 'reaction' | 'outcome' | 'chat_topic' | 'chat_free' | 'chat_persuade' | 'combat_start' | 'combat_card' | 'combat_hurt' | 'combat_phase' | 'combat_defeat' | 'combat_victory'} request.kind
      *        Saludo, réplica, comentario de lo ocurrido, conversación o frase de combate
      * @param {object} request.npc             Entrada de NPC_DATABASE (id, name, archetype, voice)
      * @param {string} request.className       Clase del jugador ("Guerrero", ...)

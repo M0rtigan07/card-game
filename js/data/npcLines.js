@@ -4,6 +4,7 @@
 //
 // Tipos (key):  greeting · reaction · bought · no_gold · already_owned · caught · offended
 //               chat_open · chat_free · chat_<tema> (who, place, advice, rumors, boss y los propios de cada personaje)
+//               Aliados: chat_values · chat_persuade_good · chat_persuade_bad · chat_recruited · chat_locked
 //               combat_start · combat_attack · combat_other · combat_hurt · combat_phase · combat_defeat · combat_victory
 // Se busca primero el banco del PNJ; si no tiene ese tipo, el de `default`.
 
@@ -107,6 +108,26 @@ export const FALLBACK_LINES = {
             'No sé qué decirte a eso.',
             'Pregúntame otra cosa.',
             'Eso se me escapa.'
+        ],
+        chat_values: [
+            'Valoro lo mismo que cualquiera: que me traten con respeto.',
+            'Pregúntame otra cosa; eso no lo tengo claro.'
+        ],
+        chat_persuade_good: [
+            'Hmm... eso suena razonable.',
+            'Sigue, me estás convenciendo.'
+        ],
+        chat_persuade_bad: [
+            'Eso no me convence.',
+            'Prueba con otra cosa.'
+        ],
+        chat_recruited: [
+            'De acuerdo, me uno a ti.',
+            'Está bien, iré contigo.'
+        ],
+        chat_locked: [
+            'Se acabó la conversación.',
+            'No quiero oír más.'
         ]
     },
 
@@ -181,6 +202,26 @@ export const FALLBACK_LINES = {
         chat_eternity: [
             'Tres siglos mirando la misma piedra. Por eso agradezco cualquier visita, aunque sea comida.',
             'La eternidad es un banquete sin hambre, mortal. Lo difícil es no aburrirse.'
+        ],
+        chat_values: [
+            'El poder, el linaje y el trato debido a un noble, mortal. La súplica y los sermones los dejo a los débiles.',
+            'Quiero que me traten como a un conde, no como a un monstruo ni como a un mendigo.'
+        ],
+        chat_persuade_good: [
+            'Hmm... hablas como alguien que entiende de rangos, mortal.',
+            'Un argumento digno de un noble. Continúa.'
+        ],
+        chat_persuade_bad: [
+            'Qué vulgar, mortal. Un conde no se rebaja a escuchar eso.',
+            'Redención, súplicas... qué aburrimiento.'
+        ],
+        chat_recruited: [
+            'Acepto tu pacto, mortal: el Conde Valerius te acompañará. Un honor que pocos reciben.',
+            'Que así sea. Será entretenido caminar entre los vivos.'
+        ],
+        chat_locked: [
+            'Se acabó, mortal. Mi paciencia es eterna, pero no para ti.',
+            'No volveré a escucharte. Retírate.'
         ]
     },
 
@@ -344,6 +385,26 @@ export const FALLBACK_LINES = {
         chat_valhalla: [
             'El Valhalla es la sala de los valientes. Allí no entra quien huye.',
             'Un banquete eterno para quien muere con el arma en la mano. Eso espero.'
+        ],
+        chat_values: [
+            'Honor, fuerza y gloria: eso valoro. Y desprecio al que me trata como a alguien débil.',
+            'Luchar al lado de quien no retrocede. Lo demás, charla.'
+        ],
+        chat_persuade_good: [
+            'Ahora sí hablas como guerrero.',
+            'Eso me gusta. Sigue.'
+        ],
+        chat_persuade_bad: [
+            '¿Débil, yo? Cuida tus palabras.',
+            'Eso suena a cobardía. Elige otra.'
+        ],
+        chat_recruited: [
+            'Tu valor y el mío, juntos. Odín nos mira. Iré contigo.',
+            'Hecho. Mi escudo es tuyo, guerrero.'
+        ],
+        chat_locked: [
+            'Basta. No luchamos del mismo lado.',
+            'Se acabó la charla. Lárgate.'
         ]
     },
 
@@ -433,6 +494,26 @@ export const FALLBACK_LINES = {
         chat_wind: [
             'Dice que algo antiguo se despierta abajo, viajero. Y que no le gustan las visitas.',
             'Aquí no hay viento, y eso es lo que más me asusta.'
+        ],
+        chat_values: [
+            'Valoro la palabra dada y el respeto entre quienes comparten camino, viajero. Al oro y a las amenazas les doy la espalda.',
+            'Echo de menos el cielo abierto. Y no hay trato que sustituya a un compañero leal.'
+        ],
+        chat_persuade_good: [
+            'Hmm... hablas como un jinete, viajero. Continúa.',
+            'Eso suena a camino compartido. Me gusta.'
+        ],
+        chat_persuade_bad: [
+            'El viento no se vende ni se asusta, viajero. Prueba otra cosa.',
+            'Eso me ofende, jinete. Elige mejor tus palabras.'
+        ],
+        chat_recruited: [
+            'Tu palabra tiene peso, viajero. Mi arco cabalgará contigo.',
+            'Está decidido: dos jinetes, un camino. Vamos.'
+        ],
+        chat_locked: [
+            'El viento no soporta a quien miente o amenaza. Aquí acaba la charla, viajero.',
+            'No hay más que hablar. Sigue tu camino sin mí.'
         ]
     },
 
@@ -754,45 +835,6 @@ export const FALLBACK_LINES = {
         ]
     },
 
-    vampira_jefa: {
-        greeting: [
-            'Qué visita tan inesperada, querido. Pocas veces la noche me trae algo tan... vivo.',
-            'Bienvenido a mi salón. Pasa, que la sangre joven siempre es bien recibida.',
-            'Llevo siglos aburrida. Dime que vas a entretenerme.'
-        ],
-        combat_start: [
-            'Baila conmigo, querido. Será la última vez.',
-            'No temas: dolerá solo un instante... eterno.',
-            'Que comience el baile de la noche.'
-        ],
-        combat_attack: [
-            'Un besito, querido.',
-            'Siente cómo se detiene el tiempo.',
-            'Qué delicia de pulso tienes.'
-        ],
-        combat_other: [
-            'La noche es mi manto, querido.',
-            'Nada que me hagas me alcanza.',
-            'Ay, qué torpe. Observa cómo se hace.'
-        ],
-        combat_hurt: [
-            'Qué descaro... me has hecho sangrar.',
-            'Eso ha sido de muy mal gusto, querido.'
-        ],
-        combat_phase: [
-            'Basta de juegos. Ahora verás lo que soy.',
-            'Has despertado a la verdadera Dama de la Noche.'
-        ],
-        combat_defeat: [
-            'Qué pena... tan joven y ya me ganas...',
-            'La noche no olvida, querido...'
-        ],
-        combat_victory: [
-            'Duerme, querido. La noche te acuna.',
-            'Tan dulce... y tan breve.'
-        ]
-    },
-
     escorpiones_jefe: {
         greeting: [
             'Pocos llegan hasta aquí. Menos aún regresan.',
@@ -868,6 +910,327 @@ export const FALLBACK_LINES = {
         combat_victory: [
             'Ceniza y silencio. Otra vez.',
             'Otro héroe para mi colección de huesos.'
+        ]
+    },
+
+    vampira: {
+        greeting: [
+            'Qué visita tan inesperada, querido. Pocas veces la noche me trae algo tan... vivo.',
+            'Bienvenido a mi salón. Pasa, que la sangre joven siempre es bien recibida.',
+            'Llevo siglos aburrida. Dime que vas a entretenerme.'
+        ],
+        reaction: [
+            'Mmm, qué atrevido, querido. Casi me divierte.',
+            'Habla con elegancia o no hables. Los modales importan hasta en la tumba.',
+            'Qué ocurrente. Hace décadas que nadie me sorprendía.',
+            'Tus palabras saben a miedo disfrazado de valentía. Delicioso.'
+        ],
+        chat_open: [
+            'Acércate, querido. Te concedo una conversación.',
+            'Siéntate. La noche es larga y yo, generosa.'
+        ],
+        chat_who: [
+            'Me llaman la Dama de la Noche, querido. Mi nombre verdadero se perdió con mi último latido.',
+            'Una anfitriona de sombras, cielo. Y tú, mi invitado de honor... por ahora.'
+        ],
+        chat_place: [
+            'La mazmorra es mi salón de baile, querido: cada planta, un vals distinto.',
+            'Un lugar encantador, si te gusta la oscuridad y el eco de los gritos.'
+        ],
+        chat_advice: [
+            'Observa lo que prepara tu enemigo, querido. Los descuidados mueren feos.',
+            'Gasta tu energía con elegancia: ni un gesto de más ni uno de menos.'
+        ],
+        chat_rumors: [
+            'Dicen que un esqueleto con ojos de fuego guarda la planta diez. Qué falta de modales.',
+            'Se cuenta que unos escorpiones cobran bien por cada cabeza. Qué vulgares.'
+        ],
+        chat_boss: [
+            'Hay un guardián más abajo que no sabe retirarse. Ten cuidado, querido.',
+            'El próximo centinela cambia cuando sangra. Pocas cosas me divierten tanto.'
+        ],
+        chat_free: [
+            'Qué pregunta tan curiosa, querido. Prueba con otra.',
+            'No sé qué decirte a eso, cielo. Inténtalo de nuevo.',
+            'Me aburres y me intrigas a partes iguales. Otra pregunta.'
+        ],
+        chat_dance: [
+            'Las sombras, querido. Y a veces algún imprudente que no sale del baile.',
+            'Quien llega a mi salón siempre acaba bailando. Algunos, hasta un amanecer que nunca llega.'
+        ],
+        combat_start: [
+            'Baila conmigo, querido. Será la última vez.',
+            'No temas: dolerá solo un instante... eterno.',
+            'Que comience el baile de la noche.'
+        ],
+        combat_attack: [
+            'Un besito, querido.',
+            'Siente cómo se detiene el tiempo.',
+            'Qué delicia de pulso tienes.'
+        ],
+        combat_other: [
+            'La noche es mi manto, querido.',
+            'Nada que me hagas me alcanza.',
+            'Ay, qué torpe. Observa cómo se hace.'
+        ],
+        combat_hurt: [
+            'Qué descaro... me has hecho sangrar.',
+            'Eso ha sido de muy mal gusto, querido.'
+        ],
+        combat_defeat: [
+            'Qué pena... tan joven y ya me ganas...',
+            'La noche no olvida, querido...'
+        ],
+        combat_victory: [
+            'Duerme, querido. La noche te acuna.',
+            'Tan dulce... y tan breve.'
+        ],
+        chat_values: [
+            'Me encanta la elegancia, querido, y quien logra entretenerme. Los insultos y las amenazas me aburren.',
+            'Un buen juego, una conversación ingeniosa... y modales. Nada de gritos.'
+        ],
+        chat_persuade_good: [
+            'Hmm... eso suena prometedor, querido. Me estás tentando.',
+            'Vaya, qué argumento tan encantador. Sigue, sigue.'
+        ],
+        chat_persuade_bad: [
+            'Qué grosería, querido. Intenta algo con más gracia.',
+            'Eso es tan burdo que casi me ofende. Casi.'
+        ],
+        chat_recruited: [
+            'Está bien, querido: tu juego me entretiene. Iré contigo... por ahora.',
+            'Acepto. Será divertido ver cómo te las arreglas, querido.'
+        ],
+        chat_locked: [
+            'Se acabó la conversación, querido. Me has aburrido.',
+            'No volveré a escucharte. Qué decepción.'
+        ]
+    },
+
+    necro: {
+        greeting: [
+            'Un visitante vivo. Qué rareza; casi olvidé cómo se saluda.',
+            'Pasa, pasa, pero no toques los huesos: están catalogados.',
+            'Interrumpes un rito, viajero. Por suerte para ti, estaba terminando.'
+        ],
+        reaction: [
+            'Interesante. Los muertos hablan menos, pero con más sentido.',
+            'Una respuesta... pasable. Sigue, a ver si mejoras.',
+            'Tus palabras tienen vida. Qué curioso.',
+            'Hmm. Anoto eso en mis tomos, por si acaso.'
+        ],
+        chat_open: [
+            'Habla, viajero. Los muertos no tienen prisa y yo tampoco.',
+            'Te escucho. Sin ruido, por favor: duermen mis ayudantes.'
+        ],
+        chat_who: [
+            'Malakar, necromante. Estudio lo que otros temen: el final de todas las cosas.',
+            'Un erudito de la muerte, viajero. Mis colegas dicen "loco"; yo prefiero "especialista".'
+        ],
+        chat_place: [
+            'Esta mazmorra es una biblioteca de huesos, viajero. Cada planta, un volumen.',
+            'Aquí abajo la muerte se acumula como el polvo. Es un lugar excelente para trabajar.'
+        ],
+        chat_advice: [
+            'Observa la jugada del enemigo antes de decidir. La prisa es el primer síntoma de la tumba.',
+            'Los consumibles se usan desde el inventario, sin coste de energía. Aprovéchalos.'
+        ],
+        chat_rumors: [
+            'Dicen que un guerrero esquelético guarda la planta diez con juramentos más viejos que su armadura.',
+            'Se murmura que una capitana pirata busca un tesoro de dragón. Qué optimismo.'
+        ],
+        chat_boss: [
+            'Más abajo camina un guerrero de huesos que no descansa. Rómpele la armadura y no confíes en su calma.',
+            'El guardián que viene cambia de forma al herirlo. Un espectáculo, a su manera.'
+        ],
+        chat_free: [
+            'Ese tema se me escapa, viajero. Prueba con otra pregunta.',
+            'Hmm. No hay tomo que lo explique. Otra, por favor.',
+            'Una cuestión fascinante, pero ignoro la respuesta.'
+        ],
+        chat_tomes: [
+            'Busco el Tomo de los Nombres Olvidados, viajero. Dicen que escribe quién morirá antes de que ocurra.',
+            'Manuscritos prohibidos y huesos que susurran. Con eso me conformo, por ahora.'
+        ],
+        combat_start: [
+            'Excelente. Un cuerpo fresco para mis experimentos.',
+            'Los muertos te saludan, viajero. Yo, no tanto.',
+            'Que comience el rito.'
+        ],
+        combat_attack: [
+            'El polvo reclama lo suyo.',
+            'Un toque, y los huesos recuerdan.',
+            'Siente cómo se enfría la sangre.'
+        ],
+        combat_other: [
+            'Los huesos me protegen.',
+            'Esto es solo el principio del rito.',
+            'La muerte espera. Yo también.'
+        ],
+        combat_hurt: [
+            'Interesante... dolor. Casi lo había olvidado.',
+            'Qué falta de respeto hacia mi trabajo.'
+        ],
+        combat_defeat: [
+            'Vuelvo al polvo con todos mis tomos.',
+            'Qué rápido pasa el rito... anota mi nombre.'
+        ],
+        combat_victory: [
+            'Una pieza más para la colección.',
+            'Qué silencio tan agradable.'
+        ],
+        chat_values: [
+            'Valoro el saber que otros temen y el respeto a mi arte, viajero. Los sermones sobre la luz me fatigan.',
+            'Los tomos prohibidos y la compañía culta me complacen. Predicar sobre el descanso de los muertos, no.'
+        ],
+        chat_persuade_good: [
+            'Hmm... eso despierta mi curiosidad, viajero.',
+            'Un argumento sensato. Continúa.'
+        ],
+        chat_persuade_bad: [
+            'Qué argumento tan simple. Intenta algo con más sustancia.',
+            'Eso es un sermón, no un argumento. Me aburre.'
+        ],
+        chat_recruited: [
+            'Muy bien, viajero: tu propuesta merece mi talento. Te acompañaré.',
+            'Acepto. Alguien tiene que anotar lo que ocurra. Vamos.'
+        ],
+        chat_locked: [
+            'Se acabó, viajero. No pienso escuchar más sermones.',
+            'Mi paciencia, como mis huesos, se ha agotado.'
+        ]
+    },
+
+    pirata: {
+        greeting: [
+            '¡Ahoy, grumete! ¿Vienes a por mi tesoro o a pedirme indicaciones?',
+            'Mira lo que arrastró la marea: un aventurero. Acércate, que no muerdo... mucho.',
+            '¡Alto ahí! Esta planta está bajo bandera de Zafira. ¿Qué buscas, forastero?'
+        ],
+        reaction: [
+            'Ja, ja, me caes bien, grumete. O estás loco o eres valiente.',
+            'Habla claro o echo el ancla en tu cabeza. ¡Sigue, sigue!',
+            'Eso sí que no me lo esperaba. ¡Bien tirado!',
+            'Hmm, suena a trato o a trampa. Veamos cuál es.'
+        ],
+        chat_open: [
+            '¡Suelta la lengua, grumete! Hoy tengo humor de charla.',
+            'Venga, pregunta lo que quieras. ¡Gratis, si me caes bien!'
+        ],
+        chat_who: [
+            'Zafira, capitana del Cuervo Escarlata. Terror de siete mares y de esta mazmorra, aunque menos.',
+            'Una pirata sin barco, grumete. Pero con cañón, que es lo importante.'
+        ],
+        chat_place: [
+            'Un laberinto sin mar, sin brisa y con demasiados huesos. Cero estrellas, grumete.',
+            'Aquí abajo hay más tesoros que en tres galeones. Lástima que todo muerda.'
+        ],
+        chat_advice: [
+            'Un buen pirata mira la jugada del enemigo antes de disparar. Un mal pirata, ya está nadando.',
+            'Gasta la energía con cabeza, grumete: no se pueden jugar todas las cartas de golpe.'
+        ],
+        chat_rumors: [
+            'Cuentan que hay un dragón sentado sobre más oro del que cabe en mi bodega. Mmm, qué ganas.',
+            'Dicen que una dama muy elegante baila con los que llegan solos. Yo prefiero el ron.'
+        ],
+        chat_boss: [
+            'Un tipo de huesos, grumete: esqueleto con armadura y muy mal humor. Y cambia de forma al herirlo.',
+            'Más adelante hay un guardián que no se rinde. Lleva pólvora, o pociones.'
+        ],
+        chat_free: [
+            'Ni idea, grumete. Pregunta otra cosa antes de que me aburra.',
+            '¡Por mil sirenas! No tengo respuesta para eso.',
+            'Eso es más difícil que cruzar el cabo. Otra, anda.'
+        ],
+        chat_treasure: [
+            'El tesoro del dragón, grumete. Más oro que mi ambición, y eso ya es decir.',
+            'Un mapa viejo, una cruz y mucha mala idea. Eso persigo.'
+        ],
+        combat_start: [
+            '¡Al abordaje, grumete! Te voy a convertir en comida de tiburones.',
+            '¡Prepárate! Zafira no pierde jamás... casi nunca.',
+            '¡Fuego a discreción!'
+        ],
+        combat_attack: [
+            '¡Toma cañonazo!',
+            '¡A babor!',
+            '¡Prueba mi sable, grumete!'
+        ],
+        combat_other: [
+            '¡Todos a cubierta!',
+            'Un traguito de ron y sigo.',
+            'Así no hundes a la capitana.'
+        ],
+        combat_hurt: [
+            '¡Ay! Esa me ha dolido hasta el cabo.',
+            '¡Mil rayos! Me has dado en la bodega.'
+        ],
+        combat_defeat: [
+            'Hundida por un grumete... qué vergüenza...',
+            'Que alguien guarde mi ron... y mi mapa...'
+        ],
+        combat_victory: [
+            '¡Otro al fondo del mar!',
+            '¡Ja! Pregúntale al tiburón cómo sabe.'
+        ],
+        chat_values: [
+            'Los tesoros, las aventuras y que nadie me dé órdenes, grumete. Las leyes y los sermones de honradez me dan alergia.',
+            'Libertad y oro: ¡lo demás es lastre! Y odio que me manden.'
+        ],
+        chat_persuade_good: [
+            '¡Ja! Ahora sí hablas mi idioma, grumete.',
+            'Hmm... eso suena a negocio. Sigue.'
+        ],
+        chat_persuade_bad: [
+            '¿Órdenes? ¿A mí? Intenta otra cosa, grumete.',
+            'Eso me sabe a sermón. ¡Cambia de rumbo!'
+        ],
+        chat_recruited: [
+            '¡Trato hecho, grumete! Zafira se une a tu tripulación. ¡Que se preparen!',
+            'Está bien: el Cuervo Escarlata navega contigo. ¡Pero el tesoro, a medias!'
+        ],
+        chat_locked: [
+            '¡Basta! Me has agotado la paciencia, grumete.',
+            'No quiero oír más. ¡Al agua con tus palabras!'
+        ]
+    },
+
+    skull_jefe: {
+        greeting: [
+            'Hace siglos que nadie cruza esta puerta. Mueres hoy, como todos.',
+            'Mis huesos recuerdan cada batalla. Tú serás la próxima.',
+            'Un juramento me ata a esta planta. Pasarás sobre mi cadáver... que ya no tengo.'
+        ],
+        combat_start: [
+            'Desenvaina. Que el acero hable.',
+            'El frío de la tumba te espera, vivo.',
+            'Un duelo más. Será el último tuyo.'
+        ],
+        combat_attack: [
+            'El acero no olvida.',
+            'Siente el peso de mi juramento.',
+            'Cae como cayeron mis hermanos.'
+        ],
+        combat_other: [
+            'Mis huesos han resistido siglos.',
+            'Nada atraviesa lo que ya está muerto.',
+            'Continúo. Siempre continúo.'
+        ],
+        combat_hurt: [
+            'Una grieta... conozco peores.',
+            'Buen golpe, vivo. Insuficiente.'
+        ],
+        combat_phase: [
+            'Contempla mi verdadero rostro, vivo.',
+            'Los caídos responden a mi llamada.'
+        ],
+        combat_defeat: [
+            'Al fin... el descanso...',
+            'Mi juramento... queda cumplido...'
+        ],
+        combat_victory: [
+            'Otro más para la tumba.',
+            'Silencio. Como debe ser.'
         ]
     }
 };

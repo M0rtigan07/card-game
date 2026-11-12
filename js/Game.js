@@ -13,10 +13,11 @@ import { TcgCombat } from './systems/TcgCombat.js';
 import { Exploration } from './systems/Exploration.js';
 import { NpcDialogue } from './systems/NpcDialogue.js';
 import { NpcChat } from './systems/NpcChat.js';
+import { Party } from './systems/Party.js';
+import { Persuasion } from './systems/Persuasion.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
-import { HERO_IMAGES } from './data/gameConfig.js';
-import { StoryManager } from './stories/StoryManager.js';
+import { HERO_IMAGES, PARTY } from './data/gameConfig.js';
 
 export class Game {
     constructor() {
@@ -25,7 +26,6 @@ export class Game {
         this.ui = new UIManager();
 
         this.player = null;
-        this.storyManager = null;
         this.playerName = 'HÉROE';
         this.deck = null;           // PlayerDeck: tu colección de cartas (crece con las recompensas)
         this.dungeonLevel = 1;
@@ -33,6 +33,10 @@ export class Game {
         this.nameEntry = new NameEntry(this.audio);
         this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
         this.chat = new NpcChat(this);           // conversaciones con PNJ estilo aventura gráfica
+        this.party = new Party();                // aliados que te acompañan
+        this.persuasion = new Persuasion();      // lo que llevas conseguido convenciendo a cada personaje
+        this.ui.getParty = () => this.party.members;
+        this.ui.onDismissAlly = (id) => this.dismissAlly(id); // botón ✕ del panel "Grupo"
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
         this.ui.onUseItem = (id) => this.useItem(id); // botón "Usar" del inventario
@@ -72,55 +76,11 @@ export class Game {
             });
         });
 
-        document.getElementById('btnEnterDungeon').addEventListener('click', async () => {
-            this.audio.play('sega');
-
-            this.ui.showScreen('dungeonDescentScreen');
-
-            const storyBox = document.getElementById('descentStoryText');
-            if (storyBox) storyBox.textContent = "Forjando tu destino en las tinieblas...";
-
-            let descentLore = "LAS LEYENDAS CUENTAN QUE UNA ANTIGUA MALDICIÓN HA DESPERTADO EN LAS PROFUNDIDADES.";
-
-            try {
-
-
-                if (this.groq) {
-
-                    const generated =
-                        await this.groq.generateIntroLore(
-                            this.playerName,
-                            this.player?.className || "Guerrero"
-                        );
-
-                    console.log("[DEBUG] Texto final procesado:", generated);
-                    if (generated) descentLore = generated;
-                }
-            } catch (e) {
-                console.warn("[Game] Usando texto alternativo:", e);
-            }
-
-            // Volcado directo y seguro en la caja de texto verde de la pantalla
-            if (storyBox) {
-                storyBox.textContent = "";
-                // Si tienes la función de máquina de escribir, úsala; si falla, asignamos textContent directamente:
-                if (typeof this.ui.typewriterIntro === 'function') {
-                    this.ui.typewriterIntro(
-                        descentLore.toUpperCase(),
-                        'descentStoryText'
-                    );
-                } else {
-                    storyBox.textContent = descentLore.toUpperCase();
-                }
-            }
-        });
-
-        document.getElementById('btnStartAdventure')?.addEventListener('click', () => {
+        document.getElementById('btnEnterDungeon').addEventListener('click', () => {
             this.audio.play('sega');
             this.ui.showScreen('gameScreen');
-            this.startMainGame(); // Aquí empieza la Planta 1 con Barnaby y el juego normal
+            this.startMainGame();
         });
-
     }
 
     async initGame() {
@@ -139,13 +99,11 @@ export class Game {
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
-        this.storyManager =  new StoryManager(this.player);
 
         this.playerName = localStorage.getItem('mazo_hero_name') || this.playerName;
         this.player.name = this.playerName;
         this.player.img = HERO_IMAGES[classKey] || HERO_IMAGES.warrior;
         this.deck = new PlayerDeck(STARTER_DECKS[classKey] || STARTER_DECKS.warrior);
-        
 
         setText('heroClassTag', this.playerName.toUpperCase());
         setText('introHeroTitle', `${this.playerName} - ${this.player.className.toUpperCase()}`);
@@ -160,10 +118,7 @@ export class Game {
         this.ui.typewriterIntro(`LOS DESTINOS SE ALINEAN PARA ${this.playerName}...`);
 
         const story = await this.groq.generateCharacterLore(this.player.className);
-        this.ui.typewriterIntro(
-            story.toUpperCase(),
-            'introText'
-        );
+        this.ui.typewriterIntro(story.toUpperCase());
     }
 
     async startMainGame() {
@@ -183,6 +138,27 @@ export class Game {
     advanceFloor(delay = 1800) {
         this.dungeonLevel++;
         setTimeout(() => this.loadNextEvent(), delay);
+    }
+
+    /** Un personaje se une a tu grupo. Devuelve el resultado de Party.recruit. */
+    recruitAlly(npcId) {
+        const result = this.party.recruit(npcId);
+        if (!result.ok) return result;
+
+        this.ui.logEvent(`🤝 ¡${result.ally.name} se une a tu grupo!`);
+        if (this.player.addXp(PARTY.RECRUIT_XP)) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
+        this.ui.updateStats(this.player, this.dungeonLevel);
+        return result;
+    }
+
+    /** Un aliado deja tu grupo (hace sitio para otro). */
+    dismissAlly(id) {
+        const ally = this.party.members.find(member => member.id === id);
+        if (!ally || !this.party.dismiss(id)) return false;
+
+        this.ui.logEvent(`👋 ${ally.name} deja tu grupo.`);
+        this.ui.updateStats(this.player, this.dungeonLevel);
+        return true;
     }
 
     /** Usa un consumible del inventario, dentro o fuera de combate. Devuelve true si se ha gastado. */
@@ -211,8 +187,6 @@ export class Game {
         return true;
     }
 
-
-
     // Cierre común de un encuentro: refresca stats, comprueba muerte y avanza
     finishEncounter(delay) {
         this.ui.updateStats(this.player, this.dungeonLevel);
@@ -223,20 +197,3 @@ export class Game {
         this.advanceFloor(delay);
     }
 }
-
-// Al hacer clic en un botón de la interfaz de encuentro:
-/* function handleChoiceClick(selectedChoice, currentEncounter) {
-    // Si la opción requiere combate, redirige al motor TCG
-    if (selectedChoice.action === 'combat') {
-        startTcgCombat(selectedChoice.npcType || currentEncounter.npcType);
-        return;
-    }
-
-    // Si es un encuentro de historia, procesa las consecuencias
-    if (currentEncounter.storyId) {
-        resolveStoryChoice(selectedChoice, currentEncounter.storyId, gameState.player);
-    }
-
-    // Continuar con el avance de la mazmorra
-    advanceDungeonStep();
-} */

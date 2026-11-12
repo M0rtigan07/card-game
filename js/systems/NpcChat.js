@@ -7,7 +7,8 @@
 
 import { NpcChatView } from '../views/NpcChatView.js';
 import { buildFacts, cleanChatInput, topicsFor } from './ChatTopics.js';
-import { CHAT } from '../data/gameConfig.js';
+import { ALLIES } from '../data/allyCatalog.js';
+import { CHAT, PARTY } from '../data/gameConfig.js';
 
 export class NpcChat {
     /** @param {import('../Game.js').Game} game */
@@ -84,6 +85,55 @@ export class NpcChat {
         session.onClose?.();
     }
 
+    // ───────────── Convencer para que se una al grupo ─────────────
+
+    /** Qué se ve en la zona de argumentos: título y argumentos, o null si ese personaje no puede ser tu aliado. */
+    persuasionSection(npc) {
+        if (!ALLIES[npc.id] || this.game.party.has(npc.id)) return null;
+
+        const asked = this.askedSet(npc).size;
+        const check = this.game.persuasion.canTry(npc.id, { asked, partyFull: this.game.party.isFull() });
+
+        if (check.ok) return { title: '🗣️ Convencerle de que te acompañe', args: this.game.persuasion.argumentsFor(npc.id) };
+        if (check.reason === 'rapport') return { title: `🗣️ Habla un poco más con ${npc.name} antes de pedirle nada.`, args: [] };
+        if (check.reason === 'locked') return { title: `🗣️ ${npc.name} ya no quiere escucharte.`, args: [] };
+        if (check.reason === 'full') {
+            return { title: `🗣️ Tu grupo está completo (${this.game.party.members.length}/${PARTY.MAX}). Despide a alguien desde el panel «Grupo».`, args: [] };
+        }
+        return null;
+    }
+
+    /** Pruebas un argumento. Si es el que le termina de convencer, se une a tu grupo. */
+    async pickArgument(argId) {
+        const session = this.session;
+        if (!session || this.busy) return;
+
+        const { npc } = session;
+        const asked = this.askedSet(npc).size;
+        const check = this.game.persuasion.canTry(npc.id, { asked, partyFull: this.game.party.isFull() });
+        const result = check.ok ? this.game.persuasion.evaluate(npc.id, argId) : null;
+        if (!result) return;
+
+        const ally = ALLIES[npc.id];
+        const argument = ally.arguments.find(a => a.id === argId);
+
+        // La IA recibe el resultado ya decidido: solo tiene que interpretarlo a su manera
+        const outcome = result.willRecruit ? 'Su argumento te convence del todo: has decidido unirte a su grupo.'
+            : result.willLock ? 'Su argumento te irrita y te cansa: no quieres seguir escuchándole.'
+                : result.good ? 'Su argumento te convence en parte.'
+                    : 'Su argumento no te convence.';
+        const poolKey = result.willRecruit ? 'chat_recruited'
+            : result.willLock ? 'chat_locked'
+                : result.good ? 'chat_persuade_good' : 'chat_persuade_bad';
+
+        const line = await this.converse(session, argument.label, 'chat_persuade', { action: argument.label, outcome, facts: ally.values, poolKey });
+        if (line === null) return; // te fuiste antes de oír la respuesta: el argumento no se gasta
+
+        this.game.persuasion.commit(npc.id, argId);
+        if (result.willRecruit) this.game.recruitAlly(npc.id);
+        this.refreshControls();
+    }
+
     // ───────────── Hablar ─────────────
 
     /** Eliges un tema del menú. */
@@ -151,7 +201,18 @@ export class NpcChat {
     refreshControls() {
         if (!this.session || !this.view) return;
         const { npc } = this.session;
+
+        // Ya se ha unido a tu grupo: solo queda despedirse
+        if (this.game.party.has(npc.id)) {
+            this.view.renderOptions([], () => {});
+            this.view.renderArguments(null, () => {});
+            this.view.setFreeInput({ left: 0, max: CHAT.FREE_PER_NPC, maxLength: CHAT.MAX_INPUT, disabled: true });
+            this.view.setLeaveLabel('➡️ Seguir con tu nuevo aliado');
+            return;
+        }
+
         const asked = this.askedSet(npc);
+        this.view.renderArguments(this.persuasionSection(npc), (id) => this.pickArgument(id), { disabled: this.busy });
 
         this.view.renderOptions(
             topicsFor(npc).map(topic => ({ id: topic.id, label: topic.label, asked: asked.has(topic.id) })),

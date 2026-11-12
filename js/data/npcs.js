@@ -4,10 +4,10 @@ export const NPC_DATABASE = {
         id: 'valerius',
         name: 'Conde Valerius',
         images: {
-            room: 'img/npcs/conde_valerius_lluvia.gif',
-            talk: 'img/npcs/conde_valerius_habla.gif',
-            enraged: 'img/npcs/conde_valerius_enojado.gif',
-            seductive: 'img/npcs/conde_valerius_seductor.gif'
+            room: 'img/npcs/conde_valerius.jpg',
+            talk: 'img/npcs/conde_charla.jpg',
+            enraged: 'img/npcs/conde_enojado.jpg',
+            seductive: 'img/npcs/conde_seductor.jpg'
         },
         cards: {
             combat: 'img/npcs/cartaConde.png'
@@ -51,10 +51,9 @@ export const NPC_DATABASE = {
         id: 'vikinga',
         name: 'Astrid la Escudera',
         images: {
-            room: 'img/npcs/vikinga.gif',
-            talk: 'img/npcs/vikinga_habla.gif',
-            romance: 'img/npcs/vikinga_romance.gif',
-            enraged: 'img/npcs/vikinga_enojada.gif'
+            room: 'img/npcs/vikinga.jpg',
+            talk: 'img/npcs/vikinga_hablando.jpg',
+            enraged: 'img/npcs/vikinga_enojada.jpg'
         },
         type: 'warrior_viking',
         archetype: 'una guerrera vikinga feroz, orgullosa, de pocas palabras y sedienta de honor y batallas en el Valhalla',
@@ -77,10 +76,9 @@ export const NPC_DATABASE = {
         id: 'mongol',
         name: 'Batu Jan el Nómada',
         images: {
-            room: 'img/npcs/mongol.gif',
-            talk: 'img/npcs/mongol_habla.gif',
-            enraged: 'img/npcs/mongol_enojado.gif',
-            action: 'img/npcs/mongol_arco.gif'
+            room: 'img/npcs/mongol.jpg',
+            talk: 'img/npcs/mongol_habla.jpg',
+            action: 'img/npcs/mongol_arco.jpg'
         },
         type: 'nomad_archer',
         archetype: 'un arquero nómada de las estepas, sabio, curtido en tormentas de arena y misterioso',
@@ -102,9 +100,9 @@ export const NPC_DATABASE = {
         id: 'barnaby',
         name: 'Barnaby el Buhonero',
         images: {
-            room: 'img/buhonero_idle.gif',
-            talk: 'img/buhonero_habla.gif',
-            enraged: 'img/buhonero_desafiante.gif'
+            room: 'img/barnaby_room.png',
+            talk: 'img/barnaby_talk.png',
+            enraged: 'img/barnaby_enfado.png'
         },
         type: 'merchant',
         archetype: 'Barnaby el Buhonero, un mercader callejero astuto, precavido, cotilla y un poco cascarrabias',
@@ -145,10 +143,9 @@ export const NPC_DATABASE = {
         id: 'morgana',
         name: 'Bruja Morgana',
         images: {
-            room: 'img/npcs/morgana_room.gif',
-            talk: 'img/npcs/morgana_habla.gif',
-            romance: 'img/npcs/morgana_romance.gif', // Primer plano de seducción / romance oscuro
-            enraged: 'img/npcs/morgana_enojada.gif'
+            room: 'img/morgana_room.png',
+            talk: 'img/morgana_talk.png',
+            romance: 'img/morgana_romance.png' // Primer plano de seducción / romance oscuro
         },
         type: 'witch',
         archetype: 'la Bruja Morgana, una hechicera oscura, misteriosa, seductora y enigmática',
@@ -184,23 +181,78 @@ export const NPC_DATABASE = {
         }
     },
 
-    monjeLoco: {
-        id: 'monjeLoco',
-        name: 'El Monje Loco',
-        archetype: 'un monje excéntrico, desquiciado y ermitaño que habita las profundidades de la mazmorra',
-        voice: 'Voz rápida, errática y llena de risas socarronas. Habla de hongos, alucinaciones y secretos.',
+    // --- PLANTA 7: EL NECROMANTE ---
+    necro: {
+        id: 'necro',
+        name: 'Malakar el Necromante',
         images: {
-            room: 'img/monjeLoco.gif',
-            talk: 'img/monjeLoco_habla.gif',
+            room: 'img/npcs/necro.jpg',
+            talk: 'img/npcs/necro_habla.jpg',
+            enraged: 'img/npcs/necro_serio.jpg',
+            smile: 'img/npcs/necro_sonrisa.jpg',
+            magic: 'img/npcs/necro_magia.jpg'
         },
+        type: 'necromancer',
+        archetype: 'Malakar, un necromante solitario y erudito, frío, educado y obsesionado con los secretos de la muerte',
+        voice: 'Calmado, culto y algo siniestro. Habla de la muerte como de un oficio, con cortesía fría. Usa palabras como "polvo", "huesos", "rito" y "tomo".',
+        dungeonLevel: 7,
+        baseHp: 55,
+        baseAtk: 15,
         interactions: {
             choices: [
-                { text: "🍲 \"Aceptar un plato de estofado (+20 HP).\"", action: 'eat_stew' },
-                { text: "✨ [ARCANO] \"Inspeccionar el brebaje por si tiene veneno.\"", action: 'inspect_stew' },
-                { text: "🚪 \"Ignorar al chiflado y seguir caminando.\"", action: 'pass' }
+                { text: "⚔️ \"Tu magia negra termina aquí, necromante.\"", action: 'combat' },
+                { text: "🤝 \"Sellemos un pacto: tu saber por mi oro.\"", action: 'pact_accept' },
+                { text: "🏃 \"Prefiero no importunar a los muertos.\"", action: 'pass' }
+            ]
+        }
+    },
+
+    // --- PLANTA 8: LA CAPITANA PIRATA ---
+    pirata: {
+        id: 'pirata',
+        name: 'Capitana Zafira',
+        images: {
+            room: 'img/npcs/mujerPirata.jpg',
+            talk: 'img/npcs/mujerPirata_hablando.jpg',
+            enraged: 'img/npcs/mujerPirata_hablando2.jpg'
+        },
+        type: 'pirate',
+        archetype: 'Zafira, una capitana pirata audaz, codiciosa, bromista y amante de la libertad',
+        voice: 'Descarada y marinera. Habla de tesoros, mapas, ron, cañones y mareas, y llama "grumete" al héroe.',
+        dungeonLevel: 8,
+        baseHp: 65,
+        baseAtk: 16,
+        interactions: {
+            choices: [
+                { text: "⚔️ \"¡Defiéndete, corsaria!\"", action: 'combat' },
+                { text: "💰 \"Repartámonos algún botín, capitana.\"", action: 'pact_accept' },
+                { text: "🏃 \"Navego en otra dirección.\"", action: 'pass' }
+            ]
+        }
+    },
+
+    // --- PLANTA 9: LA DAMA DE LA NOCHE ---
+    vampira: {
+        id: 'vampira',
+        name: 'La Dama de la Noche',
+        images: {
+            room: 'img/npcs/vampira.jpg',
+            talk: 'img/npcs/vampira_hablando.jpg',
+            enraged: 'img/npcs/vampira_enojada.jpg',
+            seductive: 'img/npcs/vampira_romantica.jpg'
+        },
+        type: 'vampire_lady',
+        archetype: 'la Dama de la Noche, una vampira ancestral, seductora, elegante y cruel, que juega con sus presas',
+        voice: 'Seductora y aristocrática. Llama "querido" al héroe con un cariño letal. Habla de la noche, la sangre y el aburrimiento de los siglos.',
+        dungeonLevel: 9,
+        baseHp: 70,
+        baseAtk: 17,
+        interactions: {
+            choices: [
+                { text: "⚔️ \"Tu reinado de sombras acaba aquí.\"", action: 'combat' },
+                { text: "🌹 \"Una dama tan elegante merece mejor compañía que estas sombras...\"", action: 'flirt_challenge' },
+                { text: "🏃 \"Me marcho antes de que anochezca del todo.\"", action: 'pass' }
             ]
         }
     }
-
-
 };

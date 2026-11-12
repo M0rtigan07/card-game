@@ -1,9 +1,6 @@
 import { buildNpcMessages, cleanModelLine, sanitizeNpcRequest } from './_npcPrompt.js';
 
-
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-
 
 // Pide una frase de PNJ a Groq. Se mandan penalizaciones de repetición; si el modelo las rechaza (400), se reintenta sin ellas.
 async function requestNpcLine(apiKey, messages, npcName) {
@@ -11,7 +8,7 @@ async function requestNpcLine(apiKey, messages, npcName) {
         method: "POST",
         headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-            model: process.env.GROQ_NPC_MODEL || "openai/gpt-oss-120b",
+            model: process.env.GROQ_NPC_MODEL || "llama-3.3-70b-versatile",
             messages,
             temperature: 1,
             top_p: 0.95,
@@ -44,24 +41,12 @@ export default async function handler(req, res) {
         }
         body = body || {};
 
-        const {
-            type,
-            heroName = "Héroe",
-            className = "Guerrero",
-            dungeonLevel = 1,
-            npc,
-            npcName,
-            npcArchetype,
-            action
-        } = body;
+        const { type, className = "Guerrero", dungeonLevel = 1, npc, npcName, npcArchetype, action } = body;
         const apiKey = process.env.GROQ_API_KEY;
 
         // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
         const dndEncounterDatabase = {
-          
-             "Guerrero": [
-
-                /*
+            "Guerrero": [
                 {
                     npcType: "warrior",
                     description: "Un veterano malherido apoya su espadón en una pira: \"Mi escuadra cayó ante el Capitán Orco... Toma mi escudo o avanza a vengar nuestras vidas.\"",
@@ -71,9 +56,6 @@ export default async function handler(req, res) {
                         { text: "⚔️ \"Examino el pasillo en busca de los orcos. ¡A las armas!\"", action: "combat" }
                     ]
                 },
-
-                */
-
                 {
                     npcType: "automata",
                     description: "Un autómata de bronce guardián bloquea el puente de piedra: \"Solo aquellos dignos en el arte del combate atravesarán los portones del rey.\"",
@@ -83,9 +65,7 @@ export default async function handler(req, res) {
                         { text: "🚪 \"Buscaré un paso subterráneo alternativo.\"", action: "pass" }
                     ]
                 }
-            ], 
-
-
+            ],
             "Maga Arcana": [
                 {
                     npcType: "mage",
@@ -97,9 +77,6 @@ export default async function handler(req, res) {
                     ]
                 }
             ],
-
-
-
             "Pícaro": [
                 {
                     npcType: "rogue",
@@ -122,40 +99,7 @@ export default async function handler(req, res) {
                     { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
                     { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
                 ]
-            },
-            {
-                npcType: "skrullWarrior",
-                description: "Un guerrero esquelético con ojos azules llameantes custodia un altar de huesos: \"Nadie profana la cripta eterna...\"",
-                choices: [
-                    { text: "⚔️ \"¡Vuelve a tu tumba, maldito esqueleto!\"", action: "combat" },
-                    { text: "🚪 \"Evito el altar y sigo descendiendo en silencio.\"", action: "pass" }
-                ]
-            },
-
-            {
-                npcType: "draco",
-                description: "Un draconiano de escamas bronceadas y alas coriáceas bloquea el corredor: \"El reino de la oscuridad no tolera intrusos. Rinde tu espada o enfrenta mi furia.\"",
-                choices: [
-                    { text: "⚔️ \"¡No te temo, asqueroso lagarto! Enfrentaré  tu acero.\"", action: "combat" },
-                    { text: "✨ \"Intento razonar con el draconiano y apelar a su honor.\"", action: "magic" },
-                    { text: "🚪 \"Busco un pasaje lateral para evitar al draconiano.\"", action: "pass" }
-                ]
-            },
-
-            {
-                npcType: "CaballeroNegro",
-                description: "Un caballero con armadura negra y runas de muerte te bloquea el paso: \"Mi juramento superó a la tumba. Tu alma pagará el tributo de la oscuridad eterna.\"",
-                choices: [
-                    { text: "⚔️ \"¡Pues pasare por encima tuya! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
-                    { text: "✨ \"Intento ofrecerle una almaciga como ofrenda.\"", action: "magic" },
-                    { text: "🚪 \"Busco un pasaje lateral para evitar al Caballero Negro.\"", action: "pass" }
-                ]
-            },
-
-
-
-
-
+            }
         ];
 
         function getSmartFallback() {
@@ -187,112 +131,8 @@ export default async function handler(req, res) {
             }
         }
 
-        // LORE DE INTRO / DESCENSO
-        if (type === 'intro') {
-            if (!apiKey) return res.status(200).json(fallbackIntro);
-
-            try {
-                const response = await fetch(GROQ_URL, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "openai/gpt-oss-120b",
-                        messages: [{
-                            role: "system",
-                            content: `
-Eres el narrador de un videojuego de fantasía oscura
-de los años 90 inspirado en Dungeons & Dragons,
-Eye of the Beholder y Elvira: Mistress of the Dark.
-
-Escribe un breve  texto para una pantalla de transición.
-En la historia, el héroe de clase ${className} se adentra en la mazmorra KALDUR-ATH, un lugar lleno de secretos, trampas y enemigos.
-                            El heróe debe rescatar a la hija del rey, que ha sido secuestrada y llevada a las profundidades de la mazmorra.
-El héroe se llama EXACTAMENTE "${heroName}".
-
-Debes mencionar el nombre "${heroName}"
-en la PRIMERA frase.
-
-NO inventes otro nombre.
-NO cambies el nombre.
-NO uses apodos.
-NO crees títulos alternativos.
-
-El héroe se llama únicamente "${heroName}".
-
-Requisitos:
-- 5 frases como máximo.
-- 80  palabras máximo.
-
-El héroe se llama EXACTAMENTE "${heroName}".
-Su clase es "${className}".
-
-Debes mencionar el nombre "${heroName}"
-en la primera frase.
-
-NO inventes nombres.
-NO inventes apodos.
-NO sustituyas el nombre.
-
-La historia debe:
-
-- máximo 3 frases
-- máximo 45 palabras
-- mencionar KALDUR-ATH
-- mencionar a la hija del rey
-- tono oscuro
-- texto plano
-
-- Español.
-- Tono oscuro y misterioso.
-- Habla directamente al héroe.
-- Menciona KALDUR-ATH,  es  una mazmorra que se debe explorar.
-- La mazmorra es peligrosa y está llena de secretos, trampas y enemigos.
-
-- No uses markdown.
-- No uses títulos.
-- No expliques reglas del juego.
-- Debe parecer la introducción de una aventura legendaria.
-
-NO uses:
-**
-*
-#
--
-Markdown
-HTML
-
-Devuelve únicamente texto plano.
-
-`,
-                            role: "user",
-                            content: `Escribe una narrativa elaborada y tétrica para el descenso del héroe de clase ${className} hacia las profundidades de KALDUR-ATH.`
-                        }],
-                        temperature: 0.8,
-                        max_tokens: 80 // 👈 Aumentamos los tokens para permitir una historia más larga y compleja
-                    })
-                });
-
-                if (!response.ok) return res.status(200).json(fallbackIntro);
-
-                const data = await response.json();
-                const story = data.choices?.[0]?.message?.content?.trim() || fallbackIntro.story;
-
-                return res.status(200).json({ story });
-            } catch (err) {
-                console.error('[generate-lore] intro error:', err.message);
-                return res.status(200).json(fallbackIntro);
-            }
-        }
-
-        // EXPLORACIÓN PROCEDURAL
         // EXPLORACIÓN PROCEDURAL
         if (type === 'exploration') {
-           
-
-            // 2. FLUJO HABITUAL SI NO HAY HISTORIA ACTIVA
             if (!apiKey) return res.status(200).json(fallbackEvent);
 
             try {
@@ -303,7 +143,7 @@ Devuelve únicamente texto plano.
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "openai/gpt-oss-120b",
+                        model: "llama-3.3-70b-versatile",
                         messages: [{
                             role: "system",
                             content: "Eres un Dungeon Master de D&D. Genera un encuentro conversacional rico donde un PNJ hable directamente usando comillas. Devuelve EXCLUSIVAMENTE un objeto JSON sin markdown: {\"npcType\": \"warrior|mage|rogue\", \"description\": \"diálogo directo del PNJ (máx 35 palabras)\", \"choices\": [{\"text\": \"\\\"🗣️ o ⚔️ Respuesta hablada del héroe entre comillas\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 2\\\"\", \"action\": \"strength|magic|buy|combat|pass\"}, {\"text\": \"\\\"opción 3\\\"\", \"action\": \"pass\"}]}"

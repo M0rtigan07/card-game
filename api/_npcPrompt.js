@@ -3,7 +3,7 @@
 // El guion bajo inicial evita que Vercel lo publique como endpoint: es solo un módulo auxiliar.
 
 const LIMITS = { name: 60, archetype: 240, voice: 320, action: 220, outcome: 240, avoidLine: 200, avoidCount: 6, heroName: 24, className: 30, cardName: 60, cardEffect: 120, factLine: 220, factCount: 5 };
-const KINDS = ['greeting', 'reaction', 'outcome', 'chat_topic', 'chat_free', 'combat_start', 'combat_card', 'combat_hurt', 'combat_phase', 'combat_defeat', 'combat_victory'];
+const KINDS = ['greeting', 'reaction', 'outcome', 'chat_topic', 'chat_free', 'chat_persuade', 'combat_start', 'combat_card', 'combat_hurt', 'combat_phase', 'combat_defeat', 'combat_victory'];
 
 // Un "tono" distinto en cada petición: hace que dos réplicas parecidas no suenen igual
 const ANGLES = {
@@ -12,6 +12,7 @@ const ANGLES = {
     outcome: ['con satisfacción', 'con fastidio', 'con sarcasmo', 'con sorpresa', 'con una queja', 'con una advertencia'],
     chat_topic: ['con franqueza', 'con ironía', 'con misterio', 'con orgullo', 'a media voz'],
     chat_free: ['con curiosidad', 'con ironía', 'con desdén', 'con cercanía', 'con picardía'],
+    chat_persuade: ['con interés', 'con ironía', 'con orgullo', 'con desconfianza', 'con cautela'],
     combat_start: ['con una amenaza', 'con burla', 'con arrogancia', 'con una calma inquietante', 'con una promesa de dolor'],
     combat_card: ['como un grito de guerra', 'con frialdad', 'con burla', 'con rabia', 'murmurando entre dientes'],
     combat_hurt: ['con rabia', 'con incredulidad', 'con una risa forzada', 'con dolor y orgullo'],
@@ -99,6 +100,7 @@ export function buildNpcMessages(request, rng = Math.random) {
         reaction: `El héroe ${hero} te responde: «${action || 'se queda callado'}». ${state} Reacciona directamente a lo que acaba de decir o hacer.`,
         outcome: `Acaba de ocurrir esto: «${outcome || 'el héroe se marcha'}». El héroe es ${hero}. ${state} Comenta lo sucedido.`,
         chat_topic: `El héroe ${hero} se acerca a conversar contigo y te pregunta: «${action || 'cómo estás'}». ${state} Contéstale en personaje.`,
+        chat_persuade: `El héroe ${hero} intenta convencerte de que se una a su grupo y te dice: «${action}». ${outcome ? `${outcome} ` : ''}${state} Contéstale en personaje, dejando clara tu decisión.`,
         chat_free: `El héroe ${hero} te dice en plena conversación: «${action || 'se queda callado'}». ${state} Contéstale en personaje.`,
         combat_start: `Empieza un combate a muerte contra el héroe ${hero}. ${fight} Lánzale una provocación o amenaza de inicio.`,
         combat_card: `En pleno combate contra el héroe ${hero}, vas a jugar tu carta «${cardName || 'un ataque'}» (${cardEffect || 'sin efecto conocido'}). ${fight} Di una frase breve mientras la juegas.`,
