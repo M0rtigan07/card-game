@@ -263,7 +263,7 @@ export const NPC_DATABASE = {
         name: "El Monje Loco",
 
         images: {
-            room: "img/monjeLoco.jpg",
+            room: "img/monjeLoco.gif",
             talk: "img/monjeLoco_habla1.gif"
         },
 
