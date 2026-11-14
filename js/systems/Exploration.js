@@ -83,7 +83,7 @@ export class Exploration {
                 story.storyId,
                 story.chapterId
             );
-            
+
             return this.showStory(story);
         }
 
@@ -227,25 +227,77 @@ export class Exploration {
     }
 
     async showNpc(npcKey) {
+
         const npc = NPC_DATABASE[npcKey];
+
         if (!npc) return;
 
+        // NUEVO:
+        // Si es un personaje narrativo,
+        // delegamos en StoryManager
+
+        if (npc.storyId) {
+
+            const story =
+                this.game.storyManager
+                    ?.getStoryById?.(npc.storyId);
+
+            if (story) {
+
+                return this.showStory(story);
+
+            }
+
+        }
+
+        // --- Comportamiento normal ---
         const view = this.render();
+
         const token = this.sceneToken;
-        this.setSceneImage(npc.images?.room);
-        setText('sceneBadgeOverlay', npc.name.toUpperCase());
-        this.log(`👁️ Te encuentras cara a cara con ${npc.name}.`);
 
-        const interaction = this.getNpcInteraction(npc);
+        this.setSceneImage(
+            npc.images?.room
+        );
 
-        // Mientras la IA piensa el saludo se ve una línea de espera; si tarda o falla, sale uno del banco
-        view.setNarrative(`${npc.name} te observa en silencio...`, []);
-        const greeting = await this.game.dialogue.say(npc, 'greeting', {
-            extraFallback: interaction.greeting ? [interaction.greeting] : []
-        });
-        if (token !== this.sceneToken) return; // ya estás en otra escena
+        setText(
+            'sceneBadgeOverlay',
+            npc.name.toUpperCase()
+        );
 
-        this.setNpcChoices(view, npc, interaction, greeting);
+        this.log(
+            `👁️ Te encuentras cara a cara con ${npc.name}.`
+        );
+
+        const interaction =
+            this.getNpcInteraction(npc);
+
+        view.setNarrative(
+            `${npc.name} te observa en silencio...`,
+            []
+        );
+
+        const greeting =
+            await this.game.dialogue.say(
+                npc,
+                'greeting',
+                {
+                    extraFallback: interaction.greeting
+                        ? [interaction.greeting]
+                        : []
+                }
+            );
+
+        if (token !== this.sceneToken) {
+            return;
+        }
+
+        this.setNpcChoices(
+            view,
+            npc,
+            interaction,
+            greeting
+        );
+
     }
 
     /** Menú de acciones con el PNJ: lo que ves tras su saludo y al volver de una conversación. */

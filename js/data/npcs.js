@@ -237,7 +237,7 @@ export const NPC_DATABASE = {
         name: 'La Dama de la Noche',
         images: {
             room: 'img/npcs/vampira.jpg',
-            talk: 'img/npcs/vampira_hablando.jpg',
+            talk: 'img/npcs/vampira_hablando_sonrisa.jpg',
             enraged: 'img/npcs/vampira_enojada.jpg',
             seductive: 'img/npcs/vampira_romantica.jpg'
         },
@@ -254,5 +254,23 @@ export const NPC_DATABASE = {
                 { text: "🏃 \"Me marcho antes de que anochezca del todo.\"", action: 'pass' }
             ]
         }
+    },
+
+    monjeLoco: {
+
+        id: "monjeLoco",
+
+        name: "El Monje Loco",
+
+        images: {
+            room: "img/monjeLoco.jpg",
+            talk: "img/monjeLoco_habla1.gif"
+        },
+
+        dungeonLevel: 16,
+
+        storyCharacter: true,
+
+        storyId: "monjeLoco"
     }
 };

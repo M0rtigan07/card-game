@@ -111,6 +111,52 @@ export class StoryManager {
         return null;
     }
 
+    getStoryById(storyId) {
+
+        const stories =
+            this.getAvailableStories();
+
+        const story =
+            stories.find(
+                s => s.id === storyId
+            );
+
+        if (!story) {
+            return null;
+        }
+
+        const currentChapter =
+            this.getCurrentChapter(story);
+
+        const chapter =
+            story.chapters.find(
+                c => c.id === currentChapter
+            );
+
+        if (!chapter) {
+            return null;
+        }
+
+        return {
+
+            storyId: story.id,
+
+            storyTitle: story.title,
+
+            chapterId: chapter.id,
+
+            img: chapter.img,
+
+            description:
+                chapter.description,
+
+            choices:
+                chapter.choices
+
+        };
+
+    }
+
     // gestionar nombre  de personajes
 
     getMonkName() {
