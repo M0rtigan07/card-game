@@ -72,13 +72,15 @@ export const ENEMY_DECKS = {
         { name: '🦴 Reconstrucción', type: 'heal', val: 20 }
     ],
 
-    draco: [
-        { name: '🗡️ Espada de Takhisis', type: 'atk', power: 1.4, copies: 2 },
-        { name: '🛡️ Escamas de Bronce', type: 'def', val: 14, copies: 2 },
-        { name: '🦅 Zarpazo Aéreo', type: 'multi', power: 0.8, hits: 2 }
+
+    hombre_jabali: [ // Hombre jabalí: ataques feroces y sangrientos
+        { name: '💀 hachazo sangriento', type: 'atk', power: 1.5, hits: 4, copies: 3 },
+        { name: '🦴 embestida salvaje', type: 'buff', val: 3 },
+        { name: '🛡️ piel de jabalí', type: 'def', val: 12 },
     ],
 
-    
+
+
 
     escorpiones_jefe: [ // Veneno y golpes rápidos
         { name: '🦂 Aguijón', type: 'atk', power: 1.6, copies: 2 },
@@ -121,17 +123,7 @@ export const ENEMY_DECKS = {
         { name: '💋 Hechizo de Seducción', type: 'buff', val: 3 }
     ],
 
-    zombie: [ // Guerrero podrido: muerde, se cura y convoca a los muertos
-        { name: '💀 Mordida zombie', type: 'drain', power: 1.5, hits: 4, copies: 2 },
-        { name: '🦴 desgarro', type: 'buff', val: 3 },
 
-    ],
-
-    hombre_jabali: [ // Hombre jabalí: ataques feroces y sangrientos
-        { name: '💀 hachazo sangriento', type: 'atk', power: 1.5, hits: 4, copies: 3 },
-        { name: '🦴 embestida salvaje', type: 'buff', val: 3 },
-        { name: '🛡️ piel de jabalí', type: 'def', val: 12 },
-    ],
 
     // ───── Enemigos genéricos ─────
     corrupto: [
@@ -158,7 +150,23 @@ export const ENEMY_DECKS = {
         { name: '🪨 Piel de Roca', type: 'def', val: 14, copies: 2 },
         { name: '🦅 Picado', type: 'multi', power: 0.8, hits: 2 }
     ],
-    hechicero: [
+    zombie: [ // Guerrero podrido: muerde, se cura y convoca a los muertos
+        { name: '💀 Mordida zombie', type: 'drain', power: 1.5, hits: 4, copies: 2 },
+        { name: '🦴 desgarro', type: 'buff', val: 3 },
+
+    ],
+    draco: [
+        { name: '🗡️ Espada de Takhisis', type: 'atk', power: 1.4, copies: 2 },
+        { name: '🛡️ Escamas de Bronce', type: 'def', val: 14, copies: 2 },
+        { name: '🦅 Zarpazo Aéreo', type: 'multi', power: 0.8, hits: 2 }
+    ],
+
+    devorador_mentes: [
+        { name: '🧠 Devorar Memoria', type: 'drain', power: 1.5, hits: 4, copies: 2 },
+        { name: '👻 Espectro Maldito', type: 'buff', val: 3 },
+    ],
+
+    hechiceroNegro: [
         { name: '🔥 Rayo Oscuro', type: 'atk', power: 1.6, copies: 2 },
         { name: '☠️ Maldición Lenta', type: 'poison', val: 4, turns: 3 },
         { name: '🔮 Barrera Arcana', type: 'def', val: 12 },

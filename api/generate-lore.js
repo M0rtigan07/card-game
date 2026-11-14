@@ -90,9 +90,9 @@ export default async function handler(req, res) {
             ]
         };
 
-       const deepDungeonEncounters = [
+        const deepDungeonEncounters = [
             {
-                npcType: "mage",
+                npcType: "devorador_mentes",
                 description: "Un devorador de mentes te observa desde el techo: \"Siento la ambición de tu alma. Entrégame tus recuerdos de la superficie o perece.\"",
                 choices: [
                     { text: "✨ [VOLUNTAD] \"Mi mente es una fortaleza inexpugnable.\"", action: "magic" },
@@ -120,6 +120,17 @@ export default async function handler(req, res) {
             },
 
             {
+                npcType: "hechiceroNegro",
+                description: "Un hechicero oscuro te observa desde el techo: \"Siento la ambición de tu alma. Entrégame tus recuerdos de la superficie o perece.\"",
+                choices: [
+                    { text: "✨ [VOLUNTAD] \"Mi mente es una fortaleza inexpugnable.\"", action: "magic" },
+                    { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
+                    { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
+                ]
+            },
+
+
+            {
                 npcType: "CaballeroNegro",
                 description: "Un caballero con armadura negra y runas de muerte te bloquea el paso: \"Mi juramento superó a la tumba. Tu alma pagará el tributo de la oscuridad eterna.\"",
                 choices: [
@@ -129,7 +140,7 @@ export default async function handler(req, res) {
                 ]
             },
 
-            
+
 
 
 

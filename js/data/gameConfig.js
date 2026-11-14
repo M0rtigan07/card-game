@@ -22,9 +22,14 @@ export const HERO_IMAGES = {
 // Imagen de escena según el npcType que devuelve el backend
 export const ENCOUNTER_IMAGES = {
     warrior: 'img/veterano.jpg',
-    mage: 'img/mage.jpg',
+    devorador_mentes: 'img/devorador_mentes.jpg',
     rogue: 'img/gargola.png',
-    automata: 'img/automata.jpg'
+    automata: 'img/automata.jpg',
+    skrullWarrior: 'img/skrullWarrior2.jpg',
+    draco: 'img/draco.gif',
+    CaballeroNegro: 'img/caballeroNegroEspada.jpg',
+    hechiceroNegro: 'img/hechicero_negro.jpg',
+    
 };
 export const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
 
@@ -55,6 +60,17 @@ export const GENERIC_ENEMIES = [
         archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
         voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
     },
+
+    {
+        keys: ['caballero', 'guerrero medieval', 'caballero oscuro', 'armadura negra'],
+        id: 'CaballeroNegro',
+        deckId: 'CaballeroNegro',
+        name: 'Caballero Negro',
+        img: 'img/caballeroNegroEspada.jpg',
+        archetype: 'un caballero con armadura negra y runas de muerte, custodio de la oscuridad eterna',
+        voice: 'Voz fría y sepulcral. Habla de juramentos rotos, de sombras y de la eternidad del dolor.'
+    },
+
 
     {
         keys: ['hombre lagarto', 'lagarto', 'draco', 'reptil'],
