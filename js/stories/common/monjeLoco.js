@@ -18,7 +18,7 @@ export const MONJE_LOCO = {
         {
             id: 1,
 
-            minLevel: 16,
+            minLevel: 17,
 
             img: "img/monjeLoco.gif",
 

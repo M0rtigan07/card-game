@@ -62,7 +62,7 @@ export const ENEMY_DECKS = {
         { name: '🥩 Banquete de Horda', type: 'heal', val: 25 },
         { name: '🛡️ Escudo de Cráneos', type: 'def', val: 16 }
     ],
-    skull_jefe: [ // Huesos, frío de tumba y una armadura que se rehace sola
+    skrullWarrior: [ // Huesos, frío de tumba y una armadura que se rehace sola
         { name: '💀 Tajo Espectral', type: 'atk', power: 1.6, copies: 2 },
         { name: '🦴 Lluvia de Huesos', type: 'multi', power: 0.6, hits: 4 },
         { name: '⚔️ Furia de los Caídos', type: 'buff', val: 3 },
@@ -71,6 +71,13 @@ export const ENEMY_DECKS = {
         { name: '💙 Llama Fría', type: 'drain', power: 1.2, leech: 1 },
         { name: '🦴 Reconstrucción', type: 'heal', val: 20 }
     ],
+
+    draco: [
+        { name: '🗡️ Espada de Takhisis', type: 'atk', power: 1.4, copies: 2 },
+        { name: '🛡️ Escamas de Bronce', type: 'def', val: 14, copies: 2 },
+        { name: '🦅 Zarpazo Aéreo', type: 'multi', power: 0.8, hits: 2 }
+    ],
+
     escorpiones_jefe: [ // Veneno y golpes rápidos
         { name: '🦂 Aguijón', type: 'atk', power: 1.6, copies: 2 },
         { name: '🗡️ Puñalada Doble', type: 'multi', power: 1.0, hits: 2, copies: 2 },

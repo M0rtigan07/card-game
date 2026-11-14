@@ -90,7 +90,7 @@ export default async function handler(req, res) {
             ]
         };
 
-        const deepDungeonEncounters = [
+       const deepDungeonEncounters = [
             {
                 npcType: "mage",
                 description: "Un devorador de mentes te observa desde el techo: \"Siento la ambición de tu alma. Entrégame tus recuerdos de la superficie o perece.\"",
@@ -99,7 +99,40 @@ export default async function handler(req, res) {
                     { text: "⚔️ \"¡Empuño mis cartas y mi acero para destruirte!\"", action: "combat" },
                     { text: "🚪 \"Retrocedo lentamente hacia el pasillo anterior.\"", action: "pass" }
                 ]
-            }
+            },
+            {
+                npcType: "skrullWarrior",
+                description: "Un guerrero esquelético con ojos azules llameantes custodia un altar de huesos: \"Nadie profana la cripta eterna...\"",
+                choices: [
+                    { text: "⚔️ \"¡Vuelve a tu tumba, maldito esqueleto!\"", action: "combat" },
+                    { text: "🚪 \"Evito el altar y sigo descendiendo en silencio.\"", action: "pass" }
+                ]
+            },
+
+            {
+                npcType: "draco",
+                description: "Un draconiano de escamas bronceadas y alas coriáceas bloquea el corredor: \"El reino de la oscuridad no tolera intrusos. Rinde tu espada o enfrenta mi furia.\"",
+                choices: [
+                    { text: "⚔️ \"¡No te temo, asqueroso lagarto! Enfrentaré  tu acero.\"", action: "combat" },
+                    { text: "✨ \"Intento razonar con el draconiano y apelar a su honor.\"", action: "magic" },
+                    { text: "🚪 \"Busco un pasaje lateral para evitar al draconiano.\"", action: "pass" }
+                ]
+            },
+
+            {
+                npcType: "CaballeroNegro",
+                description: "Un caballero con armadura negra y runas de muerte te bloquea el paso: \"Mi juramento superó a la tumba. Tu alma pagará el tributo de la oscuridad eterna.\"",
+                choices: [
+                    { text: "⚔️ \"¡Pues pasare por encima tuya! Enfrentaré tu fuego y tu acero.\"", action: "combat" },
+                    { text: "✨ \"Intento ofrecerle una almaciga como ofrenda.\"", action: "magic" },
+                    { text: "🚪 \"Busco un pasaje lateral para evitar al Caballero Negro.\"", action: "pass" }
+                ]
+            },
+
+            
+
+
+
         ];
 
         function getSmartFallback() {
