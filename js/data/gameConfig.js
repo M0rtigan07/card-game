@@ -29,6 +29,8 @@ export const ENCOUNTER_IMAGES = {
     draco: 'img/draco.gif',
     CaballeroNegro: 'img/caballeroNegroEspada.jpg',
     hechiceroNegro: 'img/hechicero_negro.jpg',
+
+    monjeLoco: 'img/monjeLoco.gif'
     
 };
 export const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
