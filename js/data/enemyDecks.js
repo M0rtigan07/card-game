@@ -112,6 +112,12 @@ export const ENEMY_DECKS = {
         { name: '💋 Hechizo de Seducción', type: 'buff', val: 3 }
     ],
 
+    zombie: [ // Guerrero podrido: muerde, se cura y convoca a los muertos
+        { name: '💀 Mordida zombie', type: 'drain', power: 1.5, hits: 4, copies: 2 },
+        { name: '🦴 desgarro', type: 'buff', val: 3 },
+
+    ],
+
     // ───── Enemigos genéricos ─────
     corrupto: [
         { name: '🔪 Zarpazo Furtivo', type: 'atk', power: 1.3, copies: 2 },

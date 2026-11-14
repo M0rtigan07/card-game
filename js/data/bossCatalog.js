@@ -40,18 +40,18 @@ export const BOSSES = [
         ]
     },
     {
-        id: 'skull_jefe',
-        name: 'Skrull, el Guerrero Esqueleto',
-        img: 'img/skrullWarrior.jpg',
-        deckId: 'skull_jefe',
+        id: 'zombie',
+        name: 'zombie, el Guerrero Podre',
+        img: 'img/zombie.jpg',
+        deckId: 'zombie',
         baseHp: 160, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 8,
-        archetype: 'Skrull, un guerrero esquelético inmortal, implacable y orgulloso, condenado a guardar la mazmorra desde hace siglos',
-        voice: 'Sepulcral, seco y marcial. Habla de huesos, de batallas olvidadas, de juramentos y del frío de la tumba. Frases cortas y graves.',
+        archetype: 'Zombie, un guerrero podre y tenaz, que no recuerda su vida pasada y busca alimento en los vivos',
+        voice: 'EMITE GRUÑIDOS Y GEMIDOS. Habla poco, con frases cortas y sin sentido, como un animal hambriento.',
         phases: [
-            { at: 0.6, announce: 'se quita el yelmo y sus cuencas arden en azul', atkBonus: 3, shield: 20, img: 'img/skrullWarrior1.jpg' },
+            { at: 0.6, announce: 'te muestra sus fauces', atkBonus: 3, shield: 20, img: 'img/zombie1.jpg' },
             {
-                at: 0.3, announce: 'invoca el portal de los caídos', atkBonus: 4, heal: 30, img: 'img/skrullWarrior2.jpg',
-                addCards: [{ name: '💀 Legión de Huesos', type: 'multi', power: 0.5, hits: 4, copies: 2 }]
+                at: 0.3, announce: 'ataque zombie', atkBonus: 4, heal: 30, img: 'img/zombie2.jpg',
+                addCards: [{ name: '💀 aliento podrido', type: 'multi', power: 0.5, hits: 4, copies: 2 }]
             }
         ]
     },
