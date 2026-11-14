@@ -77,13 +77,13 @@ export class Exploration {
 
         const story = this.game.storyManager?.getStoryEncounter(level);
 
-        console.log(
-            "[Historia encontrada]",
-            story.id,
-            chapter.id
-        );
-
         if (story) {
+            console.log(
+                "[Historia encontrada]",
+                story.storyId,
+                story.chapterId
+            );
+            
             return this.showStory(story);
         }
 
