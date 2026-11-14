@@ -28,7 +28,7 @@ export const ENCOUNTER_IMAGES = {
     skrullWarrior: 'img/skrullWarrior2.jpg',
     draco: 'img/draco.gif',
     CaballeroNegro: 'img/caballeroNegroEspada.jpg',
-    hechiceroNegro: 'img/hechicero_negro.jpg',
+    hechiceroNegro: 'img/hechicero_negro3.jpg',
 
     monjeLoco: 'img/monjeLoco.gif'
     
@@ -93,7 +93,7 @@ export const GENERIC_ENEMIES = [
     },
 
     {
-        keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechicero', deckId: 'hechicero', name: 'Hechicero Oscuro', img: 'img/hechicero.jpg',
+        keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechiceroNegro', deckId: 'hechiceroNegro', name: 'Hechicero Oscuro', img: 'img/hechicero_negro2.jpg',
         archetype: 'un hechicero oscuro erudito, arrogante y obsesionado con el conocimiento arcano',
         voice: 'Condescendiente y pedante, con jerga académica ("hipótesis", "ecuación", "experimento"). Trata al héroe como a un ignorante.'
     },
