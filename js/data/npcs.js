@@ -52,7 +52,7 @@ export const NPC_DATABASE = {
         name: 'Astrid la Escudera',
         images: {
             room: 'img/npcs/vikinga.jpg',
-            talk: 'img/npcs/vikinga_hablando.jpg',
+            talk: 'img/npcs/vikinga_hablando1.jpg',
             enraged: 'img/npcs/vikinga_enojada.jpg'
         },
         type: 'warrior_viking',
@@ -262,15 +262,55 @@ export const NPC_DATABASE = {
 
         name: "El Monje Loco",
 
-        images: {
-            room: "img/monjeLoco.gif",
-            talk: "img/monjeLoco_habla1.gif"
-        },
-
-        dungeonLevel: 16,
-
         storyCharacter: true,
 
-        storyId: "monjeLoco"
+        storyId: "monjeLoco",
+
+        dungeonLevel: 15,
+
+        images: {
+
+            room: "img/monjeLoco.gif",
+
+            talk: "img/monjeLoco_habla1.gif"
+
+        },
+
+        type: "mad_monk",
+
+        archetype:
+            "un monje excéntrico, cobarde, despistado y misterioso que parece conocer la mazmorra mejor que nadie",
+
+        voice:
+            "Habla de forma extraña, mezcla humor con sabiduría, evita responder directamente y suele cambiar de tema.",
+
+        interactions: {
+
+            choices: [
+
+                {
+                    text: '❓ "¿Quién eres?"',
+                    action: 'chat'
+                },
+
+                {
+                    text: '🏰 "¿Qué sabes de Kaldur-Ath?"',
+                    action: 'chat'
+                },
+
+                {
+                    text: '👀 "Te he visto antes por la mazmorra..."',
+                    action: 'chat'
+                },
+
+                {
+                    text: '🚪 Seguir explorando',
+                    action: 'pass'
+                }
+
+            ]
+
+        }
+
     }
 };

@@ -10,8 +10,8 @@ export class StoryManager {
 
         if (!this.player.storyState) {
             this.player.storyState = {
-                monjeTrust: 0,
-                monjeNameKnown: false
+                monjeLocoChapter: 1,
+                monjeLocoTrust: 0
             };
         }
     }
@@ -221,6 +221,54 @@ export class StoryManager {
         return (
             this.player.storyState[storyId] === -1
         );
+    }
+
+
+// Avanza la historia  segun personaje
+
+    checkStoryProgress(storyId) {
+
+        const stories =
+            this.getAvailableStories();
+
+        const story =
+            stories.find(
+                s => s.id === storyId
+            );
+
+        if (!story?.progression) {
+            return false;
+        }
+
+        const state = this.player.storyState;
+
+        const currentChapter =
+            state[`${storyId}Chapter`] || 1;
+
+        const currentTrust =
+            state[`${storyId}Trust`] || 0;
+
+        const nextChapter =
+            currentChapter + 1;
+
+        const requirements =
+            story.progression[nextChapter];
+
+        if (!requirements) {
+            return false;
+        }
+
+        if (
+            requirements.trust &&
+            currentTrust < requirements.trust
+        ) {
+            return false;
+        }
+
+        state[`${storyId}Chapter`] =
+            nextChapter;
+
+        return true;
     }
 
     /**

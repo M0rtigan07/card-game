@@ -12,6 +12,22 @@ export const MONJE_LOCO = {
         role: "Ermitaño de Kaldur-Ath"
     },
 
+    progression: {
+
+        2: {
+            trust: 3
+        },
+
+        3: {
+            trust: 6
+        },
+
+        4: {
+            trust: 10
+        }
+
+    },
+
 
     chapters: [
 
