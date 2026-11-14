@@ -138,6 +138,29 @@ export const NPC_DATABASE = {
         }
     },
 
+    herrero:{
+        id: 'herrero',
+        name: 'El Herrero',
+        images: {
+            room: 'img/herrero.png',
+            talk: 'img/herrero_habla.png',
+            enraged: 'img/herrero_enfado.png'
+        },
+        type: 'blacksmith',
+        archetype: 'un herrero robusto, calloso, de pocas palabras y gran habilidad con el metal',
+        voice: 'Voz grave y pausada. Habla de forja, acero y fuego. Frases cortas y directas.',
+        dungeonLevel: 22, // <-- Aparece en la planta 2
+        baseHp: 50,
+        baseAtk: 10,
+        interactions: {
+            choices: [
+                { text: "⚒️ Forjar una espada mejorada (-50 Oro)", action: 'forge_sword' },
+                { text: "🛡️ Forjar un escudo reforzado (-40 Oro)", action: 'forge_shield' }
+            ]
+        }
+    },
+
+
     // --- PLANTA 3: LA BRUJA DE LOS PANTANOS ---
     morgana: {
         id: 'morgana',
