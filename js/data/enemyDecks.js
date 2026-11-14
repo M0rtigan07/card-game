@@ -118,6 +118,12 @@ export const ENEMY_DECKS = {
 
     ],
 
+    hombre_jabali: [ // Hombre jabalí: ataques feroces y sangrientos
+        { name: '💀 hachazo sangriento', type: 'atk', power: 1.5, hits: 4, copies: 3 },
+        { name: '🦴 embestida salvaje', type: 'buff', val: 3 },
+        { name: '🛡️ piel de jabalí', type: 'def', val: 12 },
+    ],
+
     // ───── Enemigos genéricos ─────
     corrupto: [
         { name: '🔪 Zarpazo Furtivo', type: 'atk', power: 1.3, copies: 2 },
