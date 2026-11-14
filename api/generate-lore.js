@@ -45,6 +45,7 @@ export default async function handler(req, res) {
         const apiKey = process.env.GROQ_API_KEY;
 
         // BANCO NARRATIVO RAMIFICADO Y DINÁMICO (FALLBACKS D&D)
+        //ENCUENTROS GENERICOS  POR CLASE DE PERSONAJE
         const dndEncounterDatabase = {
             "Guerrero": [
                 {
@@ -89,6 +90,9 @@ export default async function handler(req, res) {
                 }
             ]
         };
+
+        // ENCUENTROS DE LA PLANTA PROFUNDA (FALLBACKS D&D)
+        //ENEMIGOS GENERICOS COMUNES
 
         const deepDungeonEncounters = [
             {

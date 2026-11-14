@@ -34,6 +34,8 @@ export const ENCOUNTER_IMAGES = {
 export const DEFAULT_ENCOUNTER_IMAGE = 'img/guerreroCorrupto.png';
 
 // Enemigos genéricos: se elige el primero cuyo texto clave aparezca en la descripción del encuentro
+
+//configuracion para el modo batalla
 export const GENERIC_ENEMIES = [
     {
         keys: ['autómata', 'automata'], id: 'automata', deckId: 'automata', name: 'Autómata de Bronce', img: 'img/automata.jpg',
@@ -49,6 +51,12 @@ export const GENERIC_ENEMIES = [
         keys: ['gárgola', 'gargola', 'estatua'], id: 'gargola', deckId: 'gargola', name: 'Estatua de Gárgola', img: 'img/gargola.png',
         archetype: 'una gárgola de piedra milenaria, paciente, antigua y solemne',
         voice: 'Voz lenta y solemne. Habla de siglos, de piedra, de polvo y de ruinas. Frases pausadas y con peso.'
+    },
+
+    {
+        keys: ['devorador de mentes', 'devorador_mentes'], id: 'devorador_mentes', deckId: 'devorador_mentes', name: 'Devorador de Mentes', img: 'img/devorador_mentes3.jpg',
+        archetype: 'un ser que devora la memoria y los recuerdos de sus víctimas',
+        voice: 'Voz sibilante y fría. Habla en términos de control mental y manipulación. Frases cortas y cargadas de amenaza.'
     },
 
     {

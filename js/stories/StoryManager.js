@@ -37,12 +37,25 @@ export class StoryManager {
      */
     getStoryEncounter(level) {
 
+        console.log(
+            "[Estado historias]",
+            this.player.storyState
+        );
+
         const stories =
             this.getAvailableStories();
 
         for (const story of stories) {
 
             const currentChapter = this.getCurrentChapter(story);
+
+            console.log(
+                "[StoryManager]",
+                "Planta:",
+                level
+            );
+
+
 
             if (!currentChapter) {
                 continue;
@@ -111,8 +124,8 @@ export class StoryManager {
 
         return "El Monje Loco";
     }
-    
-    
+
+
 
     /**
      * Devuelve el capítulo actual de una historia.
