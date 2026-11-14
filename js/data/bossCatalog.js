@@ -70,6 +70,24 @@ export const BOSSES = [
             }
         ]
     },
+
+    {
+        id: 'hombre_jabali',
+        name: 'El Hombre Jabali',
+        img: 'img/hombre_jabali.gif',
+        deckId: 'hombre_jabali',
+        baseHp: 160, hpPerFloor: 10, baseAtk: 16, atkPerFloor: 0.6, armor: 8,
+        archetype: 'El Hombre Jabali, un guerrero feroz y bestial, que ataca sin piedad',
+        voice: 'acaba  sus farses  con  gruñidos ,  habla en tono  de mal humor , como un animal furioso.',
+        phases: [
+            { at: 0.6, announce: 'mirada intimidante', atkBonus: 3, shield: 20, img: 'img/hombre_jabali1.jpg' },
+            {
+                at: 0.3, announce: 'ataque feroz', atkBonus: 4, heal: 30, img: 'img/hombre_jabali3.jpg',
+                addCards: [{ name: '💀 hachazo sangriento', type: 'atk', power: 0.5, hits: 4, copies: 3, img: 'img/hombre_jabali4.jpg' }]
+            }
+        ]
+    },
+
     {
         id: 'dragon_jefe',
         name: 'Ignis, el Dragón Guardián',
