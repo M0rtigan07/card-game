@@ -45,11 +45,33 @@ export const GENERIC_ENEMIES = [
         archetype: 'una gárgola de piedra milenaria, paciente, antigua y solemne',
         voice: 'Voz lenta y solemne. Habla de siglos, de piedra, de polvo y de ruinas. Frases pausadas y con peso.'
     },
+
+    {
+        keys: ['esqueleto', 'guerrero esquelético', 'no-muerto', 'cráneo'],
+        id: 'skrullWarrior',
+        deckId: 'skrullWarrior',
+        name: 'Guerrero Esqueleto',
+        img: 'img/skrullWarrior2.jpg', // O usa 'skrullWarrior1.jpg' / 'skrullWarrior2.jpg' según prefieras para el combate
+        archetype: 'un temible guerrero esquelético de ojos azules llameantes, antiguo campeón de las profundidades',
+        voice: 'Voz hueca, metálica y sepulcral. Habla de siglos de guardia eterna, de huesos rotos y del frío de la muerte.'
+    },
+
+    {
+        keys: ['hombre lagarto', 'lagarto', 'draco', 'reptil'],
+        id: 'draco',
+        deckId: 'draco',
+        name: 'Draco de las Profundidades',
+        img: 'img/draco.gif',
+        archetype: 'un draco de las profundidades, astuto, ágil y con un aliento venenoso',
+        voice: 'Voz sibilante y reptiliana. Habla de presas, de veneno y de la caza. Frases rápidas y con siseos.'
+    },
+
     {
         keys: ['hechicero', 'nigromante', 'mago', 'archimaga', 'devorador'], id: 'hechicero', deckId: 'hechicero', name: 'Hechicero Oscuro', img: 'img/hechicero.jpg',
         archetype: 'un hechicero oscuro erudito, arrogante y obsesionado con el conocimiento arcano',
         voice: 'Condescendiente y pedante, con jerga académica ("hipótesis", "ecuación", "experimento"). Trata al héroe como a un ignorante.'
     },
+
     {
         keys: ['dragón', 'dragon'], id: 'dragon', deckId: 'dragon', name: 'Dragón Anciano', img: 'img/dragon.png',
         archetype: 'un dragón anciano y majestuoso, orgulloso y dueño de un tesoro inmenso',

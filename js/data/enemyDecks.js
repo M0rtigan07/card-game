@@ -78,6 +78,8 @@ export const ENEMY_DECKS = {
         { name: '🦅 Zarpazo Aéreo', type: 'multi', power: 0.8, hits: 2 }
     ],
 
+    
+
     escorpiones_jefe: [ // Veneno y golpes rápidos
         { name: '🦂 Aguijón', type: 'atk', power: 1.6, copies: 2 },
         { name: '🗡️ Puñalada Doble', type: 'multi', power: 1.0, hits: 2, copies: 2 },
