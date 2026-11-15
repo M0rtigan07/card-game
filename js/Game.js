@@ -34,7 +34,14 @@ export class Game {
         this.nameEntry = new NameEntry(this.audio);
         this.dialogue = new NpcDialogue(this);   // todo lo que dicen los PNJ (Groq + respaldo)
         this.chat = new NpcChat(this);           // conversaciones con PNJ estilo aventura gráfica
-        this.party = new Party();                // aliados que te acompañan
+
+        this.party = new Party(this);
+
+        this.ui.getParty = () => this.party.active;
+
+        this.ui.onOpenParty = () => this.showPartyView();
+
+        // aliados que te acompañan
         this.persuasion = new Persuasion();      // lo que llevas conseguido convenciendo a cada personaje
         this.ui.getParty = () => this.party.members;
         this.ui.onDismissAlly = (id) => this.dismissAlly(id); // botón ✕ del panel "Grupo"
@@ -130,6 +137,60 @@ export class Game {
         await this.loadNextEvent();
     }
 
+    showPartyView() {
+
+        const recruited =
+            this.party.recruited;
+
+        const activeIds =
+            this.party.active.map(
+                ally => ally.id
+            );
+
+        const activeText =
+            this.party.active.length
+                ? this.party.active
+                    .map(a => `✅ ${a.name}`)
+                    .join('\n')
+                : 'Sin compañeros activos';
+
+        const recruitText =
+            recruited
+                .filter(
+                    ally =>
+                        !activeIds.includes(
+                            ally.id
+                        )
+                )
+                .map(
+                    ally => `➕ ${ally.name}`
+                )
+                .join('\n');
+
+        alert(
+
+            `═══════════════════
+
+GRUPO
+
+═══════════════════
+
+ACTIVOS
+
+${activeText}
+
+═══════════════════
+
+RECLUTADOS
+
+${recruitText}
+
+═══════════════════`
+
+        );
+
+    }
+
     // ───────────── FLUJO ENTRE PLANTAS ─────────────
 
     loadNextEvent() {
@@ -144,8 +205,15 @@ export class Game {
 
     /** Un personaje se une a tu grupo. Devuelve el resultado de Party.recruit. */
     recruitAlly(npcId) {
+
         const result = this.party.recruit(npcId);
-        if (!result.ok) return result;
+
+        if (result.ok && !this.party.isActivePartyFull()) {
+
+            this.party.activate(npcId);
+
+        }
+
 
         this.ui.logEvent(`🤝 ¡${result.ally.name} se une a tu grupo!`);
         if (this.player.addXp(PARTY.RECRUIT_XP)) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
@@ -155,7 +223,7 @@ export class Game {
 
     /** Un aliado deja tu grupo (hace sitio para otro). */
     dismissAlly(id) {
-        const ally = this.party.members.find(member => member.id === id);
+        const ally = this.party.recruited.find(member => member.id === id);
         if (!ally || !this.party.dismiss(id)) return false;
 
         this.ui.logEvent(`👋 ${ally.name} deja tu grupo.`);

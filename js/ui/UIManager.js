@@ -4,6 +4,7 @@ export class UIManager {
         this.onUseItem = null; // lo asigna Game: se llama con el id del objeto al pulsar "Usar"
         this.getParty = null;  // lo asigna Game: devuelve los aliados del grupo
         this.onDismissAlly = null; // lo asigna Game: se llama con el id del aliado al pulsar ✕
+        this.onOpenParty = null;
         this.acting = new Set(); // aliados que están actuando ahora mismo (se resaltan)
     }
 
@@ -118,6 +119,26 @@ export class UIManager {
         const title = document.createElement('h2');
         title.textContent = 'Grupo';
         host.appendChild(title);
+
+        const manageBtn =
+            document.createElement('button');
+
+        manageBtn.className =
+            'party-manage-btn';
+
+        manageBtn.textContent =
+            '👥 Gestionar grupo';
+
+        manageBtn.addEventListener(
+            'click',
+            () => {
+
+                this.onOpenParty?.();
+
+            }
+        );
+
+        host.appendChild(manageBtn);
 
         members.forEach(ally => {
             const card = document.createElement('div');

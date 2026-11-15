@@ -3,7 +3,8 @@
 import { ALLIES } from '../data/allyCatalog.js';
 
 /**
- * Convierte una habilidad de aliado en una carta.
+ * Convierte la habilidad del aliado
+ * en una carta utilizable durante combate.
  */
 export function buildAllyCard(ally, level) {
 
@@ -22,16 +23,23 @@ export function buildAllyCard(ally, level) {
 
 export class Party {
 
-    constructor(catalog = ALLIES) {
+    constructor(game, catalog = ALLIES) {
+
+        this.game = game;
 
         this.catalog = catalog;
 
-        // Todos los aliados reclutados
+        // Todos los personajes reclutados
         this.recruited = [];
 
-        // Los activos para combate
+        // Personajes activos para combate
         this.active = [];
+
     }
+
+    // -------------------------
+    // CONSULTAS
+    // -------------------------
 
     has(id) {
 
@@ -49,12 +57,70 @@ export class Party {
 
     }
 
+    getRecruitCount() {
+
+        return this.recruited.length;
+
+    }
+
+    getActiveCount() {
+
+        return this.active.length;
+
+    }
+
     /**
-     * Reclutar personaje.
+     * Límite dinámico de personajes activos.
      */
+    getMaxActiveMembers() {
+
+        const level =
+            this.game?.player?.level ?? 1;
+
+        if (level >= 30) return 4;
+
+        if (level >= 20) return 3;
+
+        if (level >= 10) return 2;
+
+        return 1;
+
+    }
+
+    isActivePartyFull() {
+
+        return (
+            this.active.length >=
+            this.getMaxActiveMembers()
+        );
+
+    }
+
+    getPartyInfo() {
+
+        return {
+
+            recruited:
+                this.recruited.length,
+
+            active:
+                this.active.length,
+
+            activeLimit:
+                this.getMaxActiveMembers()
+
+        };
+
+    }
+
+    // -------------------------
+    // RECLUTAMIENTO
+    // -------------------------
+
     recruit(id) {
 
-        const ally = this.catalog[id];
+        const ally =
+            this.catalog[id];
 
         if (!ally) {
 
@@ -83,9 +149,29 @@ export class Party {
 
     }
 
-    /**
-     * Activar para combate.
-     */
+    dismiss(id) {
+
+        this.deactivate(id);
+
+        const index =
+            this.recruited.findIndex(
+                ally => ally.id === id
+            );
+
+        if (index === -1) {
+            return false;
+        }
+
+        this.recruited.splice(index, 1);
+
+        return true;
+
+    }
+
+    // -------------------------
+    // ACTIVOS
+    // -------------------------
+
     activate(id) {
 
         const ally =
@@ -111,6 +197,15 @@ export class Party {
 
         }
 
+        if (this.isActivePartyFull()) {
+
+            return {
+                ok: false,
+                reason: 'party_full'
+            };
+
+        }
+
         this.active.push(ally);
 
         return {
@@ -120,9 +215,6 @@ export class Party {
 
     }
 
-    /**
-     * Sacar del grupo activo.
-     */
     deactivate(id) {
 
         const index =
@@ -141,38 +233,38 @@ export class Party {
     }
 
     /**
-     * Expulsar completamente.
+     * Reemplaza todo el grupo activo.
+     * Ideal para PartyView.
      */
-    dismiss(id) {
+    setActiveMembers(ids = []) {
 
-        this.deactivate(id);
+        const max =
+            this.getMaxActiveMembers();
 
-        const index =
-            this.recruited.findIndex(
-                ally => ally.id === id
-            );
-
-        if (index === -1) {
-            return false;
-        }
-
-        this.recruited.splice(index, 1);
-
-        return true;
+        this.active =
+            this.recruited
+                .filter(
+                    ally =>
+                        ids.includes(ally.id)
+                )
+                .slice(0, max);
 
     }
 
-    /**
-     * Aliados activos este turno.
-     */
+    // -------------------------
+    // COMBATE
+    // -------------------------
+
     actionsFor({ turn, level }) {
 
         return this.active
 
             .filter(
                 ally =>
-                    (turn - 1) %
-                    (ally.ability.every ?? 1) === 0
+                    (
+                        (turn - 1) %
+                        (ally.ability.every ?? 1)
+                    ) === 0
             )
 
             .map(
