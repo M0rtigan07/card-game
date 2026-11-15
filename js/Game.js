@@ -43,7 +43,6 @@ export class Game {
 
         // aliados que te acompañan
         this.persuasion = new Persuasion();      // lo que llevas conseguido convenciendo a cada personaje
-        this.ui.getParty = () => this.party.members;
         this.ui.onDismissAlly = (id) => this.dismissAlly(id); // botón ✕ del panel "Grupo"
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
