@@ -34,7 +34,7 @@ export const MONJE_LOCO = {
         {
             id: 1,
 
-            minLevel: 17,
+            minLevel: 16,
 
             img: "img/monjeLoco.gif",
 
@@ -49,14 +49,14 @@ export const MONJE_LOCO = {
                 },
 
                 {
-                    text: "🍲 Comer el estofado",
+                    text: "🍲 Comer el estofado (recuperar hasta 20 HP, confianza +2)",
                     hp: 20,
                     trust: 2,
                     storyId: "monjeLoco",
                     nextChapter: 2
                 },
                 {
-                    text: "😒 Tu comida parece veneno",
+                    text: "😒 Rechazar el estofado (confianza -3)",
 
                     trust: -3,
 
@@ -66,7 +66,7 @@ export const MONJE_LOCO = {
                 },
 
                 {
-                    text: "🚪 Ignorarlo",
+                    text: "🚪 Ignorarlo y terminar la historia",
                     storyId: "monjeLoco",
                     nextChapter: -1
                 }
@@ -88,7 +88,7 @@ export const MONJE_LOCO = {
 
                 {
                     text:
-                        '💬 Escuchar su historia',
+                        '💬 Escuchar su historia (+50 oro)',
 
                     gold: 50,
 
@@ -99,7 +99,7 @@ export const MONJE_LOCO = {
 
                 {
                     text:
-                        '🚪 Marcharte',
+                        '🚪 Marcharte y terminar la historia',
 
                     storyId: "monjeLoco",
 

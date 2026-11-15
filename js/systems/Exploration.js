@@ -6,6 +6,8 @@ import { DEFAULT_ENCOUNTER_IMAGE, ENCOUNTER_IMAGES, FALLBACK_IMG, NPC_MOOD_BY_AC
 import { ExplorationView } from '../views/ExplorationView.js';
 import { NpcActions } from './NpcActions.js';
 import { getBossForFloor, isBossFloor } from './Bosses.js';
+import { StoryResolver } from '../stories/StoryResolver.js';
+import { StoryView } from '../views/StoryView.js';
 import { setText, wait } from '../ui/helpers.js';
 
 export class Exploration {
@@ -199,6 +201,34 @@ export class Exploration {
         }]);
     }
 
+    showStory(story) {
+        new StoryView(this).show(story);
+        setText('sceneBadgeOverlay', `HISTORIA · ${(story.storyTitle || story.storyId).toUpperCase()}`);
+    }
+
+    async onStoryChoice(choice, storyId) {
+        this.lockChoices();
+
+        if (choice.action === 'talk') {
+            const npc = NPC_DATABASE[storyId];
+            if (!npc) {
+                console.warn(`[Exploration] No hay un PNJ asociado a la historia "${storyId}".`);
+                this.game.finishEncounter(1200);
+                return;
+            }
+
+            await this.openChat(npc, () => {
+                const story = this.game.storyManager?.getStoryById(storyId, this.game.dungeonLevel);
+                if (story) this.showStory(story);
+                else this.game.loadNextEvent();
+            });
+            return;
+        }
+
+        StoryResolver.applyChoice(this.player, { ...choice, storyId: choice.storyId ?? storyId }, this.game);
+        this.game.finishEncounter(1400);
+    }
+
     // ───────────── PNJ FIJOS ─────────────
 
     // Orden: opciones de tu clase → opciones generales del PNJ → opciones de guerrero → genéricas
@@ -240,7 +270,7 @@ export class Exploration {
 
             const story =
                 this.game.storyManager
-                    ?.getStoryById?.(npc.storyId);
+                    ?.getStoryById?.(npc.storyId, this.game.dungeonLevel);
 
             if (story) {
 
@@ -319,12 +349,12 @@ export class Exploration {
     }
 
     /** Abre la conversación; al despedirte vuelves al menú del PNJ sin repetir su saludo ni gastar la planta. */
-    openChat(npc) {
+    openChat(npc, onClose = null) {
         this.sceneToken++; // invalida cualquier respuesta que estuviera en camino para la escena anterior
         return this.game.chat.open(npc, {
-            onClose: () => this.game.party.has(npc.id)
+            onClose: onClose ?? (() => this.game.party.has(npc.id)
                 ? this.showAllyJoined(npc)
-                : this.showNpcMenu(npc, `Te despides de ${npc.name}, que sigue esperando tu decisión.`)
+                : this.showNpcMenu(npc, `Te despides de ${npc.name}, que sigue esperando tu decisión.`))
         });
     }
 

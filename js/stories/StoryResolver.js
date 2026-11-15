@@ -10,19 +10,17 @@ export class StoryResolver {
         );
 
         if (choice.trust) {
-
             player.storyState =
                 player.storyState || {};
 
-            player.storyState.monjeTrust =
-                (player.storyState.monjeTrust || 0)
+            const trustKey = `${choice.storyId || "monjeLoco"}Trust`;
+            player.storyState[trustKey] =
+                (player.storyState[trustKey] || 0)
                 + choice.trust;
 
-
-
             if (
-
-                player.storyState.monjeTrust >= 10 &&
+                trustKey === "monjeLocoTrust" &&
+                player.storyState[trustKey] >= 10 &&
 
                 !player.storyState.monjeNameKnown
 
@@ -36,10 +34,7 @@ export class StoryResolver {
 
             }
 
-            console.log(
-                "[TRUST]",
-                player.storyState.monjeTrust
-            );
+            console.log("[TRUST]", player.storyState[trustKey]);
         }
 
         // VIDA

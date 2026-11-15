@@ -10,7 +10,7 @@ export class StoryManager {
 
         if (!this.player.storyState) {
             this.player.storyState = {
-                monjeLocoChapter: 1,
+                monjeLoco: 1,
                 monjeLocoTrust: 0
             };
         }
@@ -111,7 +111,7 @@ export class StoryManager {
         return null;
     }
 
-    getStoryById(storyId) {
+    getStoryById(storyId, level) {
 
         const stories =
             this.getAvailableStories();
@@ -133,7 +133,7 @@ export class StoryManager {
                 c => c.id === currentChapter
             );
 
-        if (!chapter) {
+        if (!chapter || (level !== undefined && level < chapter.minLevel)) {
             return null;
         }
 

@@ -15,6 +15,7 @@ import { NpcDialogue } from './systems/NpcDialogue.js';
 import { NpcChat } from './systems/NpcChat.js';
 import { Party } from './systems/Party.js';
 import { Persuasion } from './systems/Persuasion.js';
+import { StoryManager } from './stories/StoryManager.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES, PARTY } from './data/gameConfig.js';
@@ -99,6 +100,7 @@ export class Game {
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
+        this.storyManager = new StoryManager(this.player);
 
         this.playerName = localStorage.getItem('mazo_hero_name') || this.playerName;
         this.player.name = this.playerName;
