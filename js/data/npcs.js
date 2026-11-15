@@ -149,7 +149,7 @@ export const NPC_DATABASE = {
         type: 'blacksmith',
         archetype: 'un herrero robusto, calloso, de pocas palabras y gran habilidad con el metal',
         voice: 'Voz grave y pausada. Habla de forja, acero y fuego. Frases cortas y directas.',
-        dungeonLevel: 2,
+        dungeonLevel: 11,
         baseHp: 50,
         baseAtk: 10,
         interactions: {
@@ -290,7 +290,7 @@ export const NPC_DATABASE = {
 
         storyId: "monjeLoco",
 
-        dungeonLevel: 15,
+        dungeonLevel: 16,
 
         images: {
 
