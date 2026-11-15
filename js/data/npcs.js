@@ -149,7 +149,7 @@ export const NPC_DATABASE = {
         type: 'blacksmith',
         archetype: 'un herrero robusto, calloso, de pocas palabras y gran habilidad con el metal',
         voice: 'Voz grave y pausada. Habla de forja, acero y fuego. Frases cortas y directas.',
-        dungeonLevel: 4, // <-- Aparece en la planta 4
+        dungeonLevel: 2,
         baseHp: 50,
         baseAtk: 10,
         interactions: {
