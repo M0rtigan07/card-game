@@ -138,7 +138,7 @@ export const CHAT = {
 
 // Aliados: personajes que se unen a tu grupo si los convences hablando
 export const PARTY = {
-    MAX: 2,          // aliados que pueden acompañarte a la vez
+    MAX: 5,          // aliados que pueden acompañarte a la vez
     RECRUIT_XP: 30   // experiencia al conseguir un aliado
 };
 export const PERSUASION = {
