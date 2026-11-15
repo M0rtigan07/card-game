@@ -209,23 +209,23 @@ export class Exploration {
     async onStoryChoice(choice, storyId) {
         this.lockChoices();
 
-        if (choice.action === 'talk') {
-            const npc = NPC_DATABASE[storyId];
-            if (!npc) {
-                console.warn(`[Exploration] No hay un PNJ asociado a la historia "${storyId}".`);
-                this.game.finishEncounter(1200);
-                return;
-            }
-
-            await this.openChat(npc, () => {
-                const story = this.game.storyManager?.getStoryById(storyId, this.game.dungeonLevel);
-                if (story) this.showStory(story);
-                else this.game.loadNextEvent();
-            });
+        const npc = choice.action === 'talk' ? NPC_DATABASE[storyId] : null;
+        if (choice.action === 'talk' && !npc) {
+            console.warn(`[Exploration] No hay un PNJ asociado a la historia "${storyId}".`);
+            this.game.finishEncounter(1200);
             return;
         }
 
         StoryResolver.applyChoice(this.player, { ...choice, storyId: choice.storyId ?? storyId }, this.game);
+        if (choice.nextChapter === undefined) {
+            this.game.storyManager?.checkStoryProgress(storyId);
+        }
+
+        if (choice.action === 'talk') {
+            await this.openChat(npc, () => this.game.finishEncounter(1400));
+            return;
+        }
+
         this.game.finishEncounter(1400);
     }
 

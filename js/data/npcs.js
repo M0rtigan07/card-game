@@ -288,7 +288,11 @@ export const NPC_DATABASE = {
 
         storyCharacter: true,
 
+        // ESENCIAL  ASIGNAR  UN storyID   para entrar en modo historia , que se usara en  storyDatabase.js
+
         storyId: "monjeLoco",
+
+        //
 
         dungeonLevel: 16,
 

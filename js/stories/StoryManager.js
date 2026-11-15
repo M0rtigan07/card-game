@@ -101,7 +101,7 @@ export class StoryManager {
                     chapter.img,
 
                 description:
-                    chapter.description,
+                    chapter.description.replace('{monkName}', this.getMonkName()),
 
                 choices:
                     chapter.choices
@@ -148,7 +148,7 @@ export class StoryManager {
             img: chapter.img,
 
             description:
-                chapter.description,
+                chapter.description.replace('{monkName}', this.getMonkName()),
 
             choices:
                 chapter.choices
@@ -240,13 +240,11 @@ export class StoryManager {
             return false;
         }
 
-        const state = this.player.storyState;
-
         const currentChapter =
-            state[`${storyId}Chapter`] || 1;
+            this.getCurrentChapter(story);
 
         const currentTrust =
-            state[`${storyId}Trust`] || 0;
+            this.player.storyState[`${storyId}Trust`] ?? 0;
 
         const nextChapter =
             currentChapter + 1;
@@ -258,15 +256,11 @@ export class StoryManager {
             return false;
         }
 
-        if (
-            requirements.trust &&
-            currentTrust < requirements.trust
-        ) {
+        if (currentTrust < (requirements.trust ?? 0)) {
             return false;
         }
 
-        state[`${storyId}Chapter`] =
-            nextChapter;
+        this.setChapter(storyId, nextChapter);
 
         return true;
     }

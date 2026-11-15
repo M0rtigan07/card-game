@@ -9,14 +9,15 @@ export class StoryResolver {
             choice.text
         );
 
-        if (choice.trust) {
+        if (choice.trust || choice.trustFloor !== undefined) {
             player.storyState =
                 player.storyState || {};
 
             const trustKey = `${choice.storyId || "monjeLoco"}Trust`;
-            player.storyState[trustKey] =
-                (player.storyState[trustKey] || 0)
-                + choice.trust;
+            player.storyState[trustKey] = (player.storyState[trustKey] || 0) + (choice.trust || 0);
+            if (choice.trustFloor !== undefined) {
+                player.storyState[trustKey] = Math.max(player.storyState[trustKey], choice.trustFloor);
+            }
 
             if (
                 trustKey === "monjeLocoTrust" &&
