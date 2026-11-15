@@ -34,6 +34,8 @@ export class NpcActions {
             combat: () => this.game.combat.startFromNpc(npc),
             buy: () => this.payToll(npc),
             pass: () => this.leave(npc),
+            forge_sword: () => this.purchase(npc, 'forged_sword'),
+            forge_shield: () => this.purchase(npc, 'reinforced_shield'),
 
             pact_accept: () => {
                 this.log(`🤝 Sellas un pacto con ${npc.name}. Obtienes información y riquezas (+200 oro).`);

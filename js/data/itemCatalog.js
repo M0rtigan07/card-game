@@ -30,6 +30,8 @@ export const ITEM_CATALOG = [
     // ───── Reliquias que se compran o se consiguen con PNJ ─────
     { id: 'arcane_grimoire', name: '📖 Grimorio Arcano', kind: 'relic', price: 40, effect: '+1 de energía cada turno', mods: { energyBonus: 1 } },
     { id: 'blade_venom', name: '🧪 Veneno de Filo', kind: 'relic', price: 40, effect: '+5 de daño en tus ataques', mods: { attackBonus: 5 } },
+    { id: 'forged_sword', name: '⚔️ Espada Reforjada', kind: 'relic', price: 50, effect: '+5 de daño en tus ataques', mods: { attackBonus: 5 } },
+    { id: 'reinforced_shield', name: '🛡️ Escudo Reforzado', kind: 'relic', price: 40, effect: 'Empiezas cada combate con 8 de guardia', mods: { startShield: 8 } },
     { id: 'subsistence_potion', name: '🧪 Poción de Subsistencia', kind: 'relic', effect: '+20 HP máximo', onAcquire: { maxHealth: 20, fullHeal: true } },
 
     // ───── Reliquias que se encuentran como botín ─────
