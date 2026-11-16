@@ -96,7 +96,20 @@ export class TcgCombat {
 
         this.speak('combat_start');
         this.prepareIntentLine();
-        this.runAllies();
+        const startedEnemy = this.enemy;
+        this.busy = true;
+        this.view.setControls(false);
+        this.runAllies().then(ended => {
+            if (ended || this.enemy !== startedEnemy || !this.inCombat) return;
+            this.busy = false;
+            this.view.setControls(true);
+        }).catch(error => {
+            console.error('[TcgCombat] Falló la acción inicial de los aliados:', error);
+            if (this.enemy === startedEnemy && this.inCombat) {
+                this.busy = false;
+                this.view.setControls(true);
+            }
+        });
     }
 
     createEnemy(enemyData) {
@@ -187,7 +200,7 @@ export class TcgCombat {
     }
 
     /** Resuelve el efecto de una carta o de un objeto sobre el combate (sin pagar coste ni tocar la mano). */
-    applyEffect(card) {
+    applyEffect(card, { visuals = true } = {}) {
         const enemy = this.enemy;
         const hero = { health: this.player.health, maxHealth: this.player.maxHealth, shield: this.heroShield, poison: this.heroPoison };
         const events = resolvePlayerCard(card, enemy, hero, { attackBonus: this.modifiers().attackBonus });
@@ -195,7 +208,7 @@ export class TcgCombat {
         this.heroShield = hero.shield;
         this.heroPoison = hero.poison;
 
-        this.narratePlayer(card, events);
+        this.narratePlayer(card, events, { visuals });
 
         const phased = this.checkPhases(); // si cambia de fase, esa es la frase del momento
         if (!phased && enemy.hp > 0 && !this.hurtSpoken && enemy.hp <= enemy.maxHp * DIALOGUE.HURT_THRESHOLD) {
@@ -233,7 +246,7 @@ export class TcgCombat {
     }
 
     // Cuenta qué ha hecho tu carta (diario y números flotantes)
-    narratePlayer(card, events) {
+    narratePlayer(card, events, { visuals = true } = {}) {
         const enemy = this.enemy;
 
         for (const ev of events) {
@@ -241,24 +254,26 @@ export class TcgCombat {
                 case 'damage':
                     this.log(`🗡️ ${card.name}: infliges ${ev.dealt} de daño a ${enemy.name}.`);
                     if (ev.absorbed > 0) this.log(`🛡️ El escudo de ${enemy.name} absorbe ${ev.absorbed}.`);
-                    this.view.float('enemyPortraitContainer', ev.dealt > 0 ? `-${ev.dealt}` : '🛡️', ev.dealt > 0 ? 'dmg' : 'shield');
-                    this.view.shake('enemyPortraitContainer');
+                    if (visuals) {
+                        this.view.float('enemyPortraitContainer', ev.dealt > 0 ? `-${ev.dealt}` : '🛡️', ev.dealt > 0 ? 'dmg' : 'shield');
+                        this.view.shake('enemyPortraitContainer');
+                    }
                     break;
                 case 'heal':
                     this.log(`✨ ${card.name}: restauras ${ev.amount} HP.`);
-                    this.view.float('heroPortraitContainer', `+${ev.amount}`, 'heal');
+                    if (visuals) this.view.float('heroPortraitContainer', `+${ev.amount}`, 'heal');
                     break;
                 case 'shield':
                     this.log(`🛡️ ${card.name}: obtienes ${ev.amount} de escudo.`);
-                    this.view.float('heroPortraitContainer', `+${ev.amount}`, 'shield');
+                    if (visuals) this.view.float('heroPortraitContainer', `+${ev.amount}`, 'shield');
                     break;
                 case 'poison':
                     this.log(`☠️ ${card.name}: ${enemy.name} sufrirá ${ev.dmg} de daño durante ${ev.turns} turnos.`);
-                    this.view.float('enemyPortraitContainer', '☠️', 'poison');
+                    if (visuals) this.view.float('enemyPortraitContainer', '☠️', 'poison');
                     break;
                 case 'energy':
                     this.log(`⚡ ${card.name}: ganas ${ev.amount} de energía.`);
-                    this.view.float('heroPortraitContainer', `⚡ +${ev.amount}`, 'buff');
+                    if (visuals) this.view.float('heroPortraitContainer', `⚡ +${ev.amount}`, 'buff');
                     break;
                 case 'draw':
                     this.log(`📜 ${card.name}: robas ${ev.amount} cartas.`);
@@ -321,7 +336,7 @@ export class TcgCombat {
             this.game.ui.showGameOver();
             return;
         }
-        this.startPlayerTurn();
+        await this.startPlayerTurn();
     }
 
     // Cuenta qué ha hecho la carta enemiga (diario, sonido y números flotantes)
@@ -364,7 +379,7 @@ export class TcgCombat {
         }
     }
 
-    startPlayerTurn() {
+    async startPlayerTurn() {
         this.heroShield = 0;
 
         const regen = this.modifiers().regen;
@@ -395,7 +410,7 @@ export class TcgCombat {
 
         this.energy = this.maxEnergy();
         this.turn += 1;
-        if (this.runAllies()) return; // tus aliados acaban con el enemigo
+        if (await this.runAllies()) return; // tus aliados acaban con el enemigo
         this.brain.drawIntent(this.enemy, { poison: this.heroPoison });
         this.prepareIntentLine();
         this.renderIntent();
@@ -494,22 +509,31 @@ export class TcgCombat {
 
     // ───────────── ALIADOS ─────────────
 
-    /** Los aliados de tu grupo actúan al empezar tu turno, gratis. Devuelve true si el enemigo cae. */
-    runAllies() {
+    /** Los aliados actúan en secuencia al empezar tu turno. Devuelve true si el enemigo cae. */
+    async runAllies() {
         const enemy = this.enemy;
         const actions = this.game.party.actionsFor({ turn: this.turn, level: this.player.level });
 
         for (const { ally, card } of actions) {
             this.game.ui.flashAlly(ally.id);
-            const events = this.applyEffect(card);
+            const events = this.applyEffect(card, { visuals: false });
             this.applyHandEffects(events);
+            const lines = ally.battleLines ?? [];
+            const every = Math.max(1, ally.ability.every ?? 1);
+            const lineIndex = Math.floor((this.turn - 1) / every) % Math.max(1, lines.length);
+            const phrase = lines[lineIndex] ?? `${ally.name} entra en acción.`;
+            this.log(`🗣️ ${ally.name}: “${phrase}”`);
+            if (events.some(event => event.kind === 'damage' && event.dealt > 0)) {
+                this.audio.play('hit');
+            }
+            await this.view.playAllyAction(ally, phrase, events);
+            this.refresh();
 
             if (enemy.hp <= 0) {
-                this.win();
+                await this.win();
                 return true;
             }
         }
-        if (actions.length > 0) this.refresh();
         return false;
     }
 

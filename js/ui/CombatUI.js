@@ -3,7 +3,7 @@
 // recibe datos ya calculados y los pinta. La lógica vive en systems/TcgCombat.js.
 
 import { TcgCombatView } from '../views/TcgCombatView.js';
-import { setText } from './helpers.js';
+import { setText, wait } from './helpers.js';
 import { DIALOGUE } from '../data/gameConfig.js';
 
 const RARITY_LABEL = { common: 'COMÚN', uncommon: 'POCO COMÚN', rare: 'RARA' };
@@ -11,6 +11,8 @@ const RARITY_LABEL = { common: 'COMÚN', uncommon: 'POCO COMÚN', rare: 'RARA' }
 export class CombatUI {
     /** Dibuja la pantalla de combate en el panel central. */
     mount(game, enemy, player) {
+        clearTimeout(this.allySpeechTimer);
+        clearTimeout(this.speechTimer);
         const view = new TcgCombatView(document.getElementById('mainContent'), game);
         view.render(enemy, player);
     }
@@ -63,6 +65,83 @@ export class CombatUI {
 
         clearTimeout(this.speechTimer);
         this.speechTimer = setTimeout(() => host.classList.remove('visible'), DIALOGUE.SPEECH_VISIBLE_MS);
+    }
+
+    showAllySpeech(ally, text) {
+        const host = document.getElementById('allySpeech');
+        if (!host) return;
+
+        const speaker = document.createElement('b');
+        speaker.textContent = `${ally.name}:`;
+        const quote = document.createElement('span');
+        quote.textContent = `“${text}”`;
+
+        host.replaceChildren(speaker, quote);
+        host.dataset.ally = ally.id;
+        host.classList.remove('visible');
+        void host.offsetWidth;
+        host.classList.add('visible');
+
+        clearTimeout(this.allySpeechTimer);
+        this.allySpeechTimer = setTimeout(() => host.classList.remove('visible'), 2200);
+    }
+
+    async playAllyAction(ally, phrase, events) {
+        const actor = document.getElementById(`combat-ally-${ally.id}`);
+        const attacks = events.some(event =>
+            (event.kind === 'damage' && (event.dealt > 0 || event.absorbed > 0)) ||
+            event.kind === 'poison'
+        );
+        const supports = events.some(event => event.kind === 'heal' || event.kind === 'shield');
+
+        if (actor) {
+            actor.classList.remove('acting', 'attacking', 'supporting');
+            void actor.offsetWidth;
+            actor.classList.add('acting', attacks ? 'attacking' : 'supporting');
+        }
+
+        this.showAllySpeech(ally, phrase);
+        await wait(240);
+
+        for (const event of events) {
+            switch (event.kind) {
+                case 'damage':
+                    this.float(
+                        'enemyPortraitContainer',
+                        event.dealt > 0 ? `-${event.dealt}` : '🛡️',
+                        event.dealt > 0 ? 'dmg' : 'shield'
+                    );
+                    break;
+                case 'poison':
+                    this.float('enemyPortraitContainer', '☠️', 'poison');
+                    break;
+                case 'heal':
+                    this.float('heroPortraitContainer', `+${event.amount}`, 'heal');
+                    break;
+                case 'shield':
+                    this.float('heroPortraitContainer', `+${event.amount}`, 'shield');
+                    break;
+                case 'energy':
+                    this.float('heroPortraitContainer', `⚡ +${event.amount}`, 'buff');
+                    break;
+            }
+        }
+
+        if (attacks) this.pulse('enemyPortraitContainer', 'ally-impact');
+        if (supports) this.pulse('heroPortraitContainer', 'ally-support');
+
+        await wait(420);
+        actor?.classList.remove('acting', 'attacking', 'supporting');
+    }
+
+    pulse(containerId, className) {
+        const host = document.getElementById(containerId);
+        if (!host) return;
+
+        host.classList.remove(className);
+        void host.offsetWidth;
+        host.classList.add(className);
+        setTimeout(() => host.classList.remove(className), 520);
     }
 
     // ───────────── Cartas y mano ─────────────

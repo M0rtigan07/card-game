@@ -5,19 +5,25 @@
 //   ability     Lo que hace por ti al empezar cada uno de tus turnos de combate, sin gastar energía:
 //                 type  atk | def | drain | poison | heal   (mismos efectos que tus cartas)
 //                 base + perLevel × tu nivel = valor;  every = cada cuántos turnos actúa (1 = siempre)
+//   battleLines  Frases que dice el aliado al usar su habilidad en combate.
 //   values      Lo que valora y lo que desprecia: son los datos reales que cuenta si le preguntas
 //               "¿Qué es lo que más valoras?". Es la pista para elegir bien los argumentos.
 //   arguments   Lo que puedes decirle para convencerle. good: true = le convence; false = le ofende.
 //               Hacen falta NEEDED argumentos buenos y se pierde la oportunidad con BAD_LIMIT malos
 //               (ver PERSUASION en gameConfig.js).
 //
-// Para añadir un aliado: una entrada aquí, su carta, y las frases de respaldo chat_values,
-// chat_persuade_good, chat_persuade_bad, chat_recruited y chat_locked en npcLines.js.
+// Para añadir un aliado: una entrada aquí con battleLines, su carta y sus frases sociales
+// de respaldo (chat_values, chat_persuade_good, chat_persuade_bad, chat_recruited y chat_locked) en npcLines.js.
 
 export const ALLIES = {
     mongol: {
         id: 'mongol', name: 'Batu Jan', card: 'img/npcs/cartaArquero.png',
         ability: { name: '🏹 Lluvia de Flechas', type: 'atk', base: 6, perLevel: 2, every: 1, text: 'Dispara al enemigo cada turno' },
+        battleLines: [
+            '¡Que mis flechas te encuentren!',
+            'La estepa me enseñó a no fallar.',
+            '¡Una flecha por cada paso que das!'
+        ],
         values: [
             'Valoras la palabra dada y el respeto entre compañeros de camino.',
             'Echas de menos el cielo abierto y la libertad de la estepa.',
@@ -34,6 +40,11 @@ export const ALLIES = {
     vikinga: {
         id: 'vikinga', name: 'Astrid', card: 'img/npcs/cartaVikinga.png',
         ability: { name: '🛡️ Muro de Escudos', type: 'def', base: 6, perLevel: 2, every: 1, text: 'Te cubre con su escudo cada turno' },
+        battleLines: [
+            '¡Tras mi escudo, nadie caerá!',
+            '¡Que pruebe el acero antes de tocarte!',
+            '¡Resiste! Aún nos queda gloria por ganar.'
+        ],
         values: [
             'Valoras el honor, la fuerza y la gloria en combate.',
             'Desprecias a los cobardes y a quien te trata como a alguien débil.'
@@ -49,6 +60,11 @@ export const ALLIES = {
     valerius: {
         id: 'valerius', name: 'Conde Valerius', card: 'img/npcs/cartaConde.png',
         ability: { name: '🦇 Mordisco Carmesí', type: 'drain', base: 4, perLevel: 2, every: 1, text: 'Muerde al enemigo y te cura cada turno' },
+        battleLines: [
+            'Tu sangre pagará esta insolencia.',
+            'Ah... el sabor de una presa digna.',
+            'La noche siempre cobra sus deudas.'
+        ],
         values: [
             'Valoras el poder, el linaje y que te traten como al noble que eres.',
             'Desprecias la súplica y los sermones sobre redención.'
@@ -64,6 +80,11 @@ export const ALLIES = {
     necro: {
         id: 'necro', name: 'Malakar', card: 'img/npcs/cartaNecro.png',
         ability: { name: '☠️ Maldición Necrótica', type: 'poison', base: 5, perLevel: 2, turns: 3, every: 1, text: 'Envenena al enemigo cada turno' },
+        battleLines: [
+            '¡Que la putrefacción te consuma!',
+            'Las sombras ya reclaman tu nombre.',
+            'La muerte obedece mi voluntad.'
+        ],
         values: [
             'Valoras el saber prohibido sobre la muerte y que respeten tu arte.',
             'Desprecias los sermones sobre la luz y sobre el descanso de los muertos.'
@@ -79,6 +100,11 @@ export const ALLIES = {
     pirata: {
         id: 'pirata', name: 'Capitana Zafira', card: 'img/npcs/cartaPirata.png',
         ability: { name: '💣 Cañonazo', type: 'atk', base: 15, perLevel: 4, every: 2, text: 'Dispara su cañón un turno sí y otro no' },
+        battleLines: [
+            '¡A babor! ¡Que hable el cañón!',
+            '¡Un cañonazo y al fondo contigo!',
+            '¡Esto no lo cubre ningún tesoro!'
+        ],
         values: [
             'Valoras los tesoros, las aventuras y no tener amo.',
             'Desprecias las órdenes, las leyes y los sermones de honradez.'
@@ -94,6 +120,11 @@ export const ALLIES = {
     vampira: {
         id: 'vampira', name: 'La Dama de la Noche', card: 'img/npcs/cartaVampira.png',
         ability: { name: '🩸 Beso Sombrío', type: 'drain', base: 10, perLevel: 3, every: 2, text: 'Drena al enemigo un turno sí y otro no' },
+        battleLines: [
+            'Ven, criatura; deja que te robe el aliento.',
+            'Qué sangre tan intensa... casi me divierte.',
+            'Un beso, y tu fuerza será mía.'
+        ],
         values: [
             'Valoras la elegancia, la intriga y que alguien consiga entretenerte.',
             'Desprecias los insultos burdos y las amenazas.'

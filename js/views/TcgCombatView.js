@@ -9,7 +9,7 @@ export class TcgCombatView {
         const activeAllies = this.game.party.active;
         const activeAllyCards = activeAllies.length
             ? activeAllies.map(ally => `
-                <div class="combat-ally">
+                <div class="combat-ally" id="combat-ally-${ally.id}">
                     <img src="${ally.card}" alt="">
                     <span>${ally.name}</span>
                 </div>
@@ -22,6 +22,7 @@ export class TcgCombatView {
             <section class="combat-allies" aria-label="Aliados en combate">
                 <h2>⚔️ Aliados en combate</h2>
                 <div class="combat-allies-list">${activeAllyCards}</div>
+                <div id="allySpeech" class="ally-speech" aria-live="polite" aria-atomic="true"></div>
             </section>
 
             <!-- VISOR DE COMBATE (HÉROE VS ENEMIGO) - TAMAÑO AMPLIADO -->
