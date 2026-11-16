@@ -630,6 +630,11 @@ ${recruitText}
     recruitAlly(npcId) {
 
         const result = this.party.recruit(npcId);
+        if (!result.ok) {
+            this.ui.logEvent(`❌ No se pudo reclutar al aliado: ${result.reason}.`);
+            return result;
+        }
+
         this.ui.logEvent(`🤝 ${result.ally.name} acepta acompañarte.`);
 
 

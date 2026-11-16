@@ -1,6 +1,7 @@
 // js/systems/Party.js
 
 import { ALLIES } from '../data/allyCatalog.js';
+import { PARTY } from '../data/gameConfig.js';
 
 /**
  * Convierte la habilidad del aliado
@@ -60,6 +61,12 @@ export class Party {
     getRecruitCount() {
 
         return this.recruited.length;
+
+    }
+
+    isRecruitmentFull() {
+
+        return this.recruited.length >= PARTY.MAX;
 
     }
 
@@ -136,6 +143,15 @@ export class Party {
             return {
                 ok: false,
                 reason: 'already'
+            };
+
+        }
+
+        if (this.isRecruitmentFull()) {
+
+            return {
+                ok: false,
+                reason: 'full'
             };
 
         }

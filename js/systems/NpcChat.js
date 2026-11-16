@@ -8,7 +8,7 @@
 import { NpcChatView } from '../views/NpcChatView.js';
 import { buildFacts, cleanChatInput, topicsFor } from './ChatTopics.js';
 import { ALLIES } from '../data/allyCatalog.js';
-import { CHAT } from '../data/gameConfig.js';
+import { CHAT, PARTY } from '../data/gameConfig.js';
 
 export class NpcChat {
     /** @param {import('../Game.js').Game} game */
@@ -92,12 +92,20 @@ export class NpcChat {
         if (!ALLIES[npc.id] || this.game.party.has(npc.id)) return null;
 
         const asked = this.askedSet(npc).size;
-        const check = this.game.persuasion.canTry(npc.id, { asked, partyFull: this.game.party.isActivePartyFull() });
+        const check = this.game.persuasion.canTry(npc.id, { asked, partyFull: this.game.party.isRecruitmentFull() });
 
         if (check.ok) return { title: '🗣️ Convencerle de que te acompañe', args: this.game.persuasion.argumentsFor(npc.id) };
         if (check.reason === 'rapport') return { title: `🗣️ Habla un poco más con ${npc.name} antes de pedirle nada.`, args: [] };
         if (check.reason === 'locked') return { title: `🗣️ ${npc.name} ya no quiere escucharte.`, args: [] };
-      
+        if (check.reason === 'full') {
+            const party = this.game.party;
+            return {
+                title: `🗣️ Tu compañía está completa (${party.getRecruitCount()}/${PARTY.MAX}). Despide a un aliado desde «Compañía» para hacer sitio.`,
+                args: []
+            };
+        }
+
+        return null;
     }
 
     /** Pruebas un argumento. Si es el que le termina de convencer, se une a tu grupo. */
@@ -107,7 +115,7 @@ export class NpcChat {
 
         const { npc } = session;
         const asked = this.askedSet(npc).size;
-        const check = this.game.persuasion.canTry(npc.id, { asked, partyFull: this.game.party.isActivePartyFull() });
+        const check = this.game.persuasion.canTry(npc.id, { asked, partyFull: this.game.party.isRecruitmentFull() });
         const result = check.ok ? this.game.persuasion.evaluate(npc.id, argId) : null;
         if (!result) return;
 
