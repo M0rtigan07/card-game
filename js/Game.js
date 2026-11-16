@@ -245,7 +245,7 @@ ${recruitText}
                         ${ally.role ?? "Aventurero"}
                     </h2>
 
-                    <div class="party-detail-section bio">
+                    <div class="party-detail-section party-detail-ability">
 
                         <h3>
                             ⚔️ Habilidad
@@ -261,7 +261,7 @@ ${recruitText}
 
                     </div>
 
-                    <div class="party-detail-section">
+                    <div class="party-detail-section party-detail-status">
 
                         <h3>
                             📍 Destino actual
@@ -363,7 +363,7 @@ ${recruitText}
 
                     </div>
 
-                    <div class="party-detail-section">
+                    <div class="party-detail-section party-detail-biography">
 
                         <h3>
                             📖 Biografía
@@ -379,7 +379,7 @@ ${recruitText}
 
                     </div>
 
-                    <div class="party-detail-section">
+                    <div class="party-detail-section party-detail-relationship">
 
                         <h3>
                             🤝 Relación
@@ -391,7 +391,7 @@ ${recruitText}
 
                     </div>
 
-                    <div class="party-detail-section">
+                    <div class="party-detail-section party-detail-chat">
 
                         <h3>
                             💬 Conversar
