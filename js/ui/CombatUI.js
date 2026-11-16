@@ -3,6 +3,7 @@
 // recibe datos ya calculados y los pinta. La lógica vive en systems/TcgCombat.js.
 
 import { TcgCombatView } from '../views/TcgCombatView.js';
+import { createAllyStatus } from './AllyStatus.js';
 import { setText, wait } from './helpers.js';
 import { DIALOGUE } from '../data/gameConfig.js';
 
@@ -247,6 +248,16 @@ export class CombatUI {
         setText('enemyHp', `❤️ HP: ${Math.max(0, enemy.hp)}/${enemy.maxHp}`);
         setText('enemyAtk', `⚔️ ATK: ${attack}${bonus}`);
         setText('enemyShield', `🛡️ DEF: ${enemy.shield}`);
+    }
+
+    renderAllyStatuses(allies) {
+        allies.forEach(ally => {
+            const card = document.getElementById(`combat-ally-${ally.id}`);
+            if (!card) return;
+
+            card.classList.toggle('knocked-out', ally.health <= 0);
+            card.querySelector('.ally-status')?.replaceWith(createAllyStatus(ally, 'combat'));
+        });
     }
 
     // ───────────── Efectos visuales ─────────────

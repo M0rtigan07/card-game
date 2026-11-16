@@ -320,13 +320,21 @@ export class TcgCombat {
         this.renderIntent(true);
         await Promise.all([wait(COMBAT.ENEMY_REVEAL_MS), this.showCardLine()]);
 
-        const hero = { health: this.player.health, shield: this.heroShield, poison: this.heroPoison };
-        const { events } = this.brain.play(enemy, hero);
-        this.player.health = hero.health;
-        this.heroShield = hero.shield;
-        this.heroPoison = hero.poison;
+        const allyTarget = this.chooseEnemyTarget(card);
+        const target = allyTarget
+            ? { health: allyTarget.health, shield: 0, poison: allyTarget.poison }
+            : { health: this.player.health, shield: this.heroShield, poison: this.heroPoison };
+        const { events } = this.brain.play(enemy, target);
+        if (allyTarget) {
+            allyTarget.health = Math.max(0, target.health);
+            allyTarget.poison = target.poison;
+        } else {
+            this.player.health = target.health;
+            this.heroShield = target.shield;
+            this.heroPoison = target.poison;
+        }
 
-        this.narrateEnemy(events);
+        this.narrateEnemy(events, allyTarget);
         this.refresh();
         await wait(COMBAT.ENEMY_RESOLVE_MS);
 
@@ -340,22 +348,48 @@ export class TcgCombat {
     }
 
     // Cuenta qué ha hecho la carta enemiga (diario, sonido y números flotantes)
-    narrateEnemy(events) {
+    chooseEnemyTarget(card) {
+        if (!['atk', 'multi', 'drain', 'poison'].includes(card.type)) return null;
+
+        const targets = [
+            null,
+            ...this.game.party.active.filter(ally => ally.health > 0)
+        ];
+        const index = Math.min(targets.length - 1, Math.floor(this.rng() * targets.length));
+        return targets[index];
+    }
+
+    narrateEnemy(events, allyTarget = null) {
         const enemy = this.enemy;
+        const targetName = allyTarget?.name ?? 'Tú';
+        const targetPortrait = allyTarget
+            ? `combat-ally-${allyTarget.id}`
+            : 'heroPortraitContainer';
 
         for (const ev of events) {
             switch (ev.kind) {
                 case 'damage': {
                     const hits = ev.hits > 1 ? ` en ${ev.hits} golpes` : '';
-                    if (ev.absorbed > 0) this.log(`🛡️ Tu guardia absorbe ${ev.absorbed} de daño.`);
+                    if (ev.absorbed > 0) {
+                        this.log(allyTarget
+                            ? `🛡️ La guardia de ${targetName} absorbe ${ev.absorbed} de daño.`
+                            : `🛡️ Tu guardia absorbe ${ev.absorbed} de daño.`);
+                    }
                     if (ev.dealt > 0) {
                         this.audio.play('hit');
-                        this.log(`💥 Recibes ${ev.dealt} de daño${hits}.`);
-                        this.view.float('heroPortraitContainer', `-${ev.dealt}`, 'dmg');
-                        this.view.shake('heroPortraitContainer');
+                        this.log(allyTarget
+                            ? `💥 ${targetName} recibe ${ev.dealt} de daño${hits}.`
+                            : `💥 Recibes ${ev.dealt} de daño${hits}.`);
+                        this.view.float(targetPortrait, `-${ev.dealt}`, 'dmg');
+                        this.view.shake(targetPortrait);
                     } else {
-                        this.log(`🛡️ ¡Bloqueas todo el daño!`);
-                        this.view.float('heroPortraitContainer', '🛡️', 'shield');
+                        this.log(allyTarget
+                            ? `🛡️ ${targetName} bloquea todo el daño.`
+                            : `🛡️ ¡Bloqueas todo el daño!`);
+                        this.view.float(targetPortrait, '🛡️', 'shield');
+                    }
+                    if (allyTarget?.health === 0) {
+                        this.log(`💫 ${targetName} queda fuera de combate.`);
                     }
                     break;
                 }
@@ -368,8 +402,10 @@ export class TcgCombat {
                     this.view.float('enemyPortraitContainer', `+${ev.amount}`, 'heal');
                     break;
                 case 'poison':
-                    this.log(`☠️ ¡Te envenena! ${ev.dmg} de daño durante ${ev.turns} turnos.`);
-                    this.view.float('heroPortraitContainer', '☠️', 'poison');
+                    this.log(allyTarget
+                        ? `☠️ ${targetName} queda envenenado: ${ev.dmg} de daño durante ${ev.turns} turnos.`
+                        : `☠️ ¡Te envenena! ${ev.dmg} de daño durante ${ev.turns} turnos.`);
+                    this.view.float(targetPortrait, '☠️', 'poison');
                     break;
                 case 'buff':
                     this.log(`🔥 El ataque de ${enemy.name} sube +${ev.amount}.`);
@@ -408,6 +444,24 @@ export class TcgCombat {
             }
         }
 
+        for (const ally of this.game.party.active) {
+            if (ally.health <= 0 || !ally.poison) continue;
+
+            const poisonedAlly = { hp: ally.health, poison: ally.poison };
+            const poisonDmg = tickPoison(poisonedAlly);
+            ally.health = Math.max(0, poisonedAlly.hp);
+            ally.poison = poisonedAlly.poison;
+
+            this.audio.play('hit');
+            this.log(`☠️ El veneno causa ${poisonDmg} de daño a ${ally.name}.`);
+            this.view.float(`combat-ally-${ally.id}`, `-${poisonDmg}`, 'poison');
+            this.view.shake(`combat-ally-${ally.id}`);
+            if (ally.health <= 0) {
+                this.log(`💫 ${ally.name} queda fuera de combate.`);
+            }
+        }
+
+        this.refresh();
         this.energy = this.maxEnergy();
         this.turn += 1;
         if (await this.runAllies()) return; // tus aliados acaban con el enemigo
@@ -440,6 +494,21 @@ export class TcgCombat {
             this.log(`🌟 ¡SUBIDA DE NIVEL! Tus cartas ahora hacen más daño/defensa.`);
         }
 
+        const allyAwards = this.game.party.awardCombatExperience();
+        for (const { ally, amount, levelsGained } of allyAwards) {
+            this.log(`🌟 ${ally.name} gana ${amount} XP (${ally.xp}/${ally.xpToNextLevel}).`);
+            levelsGained.forEach(({ level, healthGained }) => {
+                this.log(`⬆️ ${ally.name} sube al nivel ${level}${healthGained > 0 ? ` y gana ${healthGained} de vida máxima` : ''}.`);
+            });
+        }
+        const alliesNeedingRecovery = allyAwards
+            .filter(({ ally }) => ally.health < ally.maxHealth || ally.poison)
+            .map(({ ally }) => ally.name);
+        this.game.party.recoverActive();
+        alliesNeedingRecovery.forEach(name => {
+            this.log(`🩹 ${name} recupera toda su vida tras el combate.`);
+        });
+
         // A veces el enemigo suelta un objeto
         const lootId = boss ? rollBossRelic({ player: this.player, rng: this.rng }) : rollLoot({ player: this.player, rng: this.rng });
         const loot = lootId ? addItem(this.player, lootId).item : null;
@@ -454,7 +523,7 @@ export class TcgCombat {
         }
         if (loot) this.log(`🎁 Encuentras ${loot.name}: ${loot.effect}.`);
         const lootText = loot ? `${loot.name}` : '';
-        this.game.ui.updateStats(this.player, this.game.dungeonLevel);
+        this.refresh();
 
         // Las últimas palabras del enemigo se añaden al cartel de victoria si llegan a tiempo
         const defeated = this.enemy;
@@ -644,6 +713,7 @@ export class TcgCombat {
         this.view.renderEnemyStats(this.enemy, effectiveAtk(this.enemy));
         this.view.renderEnergy(this.energy, this.maxEnergy(), this.deck.counts);
         this.view.renderStatus(this.statusParts());
+        this.view.renderAllyStatuses(this.game.party.active);
         this.game.ui.updateStats(this.player, this.game.dungeonLevel);
     }
 }

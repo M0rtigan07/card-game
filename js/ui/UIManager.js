@@ -1,3 +1,5 @@
+import { createAllyStatus } from './AllyStatus.js';
+
 export class UIManager {
     constructor() {
         this.typewriterTimer = null;
@@ -172,7 +174,7 @@ export class UIManager {
                 `ally-card-${ally.id}`;
 
             card.className =
-                `party-member${inBattle ? ' in-battle' : ''}${this.acting.has(ally.id) ? ' acting' : ''}`;
+                `party-member${inBattle ? ' in-battle' : ''}${ally.health <= 0 ? ' knocked-out' : ''}${this.acting.has(ally.id) ? ' acting' : ''}`;
 
             const image =
                 document.createElement('img');
@@ -220,12 +222,15 @@ export class UIManager {
                 `party-status-indicator${inBattle ? ' in-battle' : ' in-reserve'}`;
 
             status.textContent =
-                inBattle ? '⚔️ En combate' : '🏕️ En campamento';
+                ally.health <= 0
+                    ? '💫 Fuera de combate'
+                    : inBattle ? '⚔️ En combate' : '🏕️ En campamento';
 
             info.append(
                 name,
                 ability,
-                status
+                status,
+                createAllyStatus(ally, 'sidebar')
             );
 
             card.append(

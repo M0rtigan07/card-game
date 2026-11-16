@@ -2145,6 +2145,88 @@ h1 {
     color: #c9b773;
 }
 
+.ally-status {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 100%;
+    min-width: 0;
+    padding: 5px 6px;
+    color: #f3e8d0;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 5px;
+    font-size: 0.75em;
+}
+
+.ally-status-heading,
+.ally-status-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    min-width: 0;
+}
+
+.ally-status-heading {
+    color: var(--gold-light);
+}
+
+.ally-status-heading span,
+.ally-status-line b {
+    overflow-wrap: anywhere;
+    text-align: right;
+}
+
+.ally-status-line {
+    color: #d8cda8;
+}
+
+.ally-meter {
+    height: 6px;
+    overflow: hidden;
+    background: #17131b;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+}
+
+.ally-meter span {
+    display: block;
+    height: 100%;
+    transition: width 0.25s ease;
+}
+
+.ally-health-meter span {
+    background: linear-gradient(90deg, #991b1b, #ef4444);
+}
+
+.ally-xp-meter span {
+    background: linear-gradient(90deg, #1d4ed8, #67e8f9);
+}
+
+.ally-condition {
+    color: #c4b5fd;
+    overflow-wrap: anywhere;
+}
+
+.ally-condition.is-knocked-out {
+    color: #fca5a5;
+    font-weight: 700;
+}
+
+.ally-status-sidebar {
+    flex: 1 1 100%;
+    padding: 4px 5px;
+    font-size: 0.68em;
+}
+
+.party-member.knocked-out,
+.party-character-card.knocked-out,
+.combat-ally.knocked-out {
+    border-color: #ef4444;
+    filter: grayscale(0.55);
+}
+
 .combat-allies {
     width: 100%;
     display: flex;
@@ -2189,6 +2271,24 @@ h1 {
     flex: 0 0 auto;
     object-fit: cover;
     border-radius: 3px;
+}
+
+.combat-ally-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 90px;
+}
+
+.combat-ally-name {
+    color: #68ff68;
+    font-weight: 700;
+}
+
+.ally-status-combat {
+    padding: 3px 4px;
+    font-size: 0.68em;
 }
 
 .combat-ally.acting {
@@ -2293,6 +2393,16 @@ h1 {
 .combat-party-empty {
     color: var(--gold-light);
     font-size: 0.78em;
+}
+
+@media (max-width: 600px) {
+    .combat-ally {
+        flex: 1 1 135px;
+    }
+
+    .combat-ally-info {
+        min-width: 0;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

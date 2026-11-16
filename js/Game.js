@@ -5,6 +5,7 @@
 import { AudioManager } from './audio.js';
 import { Player } from './models/Player.js';
 import { UIManager } from './ui/UIManager.js';
+import { createAllyStatus } from './ui/AllyStatus.js';
 import { NameEntry } from './ui/NameEntry.js';
 import { setText, wait } from './ui/helpers.js';
 import { GroqAI } from './systems/GroqAI.js';
@@ -254,6 +255,8 @@ ${recruitText}
                         ${ally.role ?? "Aventurero"}
                     </h2>
 
+                    <div id="partyAllyStatus"></div>
+
                     <div class="party-detail-section party-detail-ability">
 
                         <h3>
@@ -433,6 +436,10 @@ ${recruitText}
 
     `;
 
+        document
+            .getElementById("partyAllyStatus")
+            .appendChild(createAllyStatus(ally));
+
         const battleCheck =
             document.getElementById(
                 "battleCheck"
@@ -501,6 +508,8 @@ ${recruitText}
                     if (activation.reason === "party_full") {
                         const limit = this.party.getMaxActiveMembers();
                         alert(`⚔️ Tu nivel permite ${limit} compañero${limit === 1 ? "" : "s"} en combate. Pasa a uno al campamento para hacer sitio.`);
+                    } else if (activation.reason === "knocked_out") {
+                        alert(`${ally.name} está fuera de combate y debe recuperarse antes de volver a la batalla.`);
                     } else {
                         alert("No se pudo asignar a este compañero al combate.");
                     }

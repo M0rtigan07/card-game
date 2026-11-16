@@ -1,4 +1,5 @@
 // js/views/PartyView.js
+import { createAllyStatus } from '../ui/AllyStatus.js';
 
 export class PartyView {
 
@@ -69,7 +70,7 @@ export class PartyView {
                 );
 
             card.className =
-                'party-character-card';
+                `party-character-card${ally.health <= 0 ? ' knocked-out' : ''}`;
 
             card.innerHTML = `
 
@@ -92,13 +93,16 @@ export class PartyView {
                     "
                 >
                     ${
-                        active
-                            ? '⚔️ En combate'
-                            : '🏕️ En campamento'
+                        ally.health <= 0
+                            ? '💫 Fuera de combate'
+                            : (active
+                                ? '⚔️ En combate'
+                                : '🏕️ En campamento')
                     }
                 </span>
 
             `;
+            card.appendChild(createAllyStatus(ally));
 
             card.addEventListener(
                 'click',

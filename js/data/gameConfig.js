@@ -141,6 +141,14 @@ export const PARTY = {
     MAX: 15,          // aliados reclutados; los activos también dependen del nivel
     RECRUIT_XP: 30   // experiencia al conseguir un aliado
 };
+export const ALLY_PROGRESSION = {
+    STARTING_HEALTH: 170,
+    HEALTH_PER_LEVEL: 100,
+    MAX_HEALTH: 1500,
+    XP_PER_VICTORY: 250,
+    XP_TO_LEVEL_2: 300,
+    XP_GROWTH_PER_LEVEL: 1000
+};
 export const PERSUASION = {
     RAPPORT_TOPICS: 2,  // temas que hay que haber hablado con él antes de poder pedirle nada
     NEEDED: 2,          // argumentos buenos para convencerle

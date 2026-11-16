@@ -1,3 +1,5 @@
+import { createAllyStatus } from '../ui/AllyStatus.js';
+
 // js/views/TcgCombatView.js
 export class TcgCombatView {
     constructor(container, gameInstance) {
@@ -7,21 +9,13 @@ export class TcgCombatView {
 
     render(enemyData, player) {
         const activeAllies = this.game.party.active;
-        const activeAllyCards = activeAllies.length
-            ? activeAllies.map(ally => `
-                <div class="combat-ally" id="combat-ally-${ally.id}">
-                    <img src="${ally.card}" alt="">
-                    <span>${ally.name}</span>
-                </div>
-            `).join('')
-            : '<span class="combat-party-empty">Sin compañeros activos: combates en solitario.</span>';
 
         this.container.innerHTML = `
             <h1 id="dungeonTitle">Combate TCG</h1>
 
             <section class="combat-allies" aria-label="Aliados en combate">
                 <h2>⚔️ Aliados en combate</h2>
-                <div class="combat-allies-list">${activeAllyCards}</div>
+                <div class="combat-allies-list"></div>
                 <div id="allySpeech" class="ally-speech" aria-live="polite" aria-atomic="true"></div>
             </section>
 
@@ -68,5 +62,33 @@ export class TcgCombatView {
                 <button id="endTurnTcgBtn" class="fantasy-btn" style="background:#ef4444; color:white; padding: 10px 24px;">Finalizar Turno ⏳</button>
             </div>
         `;
+
+        const alliesList = this.container.querySelector('.combat-allies-list');
+        if (activeAllies.length === 0) {
+            const empty = document.createElement('span');
+            empty.className = 'combat-party-empty';
+            empty.textContent = 'Sin compañeros activos: combates en solitario.';
+            alliesList.appendChild(empty);
+            return;
+        }
+
+        activeAllies.forEach(ally => {
+            const card = document.createElement('div');
+            card.id = `combat-ally-${ally.id}`;
+            card.className = `combat-ally${ally.health <= 0 ? ' knocked-out' : ''}`;
+
+            const image = document.createElement('img');
+            image.src = ally.card;
+            image.alt = '';
+
+            const info = document.createElement('div');
+            info.className = 'combat-ally-info';
+            const name = document.createElement('span');
+            name.className = 'combat-ally-name';
+            name.textContent = ally.name;
+            info.append(name, createAllyStatus(ally, 'combat'));
+            card.append(image, info);
+            alliesList.appendChild(card);
+        });
     }
 }
