@@ -193,10 +193,69 @@ ${recruitText}
 
     showPartyCharacter(id) {
 
-        console.log(
-            "Abrir ficha:",
-            id
-        );
+        const ally =
+            this.party.recruited.find(
+                a => a.id === id
+            );
+
+        if (!ally) {
+            return;
+        }
+
+        document.getElementById(
+            'mainContent'
+        ).innerHTML = `
+
+        <div class="party-detail">
+
+            <h1>
+                ${ally.name}
+            </h1>
+
+            <img
+                src="${ally.card}"
+                class="party-detail-image"
+            >
+
+            <h3>
+                ${ally.role ?? ''}
+            </h3>
+
+            <p>
+
+                ${ally.ability.name}
+
+            </p>
+
+            <p>
+
+                ${this.party.hasActive(
+            ally.id
+        )
+                ? '⚔️ Viaja contigo.'
+                : '🏕️ Se encuentra en el campamento.'
+            }
+
+            </p>
+
+            <button
+                id="partyBackBtn"
+            >
+                ⚔️ Regresar a la compañía
+            </button>
+
+        </div>
+
+    `;
+
+        document
+            .getElementById(
+                'partyBackBtn'
+            )
+            .addEventListener(
+                'click',
+                () => this.showPartyView()
+            );
 
     }
 
