@@ -38,7 +38,7 @@ export class Game {
 
         this.party = new Party(this);
 
-        this.ui.getParty = () => this.party.active;
+        this.ui.getParty = () => this.party.recruited;
 
         this.ui.onOpenParty = () => this.showPartyView();
 
