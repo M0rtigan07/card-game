@@ -21,7 +21,7 @@ export class PartyView {
                 <div class="party-header">
 
                     <img
-                        src="img/logo-kaldur-ath.png"
+                        src="img/icon-original.png"
                         alt="Kaldur-Ath"
                         class="party-logo"
                     >
