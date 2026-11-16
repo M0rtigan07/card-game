@@ -7,9 +7,14 @@ export class UIManager {
         this.isAllyActive = null;
         this.onDismissAlly = null; // lo asigna Game: se llama con el id del aliado al pulsar ✕
         this.onOpenParty = null;
+        this.onOpenHeroSheet = null;
+        this.refreshHeroSheet = null;
         this.onOpenInventory = null;
         this.refreshInventory = null;
         this.acting = new Set(); // aliados que están actuando ahora mismo (se resaltan)
+        this.allyNotices = [];
+        this.allyNoticeTimer = null;
+        this.allyNoticeHost = null;
     }
 
     showScreen(screenId) {
@@ -52,29 +57,7 @@ export class UIManager {
     }
 
     updateStats(player, dungeonLevel) {
-        // 1. Mostrar la clase arriba junto al título de la hoja
-        const classEl = document.getElementById('heroClass');
-        if (classEl && player.className) {
-            classEl.textContent = player.className.toUpperCase();
-        }
-
-        // 2. Mostrar el nombre personalizado en el pie de la foto de la carta
-        const heroTag = document.getElementById('heroClassTag');
-        const savedName = localStorage.getItem('mazo_hero_name') || /** @type {any} */ (window).game?.playerName;
-        if (heroTag && savedName) {
-            heroTag.textContent = savedName.toUpperCase();
-        }
-
-        // 3. Resto de estadísticas del panel
-        document.getElementById('lvlVal').textContent = player.level;
-        document.getElementById('hpVal').textContent = `${player.health}/${player.maxHealth}`;
-        document.getElementById('manaVal').textContent = `${player.mana}/${player.maxMana}`;
-        document.getElementById('goldVal').textContent = player.gold;
-        document.getElementById('dungeonLevel').textContent = dungeonLevel;
-
-        const xpPercent = Math.min(100, Math.floor((player.xp / player.maxXp) * 100));
-        document.getElementById('xpBar').style.width = `${xpPercent}%`;
-        document.getElementById('xpText').textContent = `${player.xp} / ${player.maxXp} XP`;
+        this.refreshHeroSheet?.(player, dungeonLevel);
 
         const inventoryCount =
             player.inventory.reduce((total, item) => total + (item.qty || 1), 0);
@@ -274,6 +257,38 @@ export class UIManager {
         while (list.children.length > maxLogs) {
             list.removeChild(list.lastChild); // Elimina el evento más antiguo que se sale por abajo
         }
+    }
+
+    showAllyNotice(message, type = 'level-up') {
+        if (!this.allyNoticeHost) {
+            this.allyNoticeHost = document.createElement('div');
+            this.allyNoticeHost.className = 'ally-notice-host';
+            this.allyNoticeHost.setAttribute('role', 'status');
+            this.allyNoticeHost.setAttribute('aria-live', 'assertive');
+            this.allyNoticeHost.setAttribute('aria-atomic', 'true');
+            document.body.appendChild(this.allyNoticeHost);
+        }
+
+        this.allyNotices.push({ message, type });
+        this.showNextAllyNotice();
+    }
+
+    showNextAllyNotice() {
+        if (this.allyNoticeTimer || this.allyNotices.length === 0) return;
+
+        const { message, type } = this.allyNotices.shift();
+        const notice = document.createElement('div');
+        notice.className = `ally-combat-notice ally-combat-notice-${type}`;
+        notice.textContent = message;
+        this.allyNoticeHost.replaceChildren(notice);
+
+        this.allyNoticeTimer = setTimeout(() => {
+            notice.classList.add('is-leaving');
+            this.allyNoticeTimer = setTimeout(() => {
+                this.allyNoticeTimer = null;
+                this.showNextAllyNotice();
+            }, 220);
+        }, 2800);
     }
 
     showGameOver() {

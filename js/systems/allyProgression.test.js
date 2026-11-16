@@ -72,6 +72,28 @@ test('enemy attack targeting includes the player and living active allies only',
     assert.equal(combat.chooseEnemyTarget({ type: 'heal' }), null);
 });
 
+test('ally level-ups create a visible combat notice', () => {
+    const notices = [];
+    const messages = [];
+    const combat = new TcgCombat({
+        ui: {
+            showAllyNotice: (message, type) => notices.push({ message, type })
+        }
+    });
+    combat.log = message => messages.push(message);
+
+    combat.notifyAllyLevelUps([{
+        ally: { name: 'Aliado' },
+        levelsGained: [{ level: 2, healthGained: 100 }]
+    }]);
+
+    assert.ok(messages.some(message => message.includes('sube al nivel 2')));
+    assert.deepEqual(notices, [{
+        message: '⬆️ ¡Subida de nivel! Aliado alcanza el nivel 2',
+        type: 'level-up'
+    }]);
+});
+
 test('ally poison ticks at the start of the turn and a knocked-out ally cannot act', async () => {
     const ally = {
         id: 'ally',
@@ -80,10 +102,14 @@ test('ally poison ticks at the start of the turn and a knocked-out ally cannot a
         poison: { dmg: 25, turns: 2 }
     };
     const messages = [];
+    const notices = [];
     const combat = new TcgCombat({
         party: { active: [ally] },
         player: { health: 100, maxHealth: 100 },
-        audio: { play() {} }
+        audio: { play() {} },
+        ui: {
+            showAllyNotice: (message, type) => notices.push({ message, type })
+        }
     });
 
     combat.heroPoison = null;
@@ -102,4 +128,8 @@ test('ally poison ticks at the start of the turn and a knocked-out ally cannot a
     assert.equal(ally.poison.turns, 1);
     assert.ok(messages.some(message => message.includes('25 de daño')));
     assert.ok(messages.some(message => message.includes('fuera de combate')));
+    assert.deepEqual(notices, [{
+        message: '💫 ¡Aliado ha caído en combate!',
+        type: 'knocked-out'
+    }]);
 });

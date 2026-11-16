@@ -17,6 +17,7 @@ import { NpcChat } from './systems/NpcChat.js';
 import { Party } from './systems/Party.js';
 import { PartyView } from './views/PartyView.js';
 import { InventoryView } from './views/InventoryView.js';
+import { HeroSheetView } from './views/HeroSheetView.js';
 import { Persuasion } from './systems/Persuasion.js';
 import { StoryManager } from './stories/StoryManager.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
@@ -44,6 +45,9 @@ export class Game {
         this.ui.isAllyActive = (id) => this.party.hasActive(id);
 
         this.ui.onOpenParty = () => this.showPartyView();
+        this.heroSheetView = new HeroSheetView();
+        this.ui.onOpenHeroSheet = () => this.heroSheetView.open(this.player, this.dungeonLevel);
+        this.ui.refreshHeroSheet = (player, dungeonLevel) => this.heroSheetView.refresh(player, dungeonLevel);
         this.inventoryView = new InventoryView((id) => this.useItem(id));
         this.ui.onOpenInventory = () => this.inventoryView.open(this.player);
         this.ui.refreshInventory = () => this.inventoryView.refresh(this.player);
@@ -98,6 +102,10 @@ export class Game {
         document.getElementById('openInventoryBtn')?.addEventListener('click', () => {
             this.ui.onOpenInventory?.();
         });
+
+        document.getElementById('openHeroSheetBtn')?.addEventListener('click', () => {
+            this.ui.onOpenHeroSheet?.();
+        });
     }
 
     async initGame() {
@@ -123,14 +131,10 @@ export class Game {
         this.player.img = HERO_IMAGES[classKey] || HERO_IMAGES.warrior;
         this.deck = new PlayerDeck(STARTER_DECKS[classKey] || STARTER_DECKS.warrior);
 
-        setText('heroClassTag', this.playerName.toUpperCase());
         setText('introHeroTitle', `${this.playerName} - ${this.player.className.toUpperCase()}`);
 
-        // 'introHeroImg' = pantalla de historia, 'sidebarHeroImg' = hoja de héroe
-        ['introHeroImg', 'sidebarHeroImg'].forEach(id => {
-            const img = /** @type {HTMLImageElement | null} */ (document.getElementById(id));
-            if (img) img.src = this.player.img;
-        });
+        const introImg = /** @type {HTMLImageElement | null} */ (document.getElementById('introHeroImg'));
+        if (introImg) introImg.src = this.player.img;
 
         this.ui.showScreen('introScreen');
         this.ui.typewriterIntro(`LOS DESTINOS SE ALINEAN PARA ${this.playerName}...`);

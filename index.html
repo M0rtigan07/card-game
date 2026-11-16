@@ -156,38 +156,16 @@
         </div>
 
         <div class="container">
-            <!-- PANEL IZQUIERDO: HOJA DE PERSONAJE -->
+            <!-- PANEL IZQUIERDO: ACCESOS Y COMPAÑÍA -->
             <div id="leftSidebar">
-                <!-- TÍTULO Y CLASE ARRIBA -->
-                <div class="sidebar-header-box">
-                    <h2>Hoja de Héroe</h2>
-                    <span id="heroClass" class="sidebar-class-subtitle">GUERRERO</span>
-                </div>
-
-                <!-- RETRATO DEL HÉROE CON SU NOMBRE EN EL PIE -->
-                <div class="hero-card-frame">
-                    <div class="hero-card-image-box">
-                        <img id="sidebarHeroImg" src="img/guerrero.png" alt="Héroe">
-                        <canvas id="renderCanvas"
-                            style="display:none; width: 100%; height: 100%; outline: none;"></canvas>
-                    </div>
-                    <!-- AQUÍ APARECERÁ EL NOMBRE PERSONALIZADO -->
-                    <span class="character-tag" id="heroClassTag">ALUCARD</span>
-                </div>
-
-                <div class="stat-item"><span>Héroe</span> <span>Lvl <b id="lvlVal">1</b></span></div>
-                <div class="stat-item">❤️ Salud <span id="hpVal">100/100</span></div>
-                <div class="stat-item">🔮 Maná <span id="manaVal">50/50</span></div>
-                <div class="stat-item">💰 Oro <span id="goldVal">0</span> gp</div>
-                <div class="stat-item">🏰 Planta <span id="dungeonLevel">1</span></div>
-
-                <div style="margin-top: 4px;">
-                    <small>Progreso XP</small>
-                    <div class="xp-container">
-                        <div id="xpBar" class="xp-bar"></div>
-                    </div>
-                    <small id="xpText">0 / 100 XP</small>
-                </div>
+                <button id="openHeroSheetBtn" class="hero-sheet-open-btn" type="button">
+                    <span class="hero-sheet-open-icon" aria-hidden="true">⚔️</span>
+                    <span class="hero-sheet-open-label">
+                        <b>Hoja de héroe</b>
+                        <small>Ver atributos y progreso</small>
+                    </span>
+                    <span class="hero-sheet-open-arrow" aria-hidden="true">›</span>
+                </button>
 
                 <section class="sidebar-inventory">
                     <h2>Inventario</h2>

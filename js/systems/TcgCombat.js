@@ -389,7 +389,7 @@ export class TcgCombat {
                         this.view.float(targetPortrait, '🛡️', 'shield');
                     }
                     if (allyTarget?.health === 0) {
-                        this.log(`💫 ${targetName} queda fuera de combate.`);
+                        this.notifyAllyKnockedOut(allyTarget);
                     }
                     break;
                 }
@@ -457,7 +457,7 @@ export class TcgCombat {
             this.view.float(`combat-ally-${ally.id}`, `-${poisonDmg}`, 'poison');
             this.view.shake(`combat-ally-${ally.id}`);
             if (ally.health <= 0) {
-                this.log(`💫 ${ally.name} queda fuera de combate.`);
+                this.notifyAllyKnockedOut(ally);
             }
         }
 
@@ -473,6 +473,25 @@ export class TcgCombat {
 
         this.busy = false;
         this.view.setControls(true);
+    }
+
+    notifyAllyKnockedOut(ally) {
+        this.log(`💫 ${ally.name} queda fuera de combate.`);
+        this.game.ui?.showAllyNotice?.(`💫 ¡${ally.name} ha caído en combate!`, 'knocked-out');
+    }
+
+    notifyAllyLevelUps(awards) {
+        const levelUps = [];
+        awards.forEach(({ ally, levelsGained }) => {
+            levelsGained.forEach(({ level, healthGained }) => {
+                this.log(`⬆️ ${ally.name} sube al nivel ${level}${healthGained > 0 ? ` y gana ${healthGained} de vida máxima` : ''}.`);
+                levelUps.push(`${ally.name} alcanza el nivel ${level}`);
+            });
+        });
+
+        if (levelUps.length > 0) {
+            this.game.ui?.showAllyNotice?.(`⬆️ ¡Subida de nivel! ${levelUps.join(' · ')}`, 'level-up');
+        }
     }
 
     // ───────────── FINAL DEL COMBATE ─────────────
@@ -497,10 +516,8 @@ export class TcgCombat {
         const allyAwards = this.game.party.awardCombatExperience();
         for (const { ally, amount, levelsGained } of allyAwards) {
             this.log(`🌟 ${ally.name} gana ${amount} XP (${ally.xp}/${ally.xpToNextLevel}).`);
-            levelsGained.forEach(({ level, healthGained }) => {
-                this.log(`⬆️ ${ally.name} sube al nivel ${level}${healthGained > 0 ? ` y gana ${healthGained} de vida máxima` : ''}.`);
-            });
         }
+        this.notifyAllyLevelUps(allyAwards);
         const alliesNeedingRecovery = allyAwards
             .filter(({ ally }) => ally.health < ally.maxHealth || ally.poison)
             .map(({ ally }) => ally.name);
