@@ -476,40 +476,45 @@ ${recruitText}
                     battleCheck.checked = true;
 
                     return;
+
                 }
 
                 const battleCount =
                     this.party.recruited.filter(
-                        a =>
-                            a.status ===
-                            "battle"
+                        a => a.status === "battle"
                     ).length;
 
                 if (
-                    ally.status !== "battle"
-                    &&
+                    ally.status !== "battle" &&
                     battleCount >= 2
                 ) {
 
                     alert(
-                        "⚔️ Solo dos compañeros pueden acompañarte en batalla."
+                        "⚔️ Solo dos compañeros pueden combatir contigo."
                     );
 
                     battleCheck.checked = false;
 
                     return;
+
                 }
 
-                ally.status =
-                    "battle";
+                ally.status = "battle";
 
-                campCheck.checked =
-                    false;
+                this.party.activate(
+                    ally.id
+                );
 
-                missionCheck.checked =
-                    false;
+                campCheck.checked = false;
+
+                missionCheck.checked = false;
 
                 refreshStatusVisuals();
+
+                this.ui.updateStats(
+                    this.player,
+                    this.dungeonLevel
+                );
 
             }
         );
@@ -520,22 +525,28 @@ ${recruitText}
 
                 if (!campCheck.checked) {
 
-                    campCheck.checked =
-                        true;
+                    campCheck.checked = true;
 
                     return;
+
                 }
 
-                ally.status =
-                    "camp";
+                ally.status = "camp";
 
-                battleCheck.checked =
-                    false;
+                this.party.deactivate(
+                    ally.id
+                );
 
-                missionCheck.checked =
-                    false;
+                battleCheck.checked = false;
+
+                missionCheck.checked = false;
 
                 refreshStatusVisuals();
+
+                this.ui.updateStats(
+                    this.player,
+                    this.dungeonLevel
+                );
 
             }
         );
@@ -546,22 +557,28 @@ ${recruitText}
 
                 if (!missionCheck.checked) {
 
-                    missionCheck.checked =
-                        true;
+                    missionCheck.checked = true;
 
                     return;
+
                 }
 
-                ally.status =
-                    "mission";
+                ally.status = "mission";
 
-                battleCheck.checked =
-                    false;
+                this.party.deactivate(
+                    ally.id
+                );
 
-                campCheck.checked =
-                    false;
+                battleCheck.checked = false;
+
+                campCheck.checked = false;
 
                 refreshStatusVisuals();
+
+                this.ui.updateStats(
+                    this.player,
+                    this.dungeonLevel
+                );
 
             }
         );
@@ -585,7 +602,7 @@ ${recruitText}
 
     showPartyView() {
 
-       
+
 
         const view =
             new PartyView(
@@ -599,8 +616,8 @@ ${recruitText}
 
     }
 
-   
-    
+
+
 
 
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
