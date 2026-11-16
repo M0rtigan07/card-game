@@ -640,6 +640,7 @@ ${recruitText}
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
     advanceFloor(delay = 1800) {
         this.dungeonLevel++;
+        this.ui.updateStats(this.player, this.dungeonLevel);
         setTimeout(() => this.loadNextEvent(), delay);
     }
 
@@ -700,8 +701,8 @@ ${recruitText}
 
     // Cierre común de un encuentro: refresca stats, comprueba muerte y avanza
     finishEncounter(delay) {
-        this.ui.updateStats(this.player, this.dungeonLevel);
         if (this.player.health <= 0) {
+            this.ui.updateStats(this.player, this.dungeonLevel);
             this.ui.showGameOver();
             return;
         }

@@ -1,5 +1,25 @@
 import { createAllyStatus } from './AllyStatus.js';
 
+const ROMAN_NUMERALS = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
+];
+
+function toRomanNumeral(number) {
+    let remaining = number;
+    let numeral = '';
+
+    for (const [value, symbol] of ROMAN_NUMERALS) {
+        while (remaining >= value) {
+            numeral += symbol;
+            remaining -= value;
+        }
+    }
+
+    return numeral;
+}
+
 export class UIManager {
     constructor() {
         this.typewriterTimer = null;
@@ -58,6 +78,14 @@ export class UIManager {
 
     updateStats(player, dungeonLevel) {
         this.refreshHeroSheet?.(player, dungeonLevel);
+
+        const floorDisplay = document.getElementById('sidebarFloorRoman');
+        if (floorDisplay && Number.isInteger(dungeonLevel) && dungeonLevel > 0) {
+            floorDisplay.textContent = toRomanNumeral(dungeonLevel);
+        }
+
+        const levelDisplay = document.getElementById('sidebarHeroLevel');
+        if (levelDisplay) levelDisplay.textContent = String(player.level);
 
         const inventoryCount =
             player.inventory.reduce((total, item) => total + (item.qty || 1), 0);
