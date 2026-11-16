@@ -2484,6 +2484,7 @@ h1 {
 /* ═══════════ ALIADOS: PANEL "GRUPO" Y ARGUMENTOS ═══════════ */
 
 .party-member {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -2498,6 +2499,14 @@ h1 {
 .party-member.acting {
     transform: scale(1.04);
     box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+}
+
+.party-member.attacking {
+    animation: allyLunge 680ms ease-in-out;
+}
+
+.party-member.supporting {
+    animation: allySupport 680ms ease-in-out;
 }
 
 .party-member.in-battle {
@@ -2656,94 +2665,17 @@ h1 {
 }
 
 .party-member.knocked-out,
-.party-character-card.knocked-out,
-.combat-ally.knocked-out {
+.party-character-card.knocked-out {
     border-color: #ef4444;
     filter: grayscale(0.55);
 }
 
-.combat-allies {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--gold-border);
-    border-radius: 8px;
-    background: rgba(30, 10, 50, 0.55);
-}
-
-.combat-allies h2 {
-    color: var(--gold);
-    font-size: 0.8em;
-}
-
-.combat-allies-list {
-    display: flex;
-    flex: 1;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-width: 0;
-}
-
-.combat-ally {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    max-width: 100%;
-    padding: 4px 8px;
-    color: #68ff68;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(104, 255, 104, 0.5);
-    border-radius: 6px;
-    font-size: 0.78em;
-}
-
-.combat-ally img {
-    width: 28px;
-    height: 40px;
-    flex: 0 0 auto;
-    object-fit: cover;
-    border-radius: 3px;
-}
-
-.combat-ally-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 90px;
-}
-
-.combat-ally-name {
-    color: #68ff68;
-    font-weight: 700;
-}
-
-.ally-status-combat {
-    padding: 3px 4px;
-    font-size: 0.68em;
-}
-
-.combat-ally.acting {
-    border-color: var(--gold);
-    box-shadow: 0 0 12px rgba(255, 215, 0, .75);
-}
-
-.combat-ally.attacking {
-    animation: allyLunge 680ms ease-in-out;
-}
-
-.combat-ally.supporting {
-    animation: allySupport 680ms ease-in-out;
-}
-
 .ally-speech {
     display: none;
-    flex: 0 0 100%;
+    flex: 0 0 auto;
     align-items: baseline;
     gap: 8px;
+    width: 100%;
     min-width: 0;
     margin-top: 2px;
     padding: 7px 10px;
@@ -2825,30 +2757,17 @@ h1 {
     45% { transform: scale(1.08); filter: brightness(1.5) drop-shadow(0 0 14px #59e3c2); }
 }
 
-.combat-party-empty {
-    color: var(--gold-light);
-    font-size: 0.78em;
-}
-
 @media (max-width: 600px) {
     .ally-notice-host {
         right: 50%;
         transform: translateX(50%);
         width: min(420px, calc(100vw - 20px));
     }
-
-    .combat-ally {
-        flex: 1 1 135px;
-    }
-
-    .combat-ally-info {
-        min-width: 0;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .combat-ally.attacking,
-    .combat-ally.supporting,
+    .party-member.attacking,
+    .party-member.supporting,
     .ally-speech.visible,
     .ally-combat-notice,
     .ally-combat-notice.is-leaving,

@@ -3,7 +3,6 @@
 // recibe datos ya calculados y los pinta. La lógica vive en systems/TcgCombat.js.
 
 import { TcgCombatView } from '../views/TcgCombatView.js';
-import { createAllyStatus } from './AllyStatus.js';
 import { setText, wait } from './helpers.js';
 import { DIALOGUE } from '../data/gameConfig.js';
 
@@ -88,7 +87,7 @@ export class CombatUI {
     }
 
     async playAllyAction(ally, phrase, events) {
-        const actor = document.getElementById(`combat-ally-${ally.id}`);
+        const actor = document.getElementById(`ally-card-${ally.id}`);
         const attacks = events.some(event =>
             (event.kind === 'damage' && (event.dealt > 0 || event.absorbed > 0)) ||
             event.kind === 'poison'
@@ -270,16 +269,6 @@ export class CombatUI {
         fill.style.width = `${percent}%`;
         fill.classList.toggle('is-low', percent <= 50);
         fill.classList.toggle('is-critical', percent <= 25);
-    }
-
-    renderAllyStatuses(allies) {
-        allies.forEach(ally => {
-            const card = document.getElementById(`combat-ally-${ally.id}`);
-            if (!card) return;
-
-            card.classList.toggle('knocked-out', ally.health <= 0);
-            card.querySelector('.ally-status')?.replaceWith(createAllyStatus(ally, 'combat'));
-        });
     }
 
     // ───────────── Efectos visuales ─────────────

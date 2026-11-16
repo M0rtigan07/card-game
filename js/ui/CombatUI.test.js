@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CombatUI } from './CombatUI.js';
+import { TcgCombatView } from '../views/TcgCombatView.js';
 
 test('hero combat vitals show current HP, guard, and a critical health bar', () => {
     const attributes = {};
@@ -92,4 +93,21 @@ test('enemy combat vitals show HP, attack, and defense', () => {
         if (previousDocument === undefined) delete globalThis.document;
         else globalThis.document = previousDocument;
     }
+});
+
+test('combat view omits duplicate ally cards but retains their dialogue area', () => {
+    const container = { innerHTML: '' };
+    const view = new TcgCombatView(container, {
+        playerName: 'Héroe',
+        party: { active: [{ id: 'ally-1' }] }
+    });
+
+    view.render(
+        { name: 'Enemigo', img: 'enemy.png', hp: 50, maxHp: 100, atk: 10, shield: 0 },
+        { img: 'hero.png', health: 80, maxHealth: 100 }
+    );
+
+    assert.doesNotMatch(container.innerHTML, /combat-allies|combat-ally-/);
+    assert.match(container.innerHTML, /id="allySpeech"/);
+    assert.match(container.innerHTML, /id="heroCombatHealthMeter"/);
 });

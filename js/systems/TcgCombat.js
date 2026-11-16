@@ -334,8 +334,8 @@ export class TcgCombat {
             this.heroPoison = target.poison;
         }
 
-        this.narrateEnemy(events, allyTarget);
         this.refresh();
+        this.narrateEnemy(events, allyTarget);
         await wait(COMBAT.ENEMY_RESOLVE_MS);
 
         if (this.player.health <= 0) {
@@ -363,7 +363,7 @@ export class TcgCombat {
         const enemy = this.enemy;
         const targetName = allyTarget?.name ?? 'Tú';
         const targetPortrait = allyTarget
-            ? `combat-ally-${allyTarget.id}`
+            ? `ally-card-${allyTarget.id}`
             : 'heroPortraitContainer';
 
         for (const ev of events) {
@@ -444,6 +444,7 @@ export class TcgCombat {
             }
         }
 
+        const poisonedAllies = [];
         for (const ally of this.game.party.active) {
             if (ally.health <= 0 || !ally.poison) continue;
 
@@ -454,14 +455,18 @@ export class TcgCombat {
 
             this.audio.play('hit');
             this.log(`☠️ El veneno causa ${poisonDmg} de daño a ${ally.name}.`);
-            this.view.float(`combat-ally-${ally.id}`, `-${poisonDmg}`, 'poison');
-            this.view.shake(`combat-ally-${ally.id}`);
+            poisonedAllies.push({ ally, poisonDmg });
             if (ally.health <= 0) {
                 this.notifyAllyKnockedOut(ally);
             }
         }
 
         this.refresh();
+        poisonedAllies.forEach(({ ally, poisonDmg }) => {
+            const target = `ally-card-${ally.id}`;
+            this.view.float(target, `-${poisonDmg}`, 'poison');
+            this.view.shake(target);
+        });
         this.energy = this.maxEnergy();
         this.turn += 1;
         if (await this.runAllies()) return; // tus aliados acaban con el enemigo
@@ -731,7 +736,6 @@ export class TcgCombat {
         this.view.renderEnemyStats(this.enemy, effectiveAtk(this.enemy));
         this.view.renderEnergy(this.energy, this.maxEnergy(), this.deck.counts);
         this.view.renderStatus(this.statusParts());
-        this.view.renderAllyStatuses(this.game.party.active);
         this.game.ui.updateStats(this.player, this.game.dungeonLevel);
     }
 }
