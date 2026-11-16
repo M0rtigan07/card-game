@@ -3,6 +3,7 @@ export class UIManager {
         this.typewriterTimer = null;
         this.onUseItem = null; // lo asigna Game: se llama con el id del objeto al pulsar "Usar"
         this.getParty = null;  // lo asigna Game: devuelve los aliados del grupo
+        this.isAllyActive = null;
         this.onDismissAlly = null; // lo asigna Game: se llama con el id del aliado al pulsar ✕
         this.onOpenParty = null;
         this.acting = new Set(); // aliados que están actuando ahora mismo (se resaltan)
@@ -179,7 +180,7 @@ export class UIManager {
         // PERSONAJES ACTIVOS
 
         members.forEach(ally => {
-
+            const inBattle = this.isAllyActive?.(ally.id) ?? ally.status === 'battle';
             const card =
                 document.createElement('div');
 
@@ -187,10 +188,7 @@ export class UIManager {
                 `ally-card-${ally.id}`;
 
             card.className =
-                `party-member${this.acting.has(ally.id)
-                    ? ' acting'
-                    : ''
-                }`;
+                `party-member${inBattle ? ' in-battle' : ''}${this.acting.has(ally.id) ? ' acting' : ''}`;
 
             const image =
                 document.createElement('img');
@@ -231,9 +229,19 @@ export class UIManager {
             ability.textContent =
                 ally.ability.name;
 
+            const status =
+                document.createElement('small');
+
+            status.className =
+                `party-status-indicator${inBattle ? ' in-battle' : ' in-reserve'}`;
+
+            status.textContent =
+                inBattle ? '⚔️ En combate' : '🏕️ Reserva';
+
             info.append(
                 name,
-                ability
+                ability,
+                status
             );
 
             card.append(

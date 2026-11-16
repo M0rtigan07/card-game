@@ -39,6 +39,7 @@ export class Game {
         this.party = new Party(this);
 
         this.ui.getParty = () => this.party.recruited;
+        this.ui.isAllyActive = (id) => this.party.hasActive(id);
 
         this.ui.onOpenParty = () => this.showPartyView();
 
@@ -202,11 +203,12 @@ ${recruitText}
             return;
         }
 
-        ally.status =
-            ally.status ?? "camp";
-
-        const inBattle =
-            ally.status === "battle";
+        const inBattle = this.party.hasActive(ally.id);
+        if (inBattle) {
+            ally.status = "battle";
+        } else if (ally.status === "battle" || !ally.status) {
+            ally.status = "camp";
+        }
 
         const inCamp =
             ally.status === "camp";
@@ -479,34 +481,29 @@ ${recruitText}
 
                 }
 
-                const battleCount =
-                    this.party.recruited.filter(
-                        a => a.status === "battle"
-                    ).length;
+                const activation = this.party.hasActive(ally.id)
+                    ? { ok: true }
+                    : this.party.activate(ally.id);
 
-                if (
-                    ally.status !== "battle" &&
-                    battleCount >= 2
-                ) {
-
-                    alert(
-                        "⚔️ Solo dos compañeros pueden combatir contigo."
-                    );
-
+                if (!activation.ok) {
                     battleCheck.checked = false;
+                    campCheck.checked = ally.status === "camp";
+                    missionCheck.checked = ally.status === "mission";
+                    refreshStatusVisuals();
+
+                    if (activation.reason === "party_full") {
+                        const limit = this.party.getMaxActiveMembers();
+                        alert(`⚔️ Tu nivel permite ${limit} compañero${limit === 1 ? "" : "s"} en combate. Pasa a uno al campamento para hacer sitio.`);
+                    } else {
+                        alert("No se pudo asignar a este compañero al combate.");
+                    }
 
                     return;
-
                 }
 
                 ally.status = "battle";
 
-                this.party.activate(
-                    ally.id
-                );
-
                 campCheck.checked = false;
-
                 missionCheck.checked = false;
 
                 refreshStatusVisuals();
@@ -634,6 +631,8 @@ ${recruitText}
             this.ui.logEvent(`❌ No se pudo reclutar al aliado: ${result.reason}.`);
             return result;
         }
+
+        result.ally.status = result.ally.status ?? "camp";
 
         this.ui.logEvent(`🤝 ${result.ally.name} acepta acompañarte.`);
 

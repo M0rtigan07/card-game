@@ -93,8 +93,8 @@ export class PartyView {
                 >
                     ${
                         active
-                            ? '⚔️ Prepaardo para Combatir'
-                            : '🏕️ Disponible'
+                            ? '⚔️ En combate'
+                            : '🏕️ Reserva'
                     }
                 </span>
 

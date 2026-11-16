@@ -6,8 +6,23 @@ export class TcgCombatView {
     }
 
     render(enemyData, player) {
+        const activeAllies = this.game.party.active;
+        const activeAllyCards = activeAllies.length
+            ? activeAllies.map(ally => `
+                <div class="combat-ally">
+                    <img src="${ally.card}" alt="">
+                    <span>${ally.name}</span>
+                </div>
+            `).join('')
+            : '<span class="combat-party-empty">Sin compañeros activos: combates en solitario.</span>';
+
         this.container.innerHTML = `
             <h1 id="dungeonTitle">Combate TCG</h1>
+
+            <section class="combat-allies" aria-label="Aliados en combate">
+                <h2>⚔️ Aliados en combate</h2>
+                <div class="combat-allies-list">${activeAllyCards}</div>
+            </section>
 
             <!-- VISOR DE COMBATE (HÉROE VS ENEMIGO) - TAMAÑO AMPLIADO -->
             <div class="elvira-scene-frame" style="height: 220px;">

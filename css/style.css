@@ -1832,6 +1832,10 @@ h1 {
     box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
 }
 
+.party-member.in-battle {
+    border-color: #68ff68;
+}
+
 .party-card {
     width: 46px;
     height: 64px;
@@ -1849,6 +1853,69 @@ h1 {
 
 .party-info small {
     color: #d8b4fe;
+}
+
+.party-info .party-status-indicator {
+    font-weight: 700;
+}
+
+.party-info .party-status-indicator.in-battle {
+    color: #68ff68;
+}
+
+.party-info .party-status-indicator.in-reserve {
+    color: #c9b773;
+}
+
+.combat-allies {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--gold-border);
+    border-radius: 8px;
+    background: rgba(30, 10, 50, 0.55);
+}
+
+.combat-allies h2 {
+    color: var(--gold);
+    font-size: 0.8em;
+}
+
+.combat-allies-list {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+
+.combat-ally {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 4px 8px;
+    color: #68ff68;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(104, 255, 104, 0.5);
+    border-radius: 6px;
+    font-size: 0.78em;
+}
+
+.combat-ally img {
+    width: 28px;
+    height: 40px;
+    flex: 0 0 auto;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
+.combat-party-empty {
+    color: var(--gold-light);
+    font-size: 0.78em;
 }
 
 .party-dismiss {
