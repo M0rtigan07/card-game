@@ -245,7 +245,7 @@ ${recruitText}
                         ${ally.role ?? "Aventurero"}
                     </h2>
 
-                    <div class="party-detail-section">
+                    <div class="party-detail-section bio">
 
                         <h3>
                             ⚔️ Habilidad
