@@ -106,16 +106,12 @@ export class UIManager {
     renderParty(members) {
 
         const sidebar =
-            document.getElementById(
-                'leftSidebar'
-            );
+            document.getElementById('leftSidebar');
 
         if (!sidebar) return;
 
         let host =
-            document.getElementById(
-                'allyParty'
-            );
+            document.getElementById('allyParty');
 
         if (!host) {
 
@@ -139,7 +135,7 @@ export class UIManager {
 
         host.appendChild(title);
 
-        // BOTÓN SIEMPRE VISIBLE
+        // BOTÓN COMPAÑÍA
 
         const manageBtn =
             document.createElement('button');
@@ -147,7 +143,7 @@ export class UIManager {
         manageBtn.className =
             'party-manage-btn';
 
-        manageBtn.textContent =
+        manageBtn.innerHTML =
             '👥 Compañía';
 
         manageBtn.addEventListener(
@@ -161,7 +157,7 @@ export class UIManager {
 
         host.appendChild(manageBtn);
 
-        // SI NO HAY ACTIVOS
+        // MENSAJE MÁS INMERSIVO
 
         if (members.length === 0) {
 
@@ -172,7 +168,7 @@ export class UIManager {
                 'party-empty';
 
             info.textContent =
-                'No hay compañeros activos.';
+                'Todavía nadie comparte tu viaje por Kaldur-Ath.';
 
             host.appendChild(info);
 
@@ -180,7 +176,7 @@ export class UIManager {
 
         }
 
-        // ALIADOS ACTIVOS
+        // PERSONAJES ACTIVOS
 
         members.forEach(ally => {
 
@@ -214,7 +210,8 @@ export class UIManager {
 
             };
 
-            image.src = ally.card;
+            image.src =
+                ally.card;
 
             const info =
                 document.createElement('div');
@@ -232,39 +229,16 @@ export class UIManager {
                 document.createElement('small');
 
             ability.textContent =
-                `${ally.ability.name}: ${ally.ability.text}`;
+                ally.ability.name;
 
             info.append(
                 name,
                 ability
             );
 
-            const dismiss =
-                document.createElement(
-                    'button'
-                );
-
-            dismiss.className =
-                'party-dismiss';
-
-            dismiss.title =
-                'Retirar';
-
-            dismiss.textContent =
-                '✕';
-
-            dismiss.addEventListener(
-                'click',
-                () =>
-                    this.onDismissAlly?.(
-                        ally.id
-                    )
-            );
-
             card.append(
                 image,
-                info,
-                dismiss
+                info
             );
 
             host.appendChild(card);

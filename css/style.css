@@ -2194,78 +2194,98 @@ h1 {
     }
 }
 
-.party-screen {
-
-    padding: 20px;
-
-}
-
-.party-header {
-
-    text-align: center;
-
-    margin-bottom: 20px;
-
-}
-
-.party-logo {
-
-    max-width: 220px;
-
-    margin-bottom: 10px;
-
-}
-
-.party-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(auto-fit, minmax(180px, 1fr));
-
-    gap: 15px;
-
-}
-
-.party-character-card {
-
-    cursor: pointer;
-
-    border: 2px solid #c9a227;
-
-    padding: 10px;
-
-    text-align: center;
-
-    background: rgba(15, 5, 35, 0.95);
-
-    transition: 0.2s;
-}
-
-.party-character-card:hover {
-
-    transform: scale(1.03);
-
-}
-
-.party-character-card img {
+.party-manage-btn {
 
     width: 100%;
 
-    height: 220px;
+    background: #23003d;
 
-    object-fit: cover;
+    color: #d7b500;
+
+    border: 2px solid #d7b500;
+
+    font-family: 'Cinzel', serif;
+
+    padding: 6px;
+
+    cursor: pointer;
+
+    margin-top: 4px;
 
 }
 
-.party-active {
+.party-manage-btn:hover {
 
-    color: #50ff50;
+    background: #3a0066;
 
 }
 
-.party-reserve {
+.party-manage-btn {
 
-    color: #bcbcbc;
+    width: 100%;
+
+    margin-top: 6px;
+
+    margin-bottom: 8px;
+
+    padding: 8px;
+
+    background: #2a003f;
+
+    color: #d4af37;
+
+    border: 1px solid #d4af37;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: .2s;
+
+}
+
+.party-manage-btn:hover {
+
+    background: #45006a;
+
+}
+
+.party-empty {
+
+    display: block;
+
+    color: #c9b773;
+
+    font-style: italic;
+
+    line-height: 1.4;
+
+    margin-top: 6px;
+
+}
+
+.party-return-btn {
+
+    margin-top: 15px;
+
+    padding: 10px 18px;
+
+    background: #2a003f;
+
+    color: #d4af37;
+
+    border: 2px solid #d4af37;
+
+    font-family: inherit;
+
+    cursor: pointer;
+
+}
+
+.party-return-btn:hover {
+
+    background: #45006a;
 
 }
