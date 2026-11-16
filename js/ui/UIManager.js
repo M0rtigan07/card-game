@@ -104,21 +104,42 @@ export class UIManager {
 
     /** Panel "Grupo": la carta de cada aliado, lo que hace por ti y un botón para despedirle. */
     renderParty(members) {
-        const sidebar = document.getElementById('leftSidebar');
+
+        const sidebar =
+            document.getElementById(
+                'leftSidebar'
+            );
+
         if (!sidebar) return;
 
-        let host = document.getElementById('allyParty');
-        if (!host) {
-            host = document.createElement('div');
-            host.id = 'allyParty';
-            sidebar.appendChild(host);
-        }
-        host.replaceChildren();
-        if (members.length === 0) return;
+        let host =
+            document.getElementById(
+                'allyParty'
+            );
 
-        const title = document.createElement('h2');
-        title.textContent = 'Grupo';
+        if (!host) {
+
+            host =
+                document.createElement('div');
+
+            host.id = 'allyParty';
+
+            sidebar.appendChild(host);
+
+        }
+
+        host.replaceChildren();
+
+        // TÍTULO
+
+        const title =
+            document.createElement('h2');
+
+        title.textContent = 'Compañía';
+
         host.appendChild(title);
+
+        // BOTÓN SIEMPRE VISIBLE
 
         const manageBtn =
             document.createElement('button');
@@ -127,7 +148,7 @@ export class UIManager {
             'party-manage-btn';
 
         manageBtn.textContent =
-            '👥 Gestionar grupo';
+            '👥 Compañía';
 
         manageBtn.addEventListener(
             'click',
@@ -140,34 +161,116 @@ export class UIManager {
 
         host.appendChild(manageBtn);
 
-        members.forEach(ally => {
-            const card = document.createElement('div');
-            card.id = `ally-card-${ally.id}`;
-            card.className = `party-member${this.acting.has(ally.id) ? ' acting' : ''}`;
+        // SI NO HAY ACTIVOS
 
-            const image = document.createElement('img');
-            image.className = 'party-card';
-            image.alt = ally.name;
-            image.onerror = () => { image.onerror = null; image.src = 'img/guerrero.png'; };
+        if (members.length === 0) {
+
+            const info =
+                document.createElement('small');
+
+            info.className =
+                'party-empty';
+
+            info.textContent =
+                'No hay compañeros activos.';
+
+            host.appendChild(info);
+
+            return;
+
+        }
+
+        // ALIADOS ACTIVOS
+
+        members.forEach(ally => {
+
+            const card =
+                document.createElement('div');
+
+            card.id =
+                `ally-card-${ally.id}`;
+
+            card.className =
+                `party-member${this.acting.has(ally.id)
+                    ? ' acting'
+                    : ''
+                }`;
+
+            const image =
+                document.createElement('img');
+
+            image.className =
+                'party-card';
+
+            image.alt =
+                ally.name;
+
+            image.onerror = () => {
+
+                image.onerror = null;
+
+                image.src =
+                    'img/guerrero.png';
+
+            };
+
             image.src = ally.card;
 
-            const info = document.createElement('div');
-            info.className = 'party-info';
-            const name = document.createElement('b');
-            name.textContent = ally.name;
-            const ability = document.createElement('small');
-            ability.textContent = `${ally.ability.name}: ${ally.ability.text}`;
-            info.append(name, ability);
+            const info =
+                document.createElement('div');
 
-            const dismiss = document.createElement('button');
-            dismiss.className = 'party-dismiss';
-            dismiss.title = 'Despedir';
-            dismiss.textContent = '✕';
-            dismiss.addEventListener('click', () => this.onDismissAlly?.(ally.id));
+            info.className =
+                'party-info';
 
-            card.append(image, info, dismiss);
+            const name =
+                document.createElement('b');
+
+            name.textContent =
+                ally.name;
+
+            const ability =
+                document.createElement('small');
+
+            ability.textContent =
+                `${ally.ability.name}: ${ally.ability.text}`;
+
+            info.append(
+                name,
+                ability
+            );
+
+            const dismiss =
+                document.createElement(
+                    'button'
+                );
+
+            dismiss.className =
+                'party-dismiss';
+
+            dismiss.title =
+                'Retirar';
+
+            dismiss.textContent =
+                '✕';
+
+            dismiss.addEventListener(
+                'click',
+                () =>
+                    this.onDismissAlly?.(
+                        ally.id
+                    )
+            );
+
+            card.append(
+                image,
+                info,
+                dismiss
+            );
+
             host.appendChild(card);
+
         });
+
     }
 
     /** Resalta un momento la carta del aliado que acaba de actuar. */
