@@ -89,6 +89,8 @@ export class UIManager {
 
         const inventoryCount =
             player.inventory.reduce((total, item) => total + (item.qty || 1), 0);
+        this.updateMerchantGold(player.gold);
+
         const inventoryCountEl =
             document.getElementById('inventoryCount');
         if (inventoryCountEl) {
@@ -98,6 +100,21 @@ export class UIManager {
 
         this.renderParty(this.getParty?.() ?? []);
         this.refreshInventory?.(player);
+    }
+
+    setMerchantGold(visible, amount) {
+        const badge = document.getElementById('merchantGoldBadge');
+        if (!badge) return;
+
+        if (visible) this.updateMerchantGold(amount);
+        badge.hidden = !visible;
+    }
+
+    updateMerchantGold(amount) {
+        const display = document.getElementById('merchantGoldAmount');
+        if (display) {
+            display.textContent = new Intl.NumberFormat('es-ES').format(amount);
+        }
     }
 
     /** Panel "Grupo": la carta de cada aliado, lo que hace por ti y un botón para despedirle. */

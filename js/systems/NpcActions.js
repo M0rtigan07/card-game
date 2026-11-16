@@ -125,6 +125,7 @@ export class NpcActions {
             await this.speak(npc, 'no_gold', `El héroe quería comprarte ${item.name} (${item.price} de oro) pero no tiene suficiente dinero.`);
         } else if (addItem(this.player, itemId).ok) {
             this.player.gold -= item.price;
+            this.game.ui.updateMerchantGold(this.player.gold);
             this.log(`🛒 Compras ${item.name} (-${item.price} Oro): ${item.effect}.`);
             await this.speak(npc, 'bought', `El héroe te ha comprado ${item.name} por ${item.price} de oro.`);
         } else {

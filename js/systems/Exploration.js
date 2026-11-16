@@ -10,6 +10,15 @@ import { StoryResolver } from '../stories/StoryResolver.js';
 import { StoryView } from '../views/StoryView.js';
 import { setText, wait } from '../ui/helpers.js';
 
+function isVendorEncounter(type, choices = []) {
+    if (type === 'merchant' || type === 'blacksmith') return true;
+
+    return choices.some(({ action }) =>
+        typeof action === 'string' &&
+        (action.startsWith('buy:') || action.startsWith('buy_') || action.startsWith('forge_'))
+    );
+}
+
 export class Exploration {
     /** @param {import('../Game.js').Game} game */
     constructor(game) {
@@ -111,6 +120,10 @@ export class Exploration {
 
         this.setSceneImage(ENCOUNTER_IMAGES[eventData.npcType] || DEFAULT_ENCOUNTER_IMAGE);
         setText('sceneBadgeOverlay', `ENCUENTRO - PLANTA ${level}`);
+        this.game.ui.setMerchantGold(
+            isVendorEncounter(eventData.npcType, eventData.choices),
+            this.player.gold
+        );
 
         view.setNarrative(
             eventData.description,
@@ -301,6 +314,11 @@ export class Exploration {
         const interaction =
             this.getNpcInteraction(npc);
 
+        this.game.ui.setMerchantGold(
+            isVendorEncounter(npc.type, interaction.choices),
+            this.player.gold
+        );
+
         view.setNarrative(
             `${npc.name} te observa en silencio...`,
             []
@@ -335,7 +353,12 @@ export class Exploration {
         const view = this.render();
         this.setSceneImage(npc.images?.room);
         setText('sceneBadgeOverlay', npc.name.toUpperCase());
-        this.setNpcChoices(view, npc, this.getNpcInteraction(npc), text);
+        const interaction = this.getNpcInteraction(npc);
+        this.game.ui.setMerchantGold(
+            isVendorEncounter(npc.type, interaction.choices),
+            this.player.gold
+        );
+        this.setNpcChoices(view, npc, interaction, text);
     }
 
     setNpcChoices(view, npc, interaction, text) {

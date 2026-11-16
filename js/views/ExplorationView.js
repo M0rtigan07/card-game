@@ -18,6 +18,11 @@ export class ExplorationView {
             <div id="rpgSceneView" class="elvira-scene-frame">
                 <img id="centralSceneImage" src="${this.game.player?.img || 'img/guerrero.png'}" alt="Escena de la Mazmorra">
                 <div class="elvira-scene-badge" id="sceneBadgeOverlay">SALA DE EXPLORACIÓN</div>
+                <div id="merchantGoldBadge" class="merchant-gold-badge" aria-live="polite" aria-atomic="true" hidden>
+                    <span class="merchant-gold-icon" aria-hidden="true">💰</span>
+                    <strong id="merchantGoldAmount" class="merchant-gold-value">0</strong>
+                    <span>Oro</span>
+                </div>
             </div>
 
             <!-- 3. OPCIONES DE EXPLORACIÓN / ACCIONES DEL JUGADOR -->
