@@ -727,6 +727,7 @@ export class TcgCombat {
     }
 
     refresh() {
+        this.view.renderHeroStats(this.player, this.heroShield);
         this.view.renderEnemyStats(this.enemy, effectiveAtk(this.enemy));
         this.view.renderEnergy(this.energy, this.maxEnergy(), this.deck.counts);
         this.view.renderStatus(this.statusParts());

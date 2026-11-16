@@ -245,9 +245,31 @@ export class CombatUI {
     renderEnemyStats(enemy, attack) {
         const bonus = enemy.atkBonus ? ` (+${enemy.atkBonus})` : '';
         setText('enemyName', enemy.name);
-        setText('enemyHp', `❤️ HP: ${Math.max(0, enemy.hp)}/${enemy.maxHp}`);
+        setText('enemyHp', `${Math.max(0, enemy.hp)}/${enemy.maxHp}`);
         setText('enemyAtk', `⚔️ ATK: ${attack}${bonus}`);
         setText('enemyShield', `🛡️ DEF: ${enemy.shield}`);
+        this.renderHealthMeter('enemyCombatHealthMeter', 'enemyCombatHealthFill', enemy.hp, enemy.maxHp);
+    }
+
+    renderHeroStats(player, shield) {
+        setText('heroCombatHp', `${Math.max(0, player.health)}/${player.maxHealth}`);
+        setText('heroCombatShield', `🛡️ Guardia: ${shield}`);
+        this.renderHealthMeter('heroCombatHealthMeter', 'heroCombatHealthFill', player.health, player.maxHealth);
+    }
+
+    renderHealthMeter(meterId, fillId, current, max) {
+        const meter = document.getElementById(meterId);
+        const fill = document.getElementById(fillId);
+        if (!meter || !fill) return;
+
+        const maximum = Math.max(1, max);
+        const value = Math.max(0, Math.min(current, maximum));
+        const percent = (value / maximum) * 100;
+        meter.setAttribute('aria-valuemax', String(maximum));
+        meter.setAttribute('aria-valuenow', String(value));
+        fill.style.width = `${percent}%`;
+        fill.classList.toggle('is-low', percent <= 50);
+        fill.classList.toggle('is-critical', percent <= 25);
     }
 
     renderAllyStatuses(allies) {
