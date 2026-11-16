@@ -11,33 +11,41 @@ export class PartyView {
 
     render() {
 
-        const party = this.game.party;
+        const allies =
+            this.game.party.recruited;
 
         this.container.innerHTML = `
 
-            <div class="party-view">
+            <div class="party-screen">
 
-                <h2>👥 Grupo</h2>
+                <div class="party-header">
 
-                <div class="party-section">
+                    <img
+                        src="img/logo-kaldur-ath.png"
+                        alt="Kaldur-Ath"
+                        class="party-logo"
+                    >
 
-                    <h3>
-                        Activos
-                        (${party.active.length})
-                    </h3>
-
-                    <div id="activeMembers"></div>
+                    <h1>
+                        COMPAÑÍA DE AVENTURA
+                    </h1>
 
                 </div>
 
-                <div class="party-section">
+                <div
+                    class="party-grid"
+                    id="partyGrid"
+                >
+                </div>
 
-                    <h3>
-                        Reclutados
-                        (${party.recruited.length})
-                    </h3>
+                <div class="party-footer">
 
-                    <div id="recruitedMembers"></div>
+                    <button
+                        id="closePartyBtn"
+                        class="party-close-btn"
+                    >
+                        Volver
+                    </button>
 
                 </div>
 
@@ -45,138 +53,77 @@ export class PartyView {
 
         `;
 
-        this.renderActive();
-        this.renderRecruited();
-
-    }
-
-    renderActive() {
-
-        const container =
+        const grid =
             document.getElementById(
-                'activeMembers'
+                'partyGrid'
             );
 
-        container.innerHTML = '';
+        allies.forEach(ally => {
 
-        this.game.party.active.forEach(
-            ally => {
+            const card =
+                document.createElement('div');
 
-                const card =
-                    document.createElement('div');
+            const active =
+                this.game.party.hasActive(
+                    ally.id
+                );
 
-                card.className =
-                    'party-card';
+            card.className =
+                'party-character-card';
 
-                card.innerHTML = `
+            card.innerHTML = `
 
-                    <strong>
-                        ${ally.name}
-                    </strong>
+                <img
+                    src="${ally.card}"
+                    alt="${ally.name}"
+                >
 
-                    <button>
-                        ➖ Quitar
-                    </button>
+                <h3>${ally.name}</h3>
 
-                `;
+                <p>${ally.role ?? ''}</p>
 
-                card
-                    .querySelector('button')
-                    .addEventListener(
-                        'click',
-                        () => {
+                <span
+                    class="
+                    ${
+                        active
+                            ? 'party-active'
+                            : 'party-reserve'
+                    }
+                    "
+                >
+                    ${
+                        active
+                            ? '⚔️ Activo'
+                            : '🏕️ Reserva'
+                    }
+                </span>
 
-                            this.game.party.deactivate(
-                                ally.id
-                            );
+            `;
 
-                            this.render();
+            card.addEventListener(
+                'click',
+                () => {
 
-                        }
-                    );
-
-                container.appendChild(card);
-
-            }
-        );
-
-    }
-
-    renderRecruited() {
-
-        const container =
-            document.getElementById(
-                'recruitedMembers'
-            );
-
-        container.innerHTML = '';
-
-        const activeIds =
-            this.game.party.active.map(
-                a => a.id
-            );
-
-        this.game.party.recruited
-
-            .filter(
-                ally =>
-                    !activeIds.includes(
+                    this.game.showPartyCharacter(
                         ally.id
-                    )
-            )
-
-            .forEach(
-                ally => {
-
-                    const card =
-                        document.createElement(
-                            'div'
-                        );
-
-                    card.className =
-                        'party-card';
-
-                    card.innerHTML = `
-
-                        <strong>
-                            ${ally.name}
-                        </strong>
-
-                        <button>
-                            ➕ Activar
-                        </button>
-
-                    `;
-
-                    card
-                        .querySelector(
-                            'button'
-                        )
-                        .addEventListener(
-                            'click',
-                            () => {
-
-                                const result =
-                                    this.game.party.activate(
-                                        ally.id
-                                    );
-
-                                if (!result.ok) {
-
-                                    alert(
-                                        result.reason
-                                    );
-
-                                }
-
-                                this.render();
-
-                            }
-                        );
-
-                    container.appendChild(
-                        card
                     );
+
+                }
+            );
+
+            grid.appendChild(card);
+
+        });
+
+        document
+            .getElementById(
+                'closePartyBtn'
+            )
+            .addEventListener(
+                'click',
+                () => {
+
+                    this.game.loadNextEvent();
 
                 }
             );

@@ -97,11 +97,7 @@ export class NpcChat {
         if (check.ok) return { title: '🗣️ Convencerle de que te acompañe', args: this.game.persuasion.argumentsFor(npc.id) };
         if (check.reason === 'rapport') return { title: `🗣️ Habla un poco más con ${npc.name} antes de pedirle nada.`, args: [] };
         if (check.reason === 'locked') return { title: `🗣️ ${npc.name} ya no quiere escucharte.`, args: [] };
-        if (check.reason === 'full') {
-            const party = this.game.party;
-            return { title: `🗣️ Tu grupo activo está completo (${party.active.length}/${party.getMaxActiveMembers()}). Libera un espacio desde «Grupo».`, args: [] };
-        }
-        return null;
+      
     }
 
     /** Pruebas un argumento. Si es el que le termina de convencer, se une a tu grupo. */

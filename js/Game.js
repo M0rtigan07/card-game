@@ -14,6 +14,7 @@ import { Exploration } from './systems/Exploration.js';
 import { NpcDialogue } from './systems/NpcDialogue.js';
 import { NpcChat } from './systems/NpcChat.js';
 import { Party } from './systems/Party.js';
+import { PartyView } from './views/PartyView.js';
 import { Persuasion } from './systems/Persuasion.js';
 import { StoryManager } from './stories/StoryManager.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
@@ -196,6 +197,20 @@ ${recruitText}
         return this.exploration.loadNext();
     }
 
+    showPartyView() {
+
+    const view =
+        new PartyView(
+            document.getElementById(
+                'mainContent'
+            ),
+            this
+        );
+
+    view.render();
+
+}
+
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
     advanceFloor(delay = 1800) {
         this.dungeonLevel++;
@@ -206,15 +221,9 @@ ${recruitText}
     recruitAlly(npcId) {
 
         const result = this.party.recruit(npcId);
-
-        if (result.ok && !this.party.isActivePartyFull()) {
-
-            this.party.activate(npcId);
-
-        }
+        this.ui.logEvent(`🤝 ${result.ally.name} acepta acompañarte.`);
 
 
-        this.ui.logEvent(`🤝 ¡${result.ally.name} se une a tu grupo!`);
         if (this.player.addXp(PARTY.RECRUIT_XP)) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
         this.ui.updateStats(this.player, this.dungeonLevel);
         return result;

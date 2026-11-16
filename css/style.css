@@ -2193,3 +2193,79 @@ h1 {
         font-size: 0.85em;
     }
 }
+
+.party-screen {
+
+    padding: 20px;
+
+}
+
+.party-header {
+
+    text-align: center;
+
+    margin-bottom: 20px;
+
+}
+
+.party-logo {
+
+    max-width: 220px;
+
+    margin-bottom: 10px;
+
+}
+
+.party-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 15px;
+
+}
+
+.party-character-card {
+
+    cursor: pointer;
+
+    border: 2px solid #c9a227;
+
+    padding: 10px;
+
+    text-align: center;
+
+    background: rgba(15, 5, 35, 0.95);
+
+    transition: 0.2s;
+}
+
+.party-character-card:hover {
+
+    transform: scale(1.03);
+
+}
+
+.party-character-card img {
+
+    width: 100%;
+
+    height: 220px;
+
+    object-fit: cover;
+
+}
+
+.party-active {
+
+    color: #50ff50;
+
+}
+
+.party-reserve {
+
+    color: #bcbcbc;
+
+}
