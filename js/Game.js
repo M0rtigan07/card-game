@@ -193,8 +193,6 @@ ${recruitText}
 
     showPartyCharacter(id) {
 
-        this.showCompanyMode();
-
         const ally =
             this.party.recruited.find(
                 a => a.id === id
@@ -574,11 +572,7 @@ ${recruitText}
             )
             ?.addEventListener(
                 "click",
-                () =>
-                    this.showPartyView(),
-               
-
-                this.loadNextEvent()
+                () => this.showPartyView()
             );
 
     }
