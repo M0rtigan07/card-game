@@ -15,6 +15,7 @@ import { NpcDialogue } from './systems/NpcDialogue.js';
 import { NpcChat } from './systems/NpcChat.js';
 import { Party } from './systems/Party.js';
 import { PartyView } from './views/PartyView.js';
+import { InventoryView } from './views/InventoryView.js';
 import { Persuasion } from './systems/Persuasion.js';
 import { StoryManager } from './stories/StoryManager.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
@@ -38,17 +39,19 @@ export class Game {
 
         this.party = new Party(this);
 
-        this.ui.getParty = () => this.party.recruited;
+        this.ui.getParty = () => this.party.active;
         this.ui.isAllyActive = (id) => this.party.hasActive(id);
 
         this.ui.onOpenParty = () => this.showPartyView();
+        this.inventoryView = new InventoryView((id) => this.useItem(id));
+        this.ui.onOpenInventory = () => this.inventoryView.open(this.player);
+        this.ui.refreshInventory = () => this.inventoryView.refresh(this.player);
 
         // aliados que te acompañan
         this.persuasion = new Persuasion();      // lo que llevas conseguido convenciendo a cada personaje
         this.ui.onDismissAlly = (id) => this.dismissAlly(id); // botón ✕ del panel "Grupo"
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
-        this.ui.onUseItem = (id) => this.useItem(id); // botón "Usar" del inventario
 
         this.initEvents();
     }
@@ -89,6 +92,10 @@ export class Game {
             this.audio.play('sega');
             this.ui.showScreen('gameScreen');
             this.startMainGame();
+        });
+
+        document.getElementById('openInventoryBtn')?.addEventListener('click', () => {
+            this.ui.onOpenInventory?.();
         });
     }
 

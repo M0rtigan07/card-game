@@ -455,16 +455,8 @@ body::after {
 
 /* BARRA DE SCROLL ESTILIZADA RETRO */
 #leftSidebar::-webkit-scrollbar,
-#rightSidebar::-webkit-scrollbar,
-#playerInventory::-webkit-scrollbar {
+#rightSidebar::-webkit-scrollbar {
     width: 6px;
-}
-
-#leftSidebar::-webkit-scrollbar-thumb,
-#rightSidebar::-webkit-scrollbar-thumb,
-#playerInventory::-webkit-scrollbar-thumb {
-    background: var(--gold-border);
-    border-radius: 4px;
 }
 
 #leftSidebar h2,
@@ -1452,46 +1444,332 @@ h1 {
     border-color: #dc2626;
 }
 
-/* ═══════════ INVENTARIO: OBJETOS CON EFECTO ═══════════ */
-
-.inv-item {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 3px 8px;
-    margin-bottom: 5px;
-    padding: 5px 8px;
-    font-size: 0.8em;
-    list-style: none;
-    background: rgba(30, 10, 50, 0.4);
-    border-left: 4px solid #a855f7;
-    border-radius: 6px;
-}
-
-.inv-consumable {
-    border-left-color: #4ade80;
-}
-
-.inv-effect {
-    flex-basis: 100%;
-    color: #d8b4fe;
-}
+/* ═══════════ INVENTARIO: PANTALLA RETRO ═══════════ */
 
 .inv-use-btn {
     margin-left: auto;
-    padding: 2px 12px;
+    padding: 7px 12px;
     font-family: inherit;
     font-size: 0.9em;
     color: #0f0a1f;
     background: var(--gold);
-    border: none;
-    border-radius: 4px;
+    border: 2px solid #fff0a8;
+    border-radius: 2px;
     cursor: pointer;
+    box-shadow: 2px 2px 0 #7a1b22;
 }
 
 .inv-use-btn:hover {
     filter: brightness(1.15);
+}
+
+.sidebar-inventory {
+    display: grid;
+    gap: 6px;
+}
+
+.inventory-open-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-height: 38px;
+    padding: 7px 9px;
+    color: var(--gold-light);
+    background: linear-gradient(180deg, #391632, #1a0d27);
+    border: 2px solid var(--gold-border);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .45), 2px 2px 0 #050308;
+    font: inherit;
+    font-size: .75em;
+    text-align: left;
+    cursor: pointer;
+}
+
+.inventory-open-btn:hover {
+    color: #fff3a3;
+    border-color: var(--gold);
+    background: linear-gradient(180deg, #552043, #24102f);
+}
+
+.inventory-open-btn small {
+    flex: 0 0 auto;
+    color: #c9b773;
+}
+
+.inventory-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(10px, 3vw, 32px);
+    overflow-y: auto;
+    background:
+        radial-gradient(ellipse at center, rgba(91, 24, 49, .45), rgba(4, 3, 10, .94) 75%),
+        rgba(4, 3, 10, .88);
+}
+
+.inventory-overlay[hidden] {
+    display: none;
+}
+
+.inventory-panel {
+    width: min(100%, 900px);
+    height: min(760px, 88dvh);
+    max-height: min(88dvh, 760px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 2vw, 18px);
+    padding: clamp(14px, 3vw, 28px);
+    overflow: hidden;
+    color: #f3e8d0;
+    background:
+        linear-gradient(135deg, rgba(49, 17, 44, .98), rgba(13, 9, 22, .99) 58%, rgba(32, 13, 26, .98));
+    border: 4px solid #8e6e3c;
+    outline: 2px solid #160c1b;
+    box-shadow:
+        inset 0 0 0 3px #24132b,
+        inset 0 0 34px rgba(176, 31, 54, .16),
+        0 0 0 2px #d0ae62,
+        0 18px 70px rgba(0, 0, 0, .85);
+}
+
+.inventory-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(208, 174, 98, .5);
+}
+
+.inventory-kicker,
+.inventory-footer,
+.inventory-kind {
+    font-family: 'Press Start 2P', cursive;
+    letter-spacing: .04em;
+}
+
+.inventory-kicker {
+    margin-bottom: 8px;
+    color: #c94b57;
+    font-size: clamp(.48rem, 1.2vw, .62rem);
+}
+
+.inventory-header h2 {
+    color: #f4d781;
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(.9rem, 2.4vw, 1.25rem);
+    text-shadow: 3px 3px #401326;
+}
+
+.inventory-close {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    color: #f5d686;
+    background: #351327;
+    border: 2px solid #a9874f;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.inventory-status {
+    padding: 10px 12px;
+    color: #f3d880;
+    background: #0d0a14;
+    border: 2px solid #645132;
+    box-shadow: inset 0 0 0 2px #17101d;
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(.48rem, 1.25vw, .68rem);
+    line-height: 1.8;
+    text-align: center;
+}
+
+.inventory-layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(120px, 170px) minmax(0, 1fr);
+    gap: 14px;
+    overflow: hidden;
+}
+
+.inventory-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inventory-tabs button {
+    min-height: 42px;
+    padding: 8px;
+    color: #d6c5a6;
+    background: #160f20;
+    border: 2px solid #57422e;
+    font: inherit;
+    font-size: .8rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.inventory-tabs button[aria-pressed="true"] {
+    color: #ffe98d;
+    background: #431728;
+    border-color: #c3a04f;
+    box-shadow: inset 3px 0 #e34c53;
+}
+
+.inventory-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.inventory-summary {
+    margin-bottom: 8px;
+    color: #c3a875;
+    font-size: .82rem;
+}
+
+.inventory-items {
+    flex: 1;
+    min-height: 100px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    align-content: start;
+    gap: 10px;
+    padding: 2px 6px 6px 2px;
+    overflow-y: auto;
+}
+
+.inventory-items::-webkit-scrollbar {
+    width: 7px;
+}
+
+.inventory-items::-webkit-scrollbar-thumb {
+    background: #8e6e3c;
+}
+
+.inventory-item-card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(145deg, rgba(26, 19, 32, .98), rgba(14, 11, 18, .98));
+    border: 2px solid #57422e;
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .45);
+}
+
+.inventory-item-card.is-consumable {
+    border-left: 4px solid #669258;
+}
+
+.inventory-item-card.is-relic {
+    border-left: 4px solid #b99548;
+}
+
+.inventory-item-header {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.inventory-item-header h3 {
+    min-width: 0;
+    color: #f1dfb5;
+    font-size: .95rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.inventory-quantity {
+    flex: 0 0 auto;
+    color: #f5d46e;
+    font-weight: 700;
+}
+
+.inventory-kind {
+    color: #d08b75;
+    font-size: .48rem;
+    line-height: 1.6;
+}
+
+.inventory-effect {
+    color: #c9bda8;
+    font-size: .82rem;
+    line-height: 1.45;
+}
+
+.inventory-empty {
+    grid-column: 1 / -1;
+    padding: 22px 12px;
+    color: #c9bda8;
+    border: 1px dashed #705a39;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.inventory-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 10px;
+    color: #ad9361;
+    border-top: 1px solid rgba(208, 174, 98, .35);
+    font-size: clamp(.42rem, 1vw, .55rem);
+    line-height: 1.6;
+}
+
+@media screen and (max-width: 600px) {
+    .inventory-overlay {
+        align-items: flex-start;
+        padding: 8px;
+    }
+
+    .inventory-panel {
+        width: 100%;
+        height: calc(100dvh - 16px);
+        max-height: none;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .inventory-layout {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .inventory-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .inventory-tabs button {
+        flex: 1 0 auto;
+        min-height: 38px;
+        text-align: center;
+    }
+
+    .inventory-items {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .inventory-footer {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
 }
 
 /* ═══════════ JEFES ═══════════ */

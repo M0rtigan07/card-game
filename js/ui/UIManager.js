@@ -1,11 +1,12 @@
 export class UIManager {
     constructor() {
         this.typewriterTimer = null;
-        this.onUseItem = null; // lo asigna Game: se llama con el id del objeto al pulsar "Usar"
-        this.getParty = null;  // lo asigna Game: devuelve los aliados del grupo
+        this.getParty = null;  // lo asigna Game: devuelve los aliados activos
         this.isAllyActive = null;
         this.onDismissAlly = null; // lo asigna Game: se llama con el id del aliado al pulsar ✕
         this.onOpenParty = null;
+        this.onOpenInventory = null;
+        this.refreshInventory = null;
         this.acting = new Set(); // aliados que están actuando ahora mismo (se resaltan)
     }
 
@@ -73,34 +74,17 @@ export class UIManager {
         document.getElementById('xpBar').style.width = `${xpPercent}%`;
         document.getElementById('xpText').textContent = `${player.xp} / ${player.maxXp} XP`;
 
-        const invList = document.getElementById('playerInventory');
-        if (invList) {
-            invList.innerHTML = '';
-            player.inventory.forEach(item => {
-                const li = document.createElement('li');
-                li.className = `inv-item inv-${item.kind || 'relic'}`;
-
-                const name = document.createElement('span');
-                name.textContent = item.qty > 1 ? `${item.name} x${item.qty}` : item.name;
-
-                const effect = document.createElement('small');
-                effect.className = 'inv-effect';
-                effect.textContent = item.effect;
-
-                li.append(name, effect);
-
-                if (item.kind === 'consumable' && this.onUseItem) {
-                    const useButton = document.createElement('button');
-                    useButton.className = 'inv-use-btn';
-                    useButton.textContent = 'Usar';
-                    useButton.addEventListener('click', () => this.onUseItem(item.id));
-                    li.appendChild(useButton);
-                }
-                invList.appendChild(li);
-            });
+        const inventoryCount =
+            player.inventory.reduce((total, item) => total + (item.qty || 1), 0);
+        const inventoryCountEl =
+            document.getElementById('inventoryCount');
+        if (inventoryCountEl) {
+            inventoryCountEl.textContent =
+                `${inventoryCount} ${inventoryCount === 1 ? 'objeto' : 'objetos'}`;
         }
 
         this.renderParty(this.getParty?.() ?? []);
+        this.refreshInventory?.(player);
     }
 
     /** Panel "Grupo": la carta de cada aliado, lo que hace por ti y un botón para despedirle. */
@@ -158,7 +142,7 @@ export class UIManager {
 
         host.appendChild(manageBtn);
 
-        // MENSAJE MÁS INMERSIVO
+        // Solo se muestran aliados activos; el resto se consulta en Compañía.
 
         if (members.length === 0) {
 
@@ -169,7 +153,7 @@ export class UIManager {
                 'party-empty';
 
             info.textContent =
-                'Todavía nadie comparte tu viaje por Kaldur-Ath.';
+                'Sin aliados en combate.';
 
             host.appendChild(info);
 
