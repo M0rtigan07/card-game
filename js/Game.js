@@ -193,71 +193,391 @@ ${recruitText}
 
     showPartyCharacter(id) {
 
-        const ally =
-            this.party.recruited.find(
-                a => a.id === id
-            );
+    const ally =
+        this.party.recruited.find(
+            a => a.id === id
+        );
 
-        if (!ally) {
-            return;
-        }
+    if (!ally) {
+        return;
+    }
 
-        document.getElementById(
-            'mainContent'
-        ).innerHTML = `
+    ally.status =
+        ally.status ?? "camp";
+
+    const inBattle =
+        ally.status === "battle";
+
+    const inCamp =
+        ally.status === "camp";
+
+    const onMission =
+        ally.status === "mission";
+
+    document.getElementById(
+        "mainContent"
+    ).innerHTML = `
 
         <div class="party-detail">
 
-            <h1>
-                ${ally.name}
-            </h1>
+            <div class="party-detail-header">
 
-            <img
-                src="${ally.card}"
-                class="party-detail-image"
-            >
+                <h1>
+                    ${ally.name}
+                </h1>
 
-            <h3>
-                ${ally.role ?? ''}
-            </h3>
+            </div>
 
-            <p>
+            <div class="party-detail-layout">
 
-                ${ally.ability.name}
+                <div class="party-detail-image">
 
-            </p>
+                    <img
+                        src="${ally.card}"
+                        alt="${ally.name}"
+                    >
 
-            <p>
+                </div>
 
-                ${this.party.hasActive(
-            ally.id
-        )
-                ? '⚔️ Viaja contigo.'
-                : '🏕️ Se encuentra en el campamento.'
-            }
+                <div class="party-detail-info">
 
-            </p>
+                    <h2>
+                        ${ally.role ?? "Aventurero"}
+                    </h2>
 
-            <button
-                id="partyBackBtn"
-            >
-                ⚔️ Regresar a la compañía
-            </button>
+                    <div class="party-detail-section">
+
+                        <h3>
+                            ⚔️ Habilidad
+                        </h3>
+
+                        <p>
+                            ${ally.ability.name}
+                        </p>
+
+                        <small>
+                            ${ally.ability.text}
+                        </small>
+
+                    </div>
+
+                    <div class="party-detail-section">
+
+                        <h3>
+                            📍 Destino actual
+                        </h3>
+
+                        <div class="party-status-selector">
+
+                            <label class="party-status-option">
+
+                                <input
+                                    type="checkbox"
+                                    id="battleCheck"
+                                    ${inBattle ? "checked" : ""}
+                                >
+
+                                <span class="party-status-icon">
+                                    ✓
+                                </span>
+
+                                <span class="party-status-label">
+
+                                    <span class="party-status-title">
+
+                                        ⚔️ Me acompaña en batalla
+
+                                    </span>
+
+                                    <span class="party-status-desc">
+
+                                        Combatirá a tu lado.
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                            <label class="party-status-option">
+
+                                <input
+                                    type="checkbox"
+                                    id="campCheck"
+                                    ${inCamp ? "checked" : ""}
+                                >
+
+                                <span class="party-status-icon">
+                                    ✓
+                                </span>
+
+                                <span class="party-status-label">
+
+                                    <span class="party-status-title">
+
+                                        🏕️ Permanece en el campamento
+
+                                    </span>
+
+                                    <span class="party-status-desc">
+
+                                        Descansa y recupera fuerzas.
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                            <label class="party-status-option">
+
+                                <input
+                                    type="checkbox"
+                                    id="missionCheck"
+                                    ${onMission ? "checked" : ""}
+                                >
+
+                                <span class="party-status-icon">
+                                    ✓
+                                </span>
+
+                                <span class="party-status-label">
+
+                                    <span class="party-status-title">
+
+                                        📜 De misión
+
+                                    </span>
+
+                                    <span class="party-status-desc">
+
+                                        Atiende asuntos propios.
+
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="party-detail-section">
+
+                        <h3>
+                            📖 Biografía
+                        </h3>
+
+                        <p>
+
+                            ${
+                                ally.bio ??
+                                "Todavía sabes poco sobre este personaje."
+                            }
+
+                        </p>
+
+                    </div>
+
+                    <div class="party-detail-section">
+
+                        <h3>
+                            🤝 Relación
+                        </h3>
+
+                        <p>
+                            Próximamente
+                        </p>
+
+                    </div>
+
+                    <div class="party-detail-section">
+
+                        <h3>
+                            💬 Conversar
+                        </h3>
+
+                        <p>
+                            Próximamente
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="party-detail-footer">
+
+                <button
+                    id="partyBackBtn"
+                    class="party-return-btn"
+                >
+
+                    ⚔️ Regresar a la compañía
+
+                </button>
+
+            </div>
 
         </div>
 
     `;
 
+    const battleCheck =
+        document.getElementById(
+            "battleCheck"
+        );
+
+    const campCheck =
+        document.getElementById(
+            "campCheck"
+        );
+
+    const missionCheck =
+        document.getElementById(
+            "missionCheck"
+        );
+
+    function refreshStatusVisuals() {
+
         document
-            .getElementById(
-                'partyBackBtn'
+            .querySelectorAll(
+                ".party-status-option"
             )
-            .addEventListener(
-                'click',
-                () => this.showPartyView()
+            .forEach(
+                el => el.classList.remove(
+                    "active-status"
+                )
             );
 
+        if (battleCheck.checked) {
+
+            battleCheck
+                .closest(
+                    ".party-status-option"
+                )
+                ?.classList.add(
+                    "active-status"
+                );
+
+        }
+
     }
+
+    refreshStatusVisuals();
+
+    battleCheck?.addEventListener(
+        "change",
+        () => {
+
+            if (!battleCheck.checked) {
+
+                battleCheck.checked = true;
+
+                return;
+            }
+
+            const battleCount =
+                this.party.recruited.filter(
+                    a =>
+                        a.status ===
+                        "battle"
+                ).length;
+
+            if (
+                ally.status !== "battle"
+                &&
+                battleCount >= 2
+            ) {
+
+                alert(
+                    "⚔️ Solo dos compañeros pueden acompañarte en batalla."
+                );
+
+                battleCheck.checked = false;
+
+                return;
+            }
+
+            ally.status =
+                "battle";
+
+            campCheck.checked =
+                false;
+
+            missionCheck.checked =
+                false;
+
+            refreshStatusVisuals();
+
+        }
+    );
+
+    campCheck?.addEventListener(
+        "change",
+        () => {
+
+            if (!campCheck.checked) {
+
+                campCheck.checked =
+                    true;
+
+                return;
+            }
+
+            ally.status =
+                "camp";
+
+            battleCheck.checked =
+                false;
+
+            missionCheck.checked =
+                false;
+
+            refreshStatusVisuals();
+
+        }
+    );
+
+    missionCheck?.addEventListener(
+        "change",
+        () => {
+
+            if (!missionCheck.checked) {
+
+                missionCheck.checked =
+                    true;
+
+                return;
+            }
+
+            ally.status =
+                "mission";
+
+            battleCheck.checked =
+                false;
+
+            campCheck.checked =
+                false;
+
+            refreshStatusVisuals();
+
+        }
+    );
+
+    document
+        .getElementById(
+            "partyBackBtn"
+        )
+        ?.addEventListener(
+            "click",
+            () =>
+                this.showPartyView()
+        );
+
+}
 
     // ───────────── FLUJO ENTRE PLANTAS ─────────────
 

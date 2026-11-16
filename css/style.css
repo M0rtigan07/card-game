@@ -2289,3 +2289,382 @@ h1 {
     background: #45006a;
 
 }
+
+/* =========================
+   FICHA DE COMPAÑERO
+   ========================= */
+
+.party-detail {
+
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 12px;
+
+    color: #e6d38b;
+
+}
+
+.party-detail-header {
+
+    text-align: center;
+    margin-bottom: 15px;
+
+}
+
+.party-detail-header h1 {
+
+    color: #d4af37;
+
+    font-size: 2rem;
+
+    text-shadow:
+        0 0 4px #000,
+        0 0 12px #8b6c00;
+
+}
+
+.party-detail-layout {
+
+    display: flex;
+
+    gap: 20px;
+
+    align-items: flex-start;
+
+}
+
+/* =========================
+   IMAGEN
+   ========================= */
+
+.party-detail-image {
+
+    flex: 1;
+
+}
+
+.party-detail-image img {
+
+    width: 100%;
+
+    border: 3px solid #c8a94b;
+
+    border-radius: 6px;
+
+    box-shadow:
+        0 0 10px rgba(0, 0, 0, .8);
+
+}
+
+/* =========================
+   INFORMACIÓN
+   ========================= */
+
+.party-detail-info {
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+.party-detail-info h2 {
+
+    margin: 0;
+
+    color: #f0d87a;
+
+    text-align: center;
+
+}
+
+.party-detail-section {
+
+    border: 1px solid #9d7c1f;
+
+    padding: 10px;
+
+    background:
+        rgba(25, 0, 45, .55);
+
+}
+
+.party-detail-section h3 {
+
+    margin-top: 0;
+    margin-bottom: 8px;
+
+    color: #d9b652;
+
+    border-bottom:
+        1px solid rgba(212, 175, 55, .3);
+
+    padding-bottom: 5px;
+
+}
+
+.party-detail-section p {
+
+    margin: 6px 0;
+
+    line-height: 1.5;
+
+}
+
+.party-detail-section small {
+
+    display: block;
+
+    color: #d4c99d;
+
+    margin-top: 4px;
+
+}
+
+/* =========================
+   CHECKS
+   ========================= */
+
+/* =========================
+   ESTADOS DEL COMPAÑERO
+   ========================= */
+
+.party-status-selector {
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+}
+
+.party-status-option {
+
+    display: flex;
+    align-items: center;
+
+    padding: 10px;
+
+    border: 1px solid #8f6c18;
+
+    background:
+        linear-gradient(rgba(35, 0, 56, .9),
+            rgba(20, 0, 30, .9));
+
+    cursor: pointer;
+
+    transition: .2s;
+
+}
+
+.party-status-option:hover {
+
+    border-color: #d4af37;
+
+    box-shadow:
+        0 0 8px rgba(212, 175, 55, .3);
+
+}
+
+.party-status-option input {
+
+    display: none;
+
+}
+
+.party-status-icon {
+
+    width: 28px;
+    height: 28px;
+
+    margin-right: 12px;
+
+    border: 2px solid #c49a2c;
+
+    background: #170021;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: transparent;
+
+    font-weight: bold;
+
+}
+
+.party-status-option input:checked+.party-status-icon {
+
+    color: #56ff56;
+
+    text-shadow: 0 0 6px #56ff56;
+
+}
+
+.party-status-label {
+
+    display: flex;
+    flex-direction: column;
+
+}
+
+.party-status-title {
+
+    color: #e5c45d;
+    font-weight: bold;
+
+}
+
+.party-status-desc {
+
+    color: #b9ad84;
+
+    font-size: 0.85rem;
+
+}
+
+/* =========================
+   BOTÓN VOLVER
+   ========================= */
+
+.party-detail-footer {
+
+    text-align: center;
+
+    margin-top: 20px;
+
+}
+
+.party-return-btn {
+
+    background:
+        linear-gradient(#3d2148,
+            #22002e);
+
+    color: #d4af37;
+
+    border: 2px solid #d4af37;
+
+    padding: 12px 20px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    transition: .2s;
+
+}
+
+.party-return-btn:hover {
+
+    background:
+        linear-gradient(#55296a,
+            #32003f);
+
+    box-shadow:
+        0 0 10px rgba(212, 175, 55, .5);
+
+}
+
+/* =========================
+   ESTADOS
+   ========================= */
+
+.party-status-battle {
+
+    color: #68ff68;
+
+    font-weight: bold;
+
+}
+
+.party-status-camp {
+
+    color: #f0d87a;
+
+}
+
+.party-status-mission {
+
+    color: #87c7ff;
+
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 900px) {
+
+    .party-detail-layout {
+
+        flex-direction: column;
+
+    }
+
+    .party-detail-image,
+    .party-detail-info {
+
+        width: 100%;
+
+    }
+
+}
+
+/* =========================
+   ANIMACIÓN COMPAÑERO ACTIVO
+   ========================= */
+
+@keyframes battleGlow {
+
+    0% {
+
+        box-shadow:
+            0 0 4px rgba(212, 175, 55, .3);
+
+        border-color:
+            #8f6c18;
+
+    }
+
+    50% {
+
+        box-shadow:
+            0 0 18px rgba(212, 175, 55, .8),
+            0 0 32px rgba(255, 215, 0, .4);
+
+        border-color:
+            #e6c45d;
+
+    }
+
+    100% {
+
+        box-shadow:
+            0 0 4px rgba(212, 175, 55, .3);
+
+        border-color:
+            #8f6c18;
+
+    }
+
+}
+
+.party-status-option.active-status {
+
+    animation:
+        battleGlow 2s infinite ease-in-out;
+
+    background:
+        linear-gradient(
+            rgba(65,40,0,.35),
+            rgba(35,0,56,.85)
+        );
+
+}
+
