@@ -236,7 +236,7 @@ export class UIManager {
                 `party-status-indicator${inBattle ? ' in-battle' : ' in-reserve'}`;
 
             status.textContent =
-                inBattle ? '⚔️ En combate' : '🏕️ Reserva';
+                inBattle ? '⚔️ En combate' : '🏕️ En campamento';
 
             info.append(
                 name,
