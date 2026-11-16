@@ -193,30 +193,32 @@ ${recruitText}
 
     showPartyCharacter(id) {
 
-    const ally =
-        this.party.recruited.find(
-            a => a.id === id
-        );
+        this.showCompanyMode();
 
-    if (!ally) {
-        return;
-    }
+        const ally =
+            this.party.recruited.find(
+                a => a.id === id
+            );
 
-    ally.status =
-        ally.status ?? "camp";
+        if (!ally) {
+            return;
+        }
 
-    const inBattle =
-        ally.status === "battle";
+        ally.status =
+            ally.status ?? "camp";
 
-    const inCamp =
-        ally.status === "camp";
+        const inBattle =
+            ally.status === "battle";
 
-    const onMission =
-        ally.status === "mission";
+        const inCamp =
+            ally.status === "camp";
 
-    document.getElementById(
-        "mainContent"
-    ).innerHTML = `
+        const onMission =
+            ally.status === "mission";
+
+        document.getElementById(
+            "mainContent"
+        ).innerHTML = `
 
         <div class="party-detail">
 
@@ -371,10 +373,9 @@ ${recruitText}
 
                         <p>
 
-                            ${
-                                ally.bio ??
-                                "Todavía sabes poco sobre este personaje."
-                            }
+                            ${ally.bio ??
+            "Todavía sabes poco sobre este personaje."
+            }
 
                         </p>
 
@@ -425,159 +426,162 @@ ${recruitText}
 
     `;
 
-    const battleCheck =
-        document.getElementById(
-            "battleCheck"
-        );
-
-    const campCheck =
-        document.getElementById(
-            "campCheck"
-        );
-
-    const missionCheck =
-        document.getElementById(
-            "missionCheck"
-        );
-
-    function refreshStatusVisuals() {
-
-        document
-            .querySelectorAll(
-                ".party-status-option"
-            )
-            .forEach(
-                el => el.classList.remove(
-                    "active-status"
-                )
+        const battleCheck =
+            document.getElementById(
+                "battleCheck"
             );
 
-        if (battleCheck.checked) {
+        const campCheck =
+            document.getElementById(
+                "campCheck"
+            );
 
-            battleCheck
-                .closest(
+        const missionCheck =
+            document.getElementById(
+                "missionCheck"
+            );
+
+        function refreshStatusVisuals() {
+
+            document
+                .querySelectorAll(
                     ".party-status-option"
                 )
-                ?.classList.add(
-                    "active-status"
+                .forEach(
+                    el => el.classList.remove(
+                        "active-status"
+                    )
                 );
+
+            if (battleCheck.checked) {
+
+                battleCheck
+                    .closest(
+                        ".party-status-option"
+                    )
+                    ?.classList.add(
+                        "active-status"
+                    );
+
+            }
 
         }
 
-    }
+        refreshStatusVisuals();
 
-    refreshStatusVisuals();
+        battleCheck?.addEventListener(
+            "change",
+            () => {
 
-    battleCheck?.addEventListener(
-        "change",
-        () => {
+                if (!battleCheck.checked) {
 
-            if (!battleCheck.checked) {
+                    battleCheck.checked = true;
 
-                battleCheck.checked = true;
+                    return;
+                }
 
-                return;
-            }
+                const battleCount =
+                    this.party.recruited.filter(
+                        a =>
+                            a.status ===
+                            "battle"
+                    ).length;
 
-            const battleCount =
-                this.party.recruited.filter(
-                    a =>
-                        a.status ===
-                        "battle"
-                ).length;
+                if (
+                    ally.status !== "battle"
+                    &&
+                    battleCount >= 2
+                ) {
 
-            if (
-                ally.status !== "battle"
-                &&
-                battleCount >= 2
-            ) {
+                    alert(
+                        "⚔️ Solo dos compañeros pueden acompañarte en batalla."
+                    );
 
-                alert(
-                    "⚔️ Solo dos compañeros pueden acompañarte en batalla."
-                );
+                    battleCheck.checked = false;
 
-                battleCheck.checked = false;
+                    return;
+                }
 
-                return;
-            }
-
-            ally.status =
-                "battle";
-
-            campCheck.checked =
-                false;
-
-            missionCheck.checked =
-                false;
-
-            refreshStatusVisuals();
-
-        }
-    );
-
-    campCheck?.addEventListener(
-        "change",
-        () => {
-
-            if (!campCheck.checked) {
+                ally.status =
+                    "battle";
 
                 campCheck.checked =
-                    true;
-
-                return;
-            }
-
-            ally.status =
-                "camp";
-
-            battleCheck.checked =
-                false;
-
-            missionCheck.checked =
-                false;
-
-            refreshStatusVisuals();
-
-        }
-    );
-
-    missionCheck?.addEventListener(
-        "change",
-        () => {
-
-            if (!missionCheck.checked) {
+                    false;
 
                 missionCheck.checked =
-                    true;
+                    false;
 
-                return;
+                refreshStatusVisuals();
+
             }
-
-            ally.status =
-                "mission";
-
-            battleCheck.checked =
-                false;
-
-            campCheck.checked =
-                false;
-
-            refreshStatusVisuals();
-
-        }
-    );
-
-    document
-        .getElementById(
-            "partyBackBtn"
-        )
-        ?.addEventListener(
-            "click",
-            () =>
-                this.showPartyView()
         );
 
-}
+        campCheck?.addEventListener(
+            "change",
+            () => {
+
+                if (!campCheck.checked) {
+
+                    campCheck.checked =
+                        true;
+
+                    return;
+                }
+
+                ally.status =
+                    "camp";
+
+                battleCheck.checked =
+                    false;
+
+                missionCheck.checked =
+                    false;
+
+                refreshStatusVisuals();
+
+            }
+        );
+
+        missionCheck?.addEventListener(
+            "change",
+            () => {
+
+                if (!missionCheck.checked) {
+
+                    missionCheck.checked =
+                        true;
+
+                    return;
+                }
+
+                ally.status =
+                    "mission";
+
+                battleCheck.checked =
+                    false;
+
+                campCheck.checked =
+                    false;
+
+                refreshStatusVisuals();
+
+            }
+        );
+
+        document
+            .getElementById(
+                "partyBackBtn"
+            )
+            ?.addEventListener(
+                "click",
+                () =>
+                    this.showPartyView(),
+                this.hideCompanyMode(),
+
+                this.loadNextEvent()
+            );
+
+    }
 
     // ───────────── FLUJO ENTRE PLANTAS ─────────────
 
@@ -586,6 +590,8 @@ ${recruitText}
     }
 
     showPartyView() {
+
+        this.showCompanyMode();
 
         const view =
             new PartyView(
@@ -598,6 +604,40 @@ ${recruitText}
         view.render();
 
     }
+
+    showCompanyMode() {
+
+        document
+            .getElementById("leftSidebar")
+            ?.classList.add("hidden");
+
+        document
+            .getElementById("rightSidebar")
+            ?.classList.add("hidden");
+
+        document
+            .body
+            .classList.add("company-mode");
+
+    }
+
+    hideCompanyMode() {
+
+        document
+            .getElementById("leftSidebar")
+            ?.classList.remove("hidden");
+
+        document
+            .getElementById("rightSidebar")
+            ?.classList.remove("hidden");
+
+        document
+            .body
+            .classList.remove("company-mode");
+
+    }
+
+
 
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
     advanceFloor(delay = 1800) {
