@@ -191,6 +191,15 @@ ${recruitText}
 
     }
 
+    showPartyCharacter(id) {
+
+        console.log(
+            "Abrir ficha:",
+            id
+        );
+
+    }
+
     // ───────────── FLUJO ENTRE PLANTAS ─────────────
 
     loadNextEvent() {
@@ -199,17 +208,17 @@ ${recruitText}
 
     showPartyView() {
 
-    const view =
-        new PartyView(
-            document.getElementById(
-                'mainContent'
-            ),
-            this
-        );
+        const view =
+            new PartyView(
+                document.getElementById(
+                    'mainContent'
+                ),
+                this
+            );
 
-    view.render();
+        view.render();
 
-}
+    }
 
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
     advanceFloor(delay = 1800) {
