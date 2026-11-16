@@ -576,7 +576,7 @@ ${recruitText}
                 "click",
                 () =>
                     this.showPartyView(),
-                this.hideCompanyMode(),
+               
 
                 this.loadNextEvent()
             );
@@ -591,7 +591,7 @@ ${recruitText}
 
     showPartyView() {
 
-        this.showCompanyMode();
+       
 
         const view =
             new PartyView(
@@ -605,38 +605,8 @@ ${recruitText}
 
     }
 
-    showCompanyMode() {
-
-        document
-            .getElementById("leftSidebar")
-            ?.classList.add("hidden");
-
-        document
-            .getElementById("rightSidebar")
-            ?.classList.add("hidden");
-
-        document
-            .body
-            .classList.add("company-mode");
-
-    }
-
-    hideCompanyMode() {
-
-        document
-            .getElementById("leftSidebar")
-            ?.classList.remove("hidden");
-
-        document
-            .getElementById("rightSidebar")
-            ?.classList.remove("hidden");
-
-        document
-            .body
-            .classList.remove("company-mode");
-
-    }
-
+   
+    
 
 
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
