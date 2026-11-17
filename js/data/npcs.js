@@ -161,6 +161,32 @@ export const NPC_DATABASE = {
         }
     },
 
+    vendedorCartas: {
+        id: 'vendedorCartas',
+        name: 'El Coleccionista de Leyendas',
+        images: {
+            room: 'img/vendedorCartas.jpg',
+            offer: 'img/vendedorCartas_ofrece.jpg',
+            talk: 'img/vendedorCartas_ofrece.jpg',
+            smile: 'img/vendedorCartas_sonrisa.jpg',
+            enraged: 'img/vendedorCartas_enfado.jpg'
+        },
+        type: 'merchant',
+        archetype: 'un coleccionista legendario que comercia con cartas mágicas únicas',
+        voice: 'Habla con entusiasmo teatral de cartas rarísimas, presume de su colección y se alegra con cada venta; se irrita cuando rechazan sus ofertas.',
+        dungeonLevel: 18,
+        cardPrice: 1000,
+        interactions: {
+            greeting: '¡Una colección como esta solo se ve una vez en la vida! Elige una carta legendaria por 1.000 de oro.',
+            choices: [
+                { text: '🃏 Comprar Lanza de las Eras (-1.000 Oro)', action: 'buy_legendary_starfall', cardId: 'legendary_starfall' },
+                { text: '🛡️ Comprar Égida de los Eternos (-1.000 Oro)', action: 'buy_legendary_aegis', cardId: 'legendary_aegis' },
+                { text: '🔥 Comprar Fuego del Fénix (-1.000 Oro)', action: 'buy_legendary_phoenix', cardId: 'legendary_phoenix' },
+                { text: '🙅 No, gracias. No compraré ninguna carta.', action: 'reject_legendary_cards' }
+            ]
+        }
+    },
+
 
     // --- PLANTA 3: LA BRUJA DE LOS PANTANOS ---
     morgana: {

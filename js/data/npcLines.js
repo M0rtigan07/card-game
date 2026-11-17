@@ -131,6 +131,29 @@ export const FALLBACK_LINES = {
         ]
     },
 
+    vendedorCartas: {
+        bought: [
+            '¡Excelente elección! Esa carta ya forma parte de tu mazo.',
+            '¡Una joya más en las manos adecuadas! Disfruta tu nueva carta.',
+            '¡Trato hecho! La carta es tuya; cuídala como merece.'
+        ],
+        no_gold: [
+            '¡Sin mil monedas no hay trato! Aún me quedan cartas, si quieres volver a intentarlo.',
+            'Una carta legendaria exige un precio legendario. Reúne el oro y hablamos.',
+            'No puedo regalar una pieza de mi colección. Vuelve con mil monedas.'
+        ],
+        already_owned: [
+            'Esa carta ya está en tu mazo. No vendo duplicados.',
+            '¡No intentes comprar dos veces la misma pieza!',
+            'Revisa tu mazo: esa carta ya es tuya.'
+        ],
+        offended: [
+            '¡¿Rechazas mi colección?! ¡Fuera de mi vista!',
+            '¡Nadie desprecia mis cartas legendarias y se marcha sonriendo!',
+            '¡Te arrepentirás cuando veas el poder de estas cartas!'
+        ]
+    },
+
     valerius: {
         greeting: [
             'Qué encantadora osadía, mortal: entrar en mi cripta sin ser invitado.',

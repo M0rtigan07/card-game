@@ -265,8 +265,16 @@ export class Exploration {
 
         // Quita opciones repetidas (mismo texto) y añade la de conversar, que tienen todos los PNJ
         const unique = [...new Map(interaction.choices.map(c => [c.text, c])).values()];
+        let choices = unique;
+        if (npc.id === 'vendedorCartas') {
+            const ownedCards = new Set(this.game.deck?.collection ?? []);
+            choices = unique.filter(choice => !choice.cardId || !ownedCards.has(choice.cardId));
+            if (!choices.some(choice => choice.cardId)) {
+                choices = [{ text: '✨ Gracias por las cartas. Seguiré mi camino.', action: 'finish_legendary_card_trade' }];
+            }
+        }
         const talk = { text: `💬 Conversar con ${npc.name}`, action: 'chat' };
-        return { ...interaction, choices: [...unique, talk] };
+        return { ...interaction, choices: [...choices, talk] };
     }
 
     async showNpc(npcKey) {
@@ -298,9 +306,7 @@ export class Exploration {
 
         const token = this.sceneToken;
 
-        this.setSceneImage(
-            npc.images?.room
-        );
+        this.setSceneImage(npc.images?.offer || npc.images?.room);
 
         setText(
             'sceneBadgeOverlay',
@@ -351,7 +357,7 @@ export class Exploration {
     /** Menú de acciones con el PNJ: lo que ves tras su saludo y al volver de una conversación. */
     showNpcMenu(npc, text) {
         const view = this.render();
-        this.setSceneImage(npc.images?.room);
+        this.setSceneImage(npc.images?.offer || npc.images?.room);
         setText('sceneBadgeOverlay', npc.name.toUpperCase());
         const interaction = this.getNpcInteraction(npc);
         this.game.ui.setMerchantGold(
@@ -401,7 +407,12 @@ export class Exploration {
 
         this.lockChoices();
 
-        const mood = NPC_MOOD_BY_ACTION[choice.action] || 'talk';
+        const cannotAffordLegendaryCard = npc.id === 'vendedorCartas'
+            && choice.cardId
+            && this.player.gold < npc.cardPrice;
+        const mood = cannotAffordLegendaryCard
+            ? 'offer'
+            : NPC_MOOD_BY_ACTION[choice.action] || 'talk';
         this.setSceneImage(npc.images?.[mood] || npc.images?.talk || npc.images?.room);
 
         // Barnaby ofendido responde con frase fija, sin gastar una llamada a la IA

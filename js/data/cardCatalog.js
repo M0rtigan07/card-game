@@ -10,7 +10,7 @@
 //   base, perLevel  Valor inicial y cuánto sube por nivel
 //   turns           Duración (solo poison). Por defecto 3
 //   text            Descripción. {val} y {turns} se sustituyen solos
-//   rarity          starter (mazo inicial) | common | uncommon | rare
+//   rarity          starter (mazo inicial) | common | uncommon | rare | legendary
 //   classes         ['warrior', ...] o null si la puede usar cualquiera
 //
 // Efectos:
@@ -64,7 +64,12 @@ export const CARD_LIBRARY = [
     { id: 'venom_dart', name: 'Dardo Envenenado', cost: 1, type: 'poison', base: 5, perLevel: 1, turns: 4, img: 'img/picaro.png', text: 'Envenena: {val} de daño durante {turns} turnos', rarity: 'common', classes: ['rogue'] },
     { id: 'smoke_bomb', name: 'Bomba de Humo', cost: 1, type: 'def', base: 16, perLevel: 5, img: 'img/escudo.png', text: 'Gana {val} guardia', rarity: 'common', classes: ['rogue'] },
     { id: 'blood_blade', name: 'Hoja Sangrienta', cost: 1, type: 'drain', base: 12, perLevel: 4, img: 'img/estocada.png', text: 'Inflige {val} y te curas ese daño', rarity: 'uncommon', classes: ['rogue'] },
-    { id: 'assassinate', name: 'Asesinar', cost: 2, type: 'atk', base: 40, perLevel: 10, img: 'img/estocada.png', text: 'Inflige {val} daño letal', rarity: 'rare', classes: ['rogue'] }
+    { id: 'assassinate', name: 'Asesinar', cost: 2, type: 'atk', base: 40, perLevel: 10, img: 'img/estocada.png', text: 'Inflige {val} daño letal', rarity: 'rare', classes: ['rogue'] },
+
+    // ───── Cartas legendarias: solo se obtienen del vendedor de la planta 18 ─────
+    { id: 'legendary_starfall', name: 'Lanza de las Eras', cost: 2, type: 'atk', base: 38, perLevel: 12, img: 'img/estocada.png', text: 'Inflige {val} daño legendario', rarity: 'legendary', classes: null },
+    { id: 'legendary_aegis', name: 'Égida de los Eternos', cost: 2, type: 'def', base: 34, perLevel: 10, img: 'img/escudo.png', text: 'Gana {val} guardia legendaria', rarity: 'legendary', classes: null },
+    { id: 'legendary_phoenix', name: 'Fuego del Fénix', cost: 3, type: 'drain', base: 30, perLevel: 9, img: 'img/pocion.png', text: 'Inflige {val} daño y te cura el daño real', rarity: 'legendary', classes: null }
 ];
 
 export const STARTER_DECKS = {

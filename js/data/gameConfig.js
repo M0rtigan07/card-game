@@ -116,7 +116,12 @@ export const NPC_MOOD_BY_ACTION = {
     pass: 'enraged',
     flirt_challenge: 'seductive',
     morgana_romance: 'romance',
-    morgana_romance_warrior: 'romance'
+    morgana_romance_warrior: 'romance',
+    buy_legendary_starfall: 'smile',
+    buy_legendary_aegis: 'smile',
+    buy_legendary_phoenix: 'smile',
+    reject_legendary_cards: 'enraged',
+    finish_legendary_card_trade: 'smile'
 };
 
 // Jefes

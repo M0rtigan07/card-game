@@ -161,6 +161,7 @@ export function rollRewards({ classKey, owned = [], level = 1, count = REWARD_CO
 
     const pool = CARD_LIBRARY.filter(card =>
         card.rarity !== 'starter'
+        && card.rarity !== 'legendary'
         && (!card.classes || card.classes.includes(classKey))
         && copies(card.id) < REWARD_CONFIG.maxCopies
     );

@@ -5,6 +5,7 @@
 
 import { DEFAULT_TOLL, NPC_TOLLS } from '../data/gameConfig.js';
 import { addItem, getItem, itemIdForAction, owns } from './Items.js';
+import { getCardTemplate } from './JugadorCards.js';
 
 export class NpcActions {
     /**
@@ -34,6 +35,11 @@ export class NpcActions {
             combat: () => this.game.combat.startFromNpc(npc),
             buy: () => this.payToll(npc),
             pass: () => this.leave(npc),
+            buy_legendary_starfall: () => this.purchaseLegendaryCard(npc, 'legendary_starfall'),
+            buy_legendary_aegis: () => this.purchaseLegendaryCard(npc, 'legendary_aegis'),
+            buy_legendary_phoenix: () => this.purchaseLegendaryCard(npc, 'legendary_phoenix'),
+            reject_legendary_cards: () => this.rejectLegendaryCards(npc),
+            finish_legendary_card_trade: () => this.game.finishEncounter(1000),
             forge_sword: () => this.purchase(npc, 'forged_sword'),
             forge_shield: () => this.purchase(npc, 'reinforced_shield'),
 
@@ -133,6 +139,38 @@ export class NpcActions {
             await this.speak(npc, 'already_owned', `El héroe quiere comprarte más ${item.name}, pero ya no le caben.`);
         }
         this.game.finishEncounter(2500);
+    }
+
+    async purchaseLegendaryCard(npc, cardId) {
+        const card = getCardTemplate(cardId);
+        if (!card || card.rarity !== 'legendary') {
+            throw new Error(`"${cardId}" no es una carta legendaria válida`);
+        }
+        if (!Number.isSafeInteger(npc.cardPrice) || npc.cardPrice <= 0) {
+            throw new Error(`El precio de cartas de "${npc.id}" no es válido`);
+        }
+
+        if (this.game.deck.collection.includes(cardId)) {
+            this.log(`ℹ️ Ya tienes ${card.name} en tu mazo.`);
+            await this.speak(npc, 'already_owned', `El héroe ya tiene ${card.name} en su mazo.`);
+        } else if (this.player.gold < npc.cardPrice) {
+            this.log(`❌ No tienes suficiente oro para ${card.name}.`);
+            await this.speak(npc, 'no_gold', `El héroe quiere comprar ${card.name}, pero no tiene los ${npc.cardPrice} de oro.`);
+        } else {
+            this.player.gold -= npc.cardPrice;
+            this.game.deck.addCard(cardId);
+            this.game.ui.updateMerchantGold(this.player.gold);
+            this.log(`🃏 Compras ${card.name} (-${npc.cardPrice} Oro). Añadida a tu mazo (${this.game.deck.counts.total} cartas).`);
+            await this.speak(npc, 'bought', `El héroe compra ${card.name} por ${npc.cardPrice} de oro y la añade a su mazo.`);
+        }
+
+        this.scene.showNpcMenu(npc, 'El coleccionista sonríe y te muestra las cartas que aún le quedan.');
+    }
+
+    async rejectLegendaryCards(npc) {
+        this.log(`😠 Rechazas las cartas de ${npc.name}; el coleccionista se enfada.`);
+        await this.speak(npc, 'offended', 'El héroe rechaza todas las cartas legendarias y se marcha sin comprar.');
+        this.game.finishEncounter(1800);
     }
 
     payToll(npc) {
