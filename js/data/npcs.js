@@ -187,6 +187,23 @@ export const NPC_DATABASE = {
         }
     },
 
+    busgosu: {
+        id: 'busgosu',
+        name: 'El Busgosu',
+        storyId: 'busgosu',
+        dungeonLevel: 21,
+        images: {
+            room: 'img/busgosu.jpg',
+            talk: 'img/busgosu_habla.jpg',
+            offer: 'img/busgosu_ofrece.jpg',
+            riddle: 'img/busgosu_acertijo.jpg',
+            portal: 'img/busgosu_portalon.jpg'
+        },
+        type: 'folklore',
+        archetype: 'un hombre cabra de la mitología asturiana, guardián de la viesca y de sus antiguos secretos',
+        voice: 'Fala n’asturianu, con humor y calma. Ofrez sidra, propón acertixos y guía a quien respeta la viesca.'
+    },
+
     demonioHindu: {
         id: 'demonio_hindu',
         name: 'Asura de la Lámpara',

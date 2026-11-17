@@ -230,6 +230,9 @@ export class Exploration {
         }
 
         StoryResolver.applyChoice(this.player, { ...choice, storyId: choice.storyId ?? storyId }, this.game);
+        if (choice.quest) {
+            this.log(`🧭 Nueva misión: ${choice.quest.title}. ${choice.quest.description}`);
+        }
         if (choice.nextChapter === undefined) {
             this.game.storyManager?.checkStoryProgress(storyId);
         }

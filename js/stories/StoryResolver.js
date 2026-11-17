@@ -109,6 +109,15 @@ export class StoryResolver {
             );
         }
 
+        if (choice.quest) {
+            player.storyState = player.storyState || {};
+            player.storyState.quests = player.storyState.quests || {};
+            player.storyState.quests[choice.quest.id] = {
+                ...choice.quest,
+                status: 'active'
+            };
+        }
+
         // CARTAS
 
         if (
