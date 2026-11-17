@@ -154,6 +154,21 @@ export const FALLBACK_LINES = {
         ]
     },
 
+    demonio_hindu: {
+        bought: [
+            '¡Trato hecho! La lámpara es tuya. ¡Que empiece la celebración!',
+            '¡Una venta digna de un asura! Disfruta tu lámpara.',
+            '¡Oro por magia! Ahora déjame bailar.'
+        ],
+        no_gold: [
+            'No tienes las 1.800 monedas. La lámpara seguirá siendo mía.',
+            'Vuelve cuando tu bolsa pese lo suficiente, mortal.'
+        ],
+        already_owned: [
+            'Esa lámpara ya es tuya. No pienso venderte otra.'
+        ]
+    },
+
     valerius: {
         greeting: [
             'Qué encantadora osadía, mortal: entrar en mi cripta sin ser invitado.',

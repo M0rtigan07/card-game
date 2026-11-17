@@ -187,6 +187,31 @@ export const NPC_DATABASE = {
         }
     },
 
+    demonioHindu: {
+        id: 'demonio_hindu',
+        name: 'Asura de la Lámpara',
+        images: {
+            room: 'img/demonio_hindu.jpg',
+            offer: 'img/demonio_hindu.jpg',
+            dance: 'img/demonio_hindu_baila_gif',
+            enraged: 'img/demonio_hindu_enfado.jpg'
+        },
+        type: 'demon',
+        archetype: 'un asura guardián de una lámpara encantada, orgulloso y peligroso cuando se le desprecia',
+        voice: 'Habla con solemnidad y astucia, ofrece la lámpara como un tesoro y responde con furia si rechazan el trato.',
+        dungeonLevel: 19,
+        baseHp: 70,
+        baseAtk: 22,
+        lampPrice: 1800,
+        interactions: {
+            greeting: 'He aquí una lámpara encantada, viajero. Págame 1.800 de oro y será tuya.',
+            choices: [
+                { text: '🪔 Comprar la Lámpara Mágica (-1.800 Oro)', action: 'buy_magic_lamp' },
+                { text: '🙅 Rechazar la oferta', action: 'combat' }
+            ]
+        }
+    },
+
 
     // --- PLANTA 3: LA BRUJA DE LOS PANTANOS ---
     morgana: {

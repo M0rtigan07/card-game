@@ -1,27 +1,36 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { NPC_DATABASE } from '../data/npcs.js';
+import { NPC_MOOD_BY_ACTION } from '../data/gameConfig.js';
 import { STARTER_DECKS } from '../data/cardCatalog.js';
+import { expandDeck } from './EnemyAI.js';
 import { Exploration } from './Exploration.js';
 import { NpcActions } from './NpcActions.js';
 import { getCardTemplate, PlayerDeck, rollRewards } from './JugadorCards.js';
 
 function createHarness(gold = 2500) {
-    const player = { gold };
+    const player = { gold, inventory: [] };
     const deck = new PlayerDeck(STARTER_DECKS.warrior);
     const goldUpdates = [];
+    const statUpdates = [];
     const logs = [];
     const outcomes = [];
     const menuUpdates = [];
     const finishedEncounters = [];
+    const combatStarts = [];
 
     const game = {
         player,
         deck,
+        dungeonLevel: 19,
         audio: { play() {} },
+        combat: { startFromNpc(npc) { combatStarts.push(npc); } },
         ui: {
             logEvent(message) { logs.push(message); },
-            updateMerchantGold(amount) { goldUpdates.push(amount); }
+            updateMerchantGold(amount) { goldUpdates.push(amount); },
+            updateStats(updatedPlayer, floor) {
+                statUpdates.push({ gold: updatedPlayer.gold, inventoryCount: updatedPlayer.inventory.length, floor });
+            }
         },
         dialogue: {
             async say(_npc, _kind, context) {
@@ -41,10 +50,12 @@ function createHarness(gold = 2500) {
         player,
         deck,
         goldUpdates,
+        statUpdates,
         logs,
         outcomes,
         menuUpdates,
-        finishedEncounters
+        finishedEncounters,
+        combatStarts
     };
 }
 
@@ -115,4 +126,35 @@ test('the card seller hides cards already owned and offers a farewell when sold 
         soldOut.choices.map(choice => choice.action),
         ['finish_legendary_card_trade', 'chat']
     );
+});
+
+test('buying the magic lamp charges gold and adds the collectible to inventory', async () => {
+    const state = createHarness(2000);
+
+    await state.actions.run(NPC_DATABASE.demonioHindu, 'buy_magic_lamp');
+
+    assert.equal(state.player.gold, 200);
+    assert.deepEqual(state.player.inventory.map(item => item.id), ['magic_lamp']);
+    assert.deepEqual(state.statUpdates, [{ gold: 200, inventoryCount: 1, floor: 19 }]);
+    assert.deepEqual(state.finishedEncounters, [2500]);
+});
+
+test('rejecting the lamp offer starts combat against the demon', async () => {
+    const demon = NPC_DATABASE.demonioHindu;
+    const state = createHarness();
+
+    await state.actions.run(demon, 'combat');
+
+    assert.deepEqual(state.combatStarts, [demon]);
+    assert.deepEqual(state.finishedEncounters, []);
+});
+
+test('the demon uses its own attack deck and dances when a lamp sale is chosen', () => {
+    const demon = NPC_DATABASE.demonioHindu;
+    const cards = expandDeck(demon.id);
+
+    assert.ok(cards.length > 0);
+    assert.ok(cards.every(card => ['atk', 'multi', 'poison', 'drain'].includes(card.type)));
+    assert.equal(NPC_MOOD_BY_ACTION.buy_magic_lamp, 'dance');
+    assert.equal(demon.images.dance, 'img/demonio_hindu_baila_gif');
 });

@@ -410,7 +410,10 @@ export class Exploration {
         const cannotAffordLegendaryCard = npc.id === 'vendedorCartas'
             && choice.cardId
             && this.player.gold < npc.cardPrice;
-        const mood = cannotAffordLegendaryCard
+        const cannotAffordMagicLamp = npc.id === 'demonio_hindu'
+            && choice.action === 'buy_magic_lamp'
+            && this.player.gold < npc.lampPrice;
+        const mood = cannotAffordLegendaryCard || cannotAffordMagicLamp
             ? 'offer'
             : NPC_MOOD_BY_ACTION[choice.action] || 'talk';
         this.setSceneImage(npc.images?.[mood] || npc.images?.talk || npc.images?.room);

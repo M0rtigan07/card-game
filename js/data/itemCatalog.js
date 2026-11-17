@@ -33,6 +33,7 @@ export const ITEM_CATALOG = [
     { id: 'forged_sword', name: '⚔️ Espada Reforjada', kind: 'relic', price: 50, effect: '+5 de daño en tus ataques', mods: { attackBonus: 5 } },
     { id: 'reinforced_shield', name: '🛡️ Escudo Reforzado', kind: 'relic', price: 40, effect: 'Empiezas cada combate con 8 de guardia', mods: { startShield: 8 } },
     { id: 'subsistence_potion', name: '🧪 Poción de Subsistencia', kind: 'relic', effect: '+20 HP máximo', onAcquire: { maxHealth: 20, fullHeal: true } },
+    { id: 'magic_lamp', name: '🪔 Lámpara Mágica', kind: 'relic', price: 1800, effect: 'Objeto especial de colección; todavía no tiene efecto de combate.' },
 
     // ───── Reliquias que se encuentran como botín ─────
     { id: 'iron_charm', name: '🛡️ Amuleto de Hierro', kind: 'relic', lootWeight: 2, effect: 'Empiezas cada combate con 8 de guardia', mods: { startShield: 8 } },

@@ -121,7 +121,8 @@ export const NPC_MOOD_BY_ACTION = {
     buy_legendary_aegis: 'smile',
     buy_legendary_phoenix: 'smile',
     reject_legendary_cards: 'enraged',
-    finish_legendary_card_trade: 'smile'
+    finish_legendary_card_trade: 'smile',
+    buy_magic_lamp: 'dance'
 };
 
 // Jefes

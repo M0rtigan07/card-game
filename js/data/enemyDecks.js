@@ -52,6 +52,13 @@ export const ENEMY_DECKS = {
         { name: '📦 Parapeto de Cajas', type: 'def', val: 8 },
         { name: '🧪 Poción Barata', type: 'heal', val: 10 }
     ],
+    demonio_hindu: [ // Asura: ataques de fuego, veneno y drenaje
+        { name: '🔥 Llama de la Lámpara', type: 'atk', power: 1.7, copies: 2 },
+        { name: '🗡️ Danza de las Cimitarras', type: 'multi', power: 0.55, hits: 3, copies: 2 },
+        { name: '☠️ Maldición del Asura', type: 'poison', val: 6, turns: 3 },
+        { name: '🩸 Drenaje Ígneo', type: 'drain', power: 1.2, leech: 0.6 },
+        { name: '💥 Estallido de Fuego', type: 'atk', power: 2.0 }
+    ],
 
     // ───── Jefes (más cartas y más duras que las de un enemigo normal) ─────
     orco_jefe: [ // Brutal: golpes enormes y se cura con banquetes
