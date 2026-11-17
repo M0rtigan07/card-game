@@ -106,5 +106,29 @@ export const BOSSES = [
                 ]
             }
         ]
+    },
+    {
+        id: 'kurgan',
+        name: 'El Kurgan, Señor Oscuro',
+        img: 'img/kurgan.jpg',
+        deckId: 'kurgan',
+        baseHp: 180, hpPerFloor: 10, baseAtk: 18, atkPerFloor: 0.6, armor: 12,
+        archetype: 'El Kurgan, un señor oscuro que gobierna mediante el miedo y la fuerza',
+        voice: 'Habla con calma amenazadora, desprecia a sus rivales y proclama que la mazmorra le pertenece.',
+        phases: [
+            {
+                at: 0.66, announce: 'ruge y desata su furia', atkBonus: 5, shield: 24,
+                img: 'img/kurgan_grita2.jpg',
+                addCards: [{ name: '⚔️ Tormenta de Acero', type: 'multi', power: 0.65, hits: 3, copies: 2 }]
+            },
+            {
+                at: 0.33, announce: 'desata todo el poder de su reino oscuro', atkBonus: 7, shield: 30, armor: 6,
+                img: 'img/kurgan_grita.jpg',
+                addCards: [
+                    { name: '💀 Ejecución Oscura', type: 'atk', power: 2.4 },
+                    { name: '🩸 Tajo del Abismo', type: 'drain', power: 1.4, leech: 0.75 }
+                ]
+            }
+        ]
     }
 ];

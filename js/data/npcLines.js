@@ -169,6 +169,39 @@ export const FALLBACK_LINES = {
         ]
     },
 
+    kurgan: {
+        combat_start: [
+            'Soy El Kurgan, Señor Oscuro. Arrodíllate y quizá te permita vivir.',
+            'Has llegado ante mi trono. Aquí termina tu desafío.',
+            'La mazmorra me pertenece. Tú solo eres otra víctima.'
+        ],
+        combat_attack: [
+            '¡Prueba el acero de mi reino!',
+            '¡Que la oscuridad te reclame!',
+            '¡Un golpe más y caerás!'
+        ],
+        combat_other: [
+            'No puedes quebrar mi voluntad.',
+            'Mi poder apenas comienza a despertar.'
+        ],
+        combat_hurt: [
+            '¡Me has hecho enfadar!',
+            'Ese golpe tendrá un precio.'
+        ],
+        combat_phase: [
+            '¡Ahora conocerás la verdadera fuerza de un señor oscuro!',
+            '¡La oscuridad se alza y mi furia no tendrá límites!'
+        ],
+        combat_defeat: [
+            'No... mi reino... no puede caer...',
+            'Has vencido hoy, pero la oscuridad perdura.'
+        ],
+        combat_victory: [
+            'Tu valor no bastó para salvarte.',
+            'La oscuridad siempre reclama lo que le pertenece.'
+        ]
+    },
+
     valerius: {
         greeting: [
             'Qué encantadora osadía, mortal: entrar en mi cripta sin ser invitado.',

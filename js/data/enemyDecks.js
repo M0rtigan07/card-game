@@ -104,6 +104,13 @@ export const ENEMY_DECKS = {
         { name: '🔥 Furia Ancestral', type: 'buff', val: 4 },
         { name: '💢 Rugido Aterrador', type: 'atk', power: 1.5 }
     ],
+    kurgan: [ // Señor oscuro: golpes pesados, veneno y drenaje
+        { name: '⚔️ Tajo del Señor Oscuro', type: 'atk', power: 1.8, copies: 2 },
+        { name: '☠️ Marca de las Tinieblas', type: 'poison', val: 8, turns: 3 },
+        { name: '🩸 Drenaje del Abismo', type: 'drain', power: 1.25, leech: 0.75 },
+        { name: '🛡️ Armadura Umbría', type: 'def', val: 24 },
+        { name: '😈 Furia Soberana', type: 'buff', val: 5 }
+    ],
 
     // ───── PNJ nuevos (también pueden ser tus aliados) ─────
     necro: [ // Veneno, drenaje y huesos
