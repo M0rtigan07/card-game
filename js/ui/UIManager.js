@@ -35,6 +35,7 @@ export class UIManager {
         this.allyNotices = [];
         this.allyNoticeTimer = null;
         this.allyNoticeHost = null;
+        this.realmMode = null;
     }
 
     showScreen(screenId) {
@@ -80,7 +81,9 @@ export class UIManager {
         this.refreshHeroSheet?.(player, dungeonLevel);
 
         const floorDisplay = document.getElementById('sidebarFloorRoman');
-        if (floorDisplay && Number.isInteger(dungeonLevel) && dungeonLevel > 0) {
+        if (this.realmMode) {
+            if (floorDisplay) floorDisplay.textContent = this.realmMode.location;
+        } else if (floorDisplay && Number.isInteger(dungeonLevel) && dungeonLevel > 0) {
             floorDisplay.textContent = toRomanNumeral(dungeonLevel);
         }
 
@@ -115,6 +118,29 @@ export class UIManager {
         if (display) {
             display.textContent = new Intl.NumberFormat('es-ES').format(amount);
         }
+    }
+
+    setRealmMode(active, location) {
+        const label = document.getElementById('sidebarProgressPrimaryLabel');
+        const value = document.getElementById('sidebarFloorRoman');
+        const progress = document.querySelector('.sidebar-progress-stone');
+
+        if (active) {
+            this.realmMode = { location };
+            if (label) label.textContent = 'Región';
+            if (value) value.textContent = location;
+            progress?.setAttribute('aria-label', 'Región y nivel del héroe');
+            document.body.classList.add('dark-world');
+            return;
+        }
+
+        this.realmMode = null;
+        if (label) label.textContent = 'Planta';
+        if (value && Number.isInteger(location) && location > 0) {
+            value.textContent = toRomanNumeral(location);
+        }
+        progress?.setAttribute('aria-label', 'Planta y nivel del héroe');
+        document.body.classList.remove('dark-world');
     }
 
     /** Panel "Grupo": la carta de cada aliado, lo que hace por ti y un botón para despedirle. */

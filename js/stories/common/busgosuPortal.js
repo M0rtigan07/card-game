@@ -29,17 +29,9 @@ export const BUSGOSU_PORTAL = {
             img: 'img/busgosu_portalon.jpg',
             description: '«¡Acertasti, viaxeru!», ríe el Busgosu. Aparta la maleza y revela un portalón de piedra cubierto de símbolos. Las hojas se abren y, al otro lado, aguarda una luz verde imposible.',
             choices: [
-                { text: '🌀 Atravesar el portalón', storyId: 'busgosu', nextChapter: 4 }
-            ]
-        },
-        {
-            id: 4,
-            minLevel: 24,
-            img: 'img/portalon_abierto.jpg',
-            description: 'Cruzas el portalón y entras en el Mundo Oscuro, una realidad donde el cielo no tiene estrellas. En el barro encuentras un broche real y unas huellas pequeñas. El Busgosu te lo explica: «La fía d’un rei ta perdida nesti mundu. Si sigues les güelles, entá puedes atopala.»',
-            choices: [
                 {
-                    text: '🔎 Seguir las huellas y comenzar la búsqueda de la hija del rey',
+                    text: '🌀 Cruzar el portalón y seguir las huellas',
+                    action: 'enter_dark_world',
                     storyId: 'busgosu',
                     nextChapter: -1,
                     quest: {
@@ -47,6 +39,12 @@ export const BUSGOSU_PORTAL = {
                         title: 'La hija del rey',
                         description: 'Busca a la hija del rey en el Mundo Oscuro; sigue las huellas junto al broche real.'
                     }
+                },
+                {
+                    text: '🚶 No cruzar; seguir tu camino por la mazmorra',
+                    action: 'decline_portal',
+                    storyId: 'busgosu',
+                    nextChapter: -1
                 }
             ]
         }

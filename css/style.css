@@ -30,6 +30,50 @@ body {
     position: relative;
 }
 
+body.dark-world {
+    --bg-dark: #07110e;
+    --panel-bg: linear-gradient(135deg, #102720 0%, #17382d 100%);
+    --gold: #8de0bd;
+    --gold-light: #d3f4e3;
+    --gold-border: #427c64;
+    --text-main: #e0f4e9;
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(ellipse at center, rgba(33, 99, 70, .2), transparent 70%);
+}
+
+body.dark-world .container {
+    background: rgba(5, 18, 14, .97);
+    border-color: #427c64;
+    box-shadow: 0 0 34px rgba(67, 175, 125, .32);
+}
+
+body.dark-world .sidebar-progress-stone {
+    background:
+        linear-gradient(135deg, rgba(190, 255, 220, .14), transparent 38%),
+        repeating-linear-gradient(165deg, transparent 0 10px, rgba(130, 220, 175, .035) 11px 12px),
+        linear-gradient(145deg, #315c49 0%, #203e32 48%, #10271e 100%);
+    border-color: #75b795;
+}
+
+body.dark-world #sidebarFloorRoman {
+    font-size: clamp(.78rem, 1.1vw, 1rem);
+    overflow-wrap: anywhere;
+}
+
+body.dark-world .exploration-panel {
+    background: linear-gradient(135deg, rgba(14, 43, 31, .97), rgba(5, 22, 16, .97));
+    border-color: #8de0bd;
+}
+
+body.dark-world .elvira-scene-frame {
+    border-color: #75b795;
+    box-shadow: 0 0 18px rgba(67, 175, 125, .35);
+}
+
+body.dark-world .choice-btn {
+    border-color: #75b795;
+}
+
 /* OVERLAY CRT GLOBAL */
 body::after {
     content: "";

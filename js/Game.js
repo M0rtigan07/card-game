@@ -20,6 +20,7 @@ import { InventoryView } from './views/InventoryView.js';
 import { HeroSheetView } from './views/HeroSheetView.js';
 import { Persuasion } from './systems/Persuasion.js';
 import { StoryManager } from './stories/StoryManager.js';
+import { DarkWorld } from './systems/DarkWorld.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES, PARTY } from './data/gameConfig.js';
@@ -57,6 +58,7 @@ export class Game {
         this.ui.onDismissAlly = (id) => this.dismissAlly(id); // botón ✕ del panel "Grupo"
         this.combat = new TcgCombat(this);
         this.exploration = new Exploration(this);
+        this.darkWorld = new DarkWorld(this);
 
         this.initEvents();
     }
@@ -144,6 +146,11 @@ export class Game {
     }
 
     async startMainGame() {
+        document.body.classList.remove('dark-world');
+        this.ui.setRealmMode(false, 1);
+        if (this.player.storyState?.darkWorld) {
+            this.player.storyState.darkWorld.active = false;
+        }
         this.dungeonLevel = 1;
         this.ui.updateStats(this.player, this.dungeonLevel);
         this.ui.logEvent(`🐉 ¡${this.player.className} entra en la Planta ${this.dungeonLevel}!`);
@@ -614,6 +621,9 @@ ${recruitText}
     // ───────────── FLUJO ENTRE PLANTAS ─────────────
 
     loadNextEvent() {
+        if (this.player.storyState?.darkWorld?.active) {
+            return this.darkWorld.loadNext();
+        }
         return this.exploration.loadNext();
     }
 
@@ -639,6 +649,11 @@ ${recruitText}
 
     // Pasa a la siguiente planta tras una pausa (para dar tiempo a leer)
     advanceFloor(delay = 1800) {
+        if (this.player.storyState?.darkWorld?.active) {
+            this.darkWorld.loadNext();
+            return;
+        }
+
         this.dungeonLevel++;
         this.ui.updateStats(this.player, this.dungeonLevel);
         setTimeout(() => this.loadNextEvent(), delay);

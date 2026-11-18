@@ -233,6 +233,13 @@ export class Exploration {
         if (choice.quest) {
             this.log(`🧭 Nueva misión: ${choice.quest.title}. ${choice.quest.description}`);
         }
+        if (choice.action === 'enter_dark_world') {
+            this.game.darkWorld.enter();
+            return;
+        }
+        if (choice.action === 'decline_portal') {
+            this.log('🚶 Dejas el portalón atrás y continúas por la mazmorra.');
+        }
         if (choice.nextChapter === undefined) {
             this.game.storyManager?.checkStoryProgress(storyId);
         }
