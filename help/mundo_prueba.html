@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo Aventura Gráfica - Babylon.js</title>
+    <!-- Importar Babylon.js -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #111;
+        }
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+        /* Estilo para los botones de navegación en pantalla */
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+        .nav-btn {
+            background-color: rgba(40, 40, 40, 0.8);
+            color: white;
+            border: 2px solid #888;
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: rgba(80, 80, 80, 0.9);
+            border-color: #fff;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 15px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="info">Estás explorando el exterior... <br><span id="location-name">Nodo 1: La Cabaña de Piedra</span></div>
+    
+    <!-- Botones de navegación -->
+    <div id="ui-container">
+        <button class="nav-btn" id="prevBtn" onclick="cambiarNodo(-1)">◀ Anterior</button>
+        <button class="nav-btn" id="nextBtn" onclick="cambiarNodo(1)">Siguiente ▶</button>
+    </div>
+
+    <canvas id="renderCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true);
+
+        let currentNodeIndex = 0;
+        let camera;
+
+        // Definimos los dos Nodos con su posición y hacia dónde miran
+        const nodes = [
+            {
+                name: "Nodo 1: La Cabaña de Piedra",
+                position: new BABYLON.Vector3(0, 1.6, 0),
+                target: new BABYLON.Vector3(0, 1.6, 10)
+            },
+            {
+                name: "Nodo 2: El Arco Monumental",
+                position: new BABYLON.Vector3(15, 1.6, 10),
+                target: new BABYLON.Vector3(15, 1.6, 20)
+            }
+        ];
+
+        const createScene = function () {
+            const scene = new BABYLON.Scene(scene);
+            scene.clearColor = new BABYLON.Color3(0.15, 0.18, 0.22); // Tono exterior
+
+            // Luz ambiental y direccional (simulando sol)
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+            const sun = new BABYLON.DirectionalLight("sun", new BABYLON.Vector3(-1, -2, -1), scene);
+            sun.intensity = 0.5;
+
+            // Suelo general
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 50, height: 50}, scene);
+            const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+            groundMat.diffuseColor = new BABYLON.Color3(0.3, 0.35, 0.3);
+            ground.material = groundMat;
+
+            // --- NODO 1: Elementos visuales (Simulando cabaña/pueblo) ---
+            const cabana = BABYLON.MeshBuilder.CreateBox("cabana", {width: 4, height: 3, depth: 6}, scene);
+            cabana.position = new BABYLON.Vector3(-3, 1.5, 8);
+            const cabanaMat = new BABYLON.StandardMaterial("cabanaMat", scene);
+            cabanaMat.diffuseColor = new BABYLON.Color3(0.5, 0.45, 0.4); // Tono piedra rústica
+            cabana.material = cabanaMat;
+
+            // --- NODO 2: Elementos visuales (Simulando el arco de roca) ---
+            const pilar1 = BABYLON.MeshBuilder.CreateCylinder("pilar1", {height: 6, diameter: 2}, scene);
+            pilar1.position = new BABYLON.Vector3(13, 3, 18);
+            const pilar2 = BABYLON.MeshBuilder.CreateCylinder("pilar2", {height: 6, diameter: 2}, scene);
+            pilar2.position = new BABYL_ON_VECTOR3_PLACEHOLDER = new BABYLON.Vector3(17, 3, 18); // Ajuste limpio
+            pilar2.position = new BABYLON.Vector3(17, 3, 18);
+            
+            const rocaMat = new BABYLON.StandardMaterial("rocaMat", scene);
+            rocaMat.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.45);
+            pilar1.material = rocaMat;
+            pilar2.material = rocaMat;
+
+            // Creamos la cámara en primera persona en el Nodo 0
+            camera = new BABYLON.UniversalCamera("UniversalCamera", nodes[0].position, scene);
+            camera.setTarget(nodes[0].target);
+            // Limitamos un poco la rotación libre para mantener la esencia de aventura gráfica
+            camera.angularSensibility = 1000; 
+
+            return scene;
+        };
+
+        const scene = createScene();
+
+        // Función para mover la cámara suavemente entre nodos (Efecto cinemático)
+        window.cambiarNodo = function(direction) {
+            currentNodeIndex += direction;
+            if (currentNodeIndex < 0) currentNodeIndex = nodes.length - 1;
+            if (currentNodeIndex >= nodes.length) currentNodeIndex = 0;
+
+            const targetNode = nodes[currentNodeIndex];
+
+            // Animación suave de posición (Lerp)
+            BABYLON.Animation.CreateAndStartAnimation(
+                "camMove", camera, "position", 30, 20,
+                camera.position, targetNode.position,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
+
+            // Actualizar texto en pantalla
+            document.getElementById("location-name").innerText = targetNode.name;
+        };
+
+        engine.runRenderLoop(function () {
+            scene.render();
+        });
+
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>

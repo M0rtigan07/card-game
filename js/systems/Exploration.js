@@ -233,8 +233,26 @@ export class Exploration {
         if (choice.quest) {
             this.log(`🧭 Nueva misión: ${choice.quest.title}. ${choice.quest.description}`);
         }
+        if (choice.action === 'reject_busgosu_sidra') {
+            await this.showBusgosuFarewell(
+                NPC_DATABASE.busgosu.images.enraged,
+                'EL BUSGOSU SE ENFADA',
+                '«¡Nun te daré sidra nin te cuntaré nada! ¡Sigue’l to camín!», protesta el Busgosu, enfadáu.',
+                '😠 Refugas la sidra. El Busgosu se enfada y no comparte su historia.'
+            );
+            return;
+        }
+        if (choice.action === 'fail_busgosu_riddle') {
+            await this.showBusgosuFarewell(
+                NPC_DATABASE.busgosu.images.talk,
+                'EL BUSGOSU SE DESPIDE',
+                '«¡Fallasti, viaxeru! Nun hai más intentos. Hasta otra; sigue’l to camín.» El Busgosu s’allonga ente los árboles.',
+                '❌ Fallas el acertijo. El Busgosu se despide y sigues tu camino.'
+            );
+            return;
+        }
         if (choice.action === 'enter_dark_world') {
-            this.game.darkWorld.enter();
+            await this.game.darkWorld.enterThroughPortal();
             return;
         }
         if (choice.action === 'decline_portal') {
@@ -250,6 +268,16 @@ export class Exploration {
         }
 
         this.game.finishEncounter(1400);
+    }
+
+    async showBusgosuFarewell(image, badge, description, logMessage) {
+        const view = this.render();
+        this.setSceneImage(image);
+        setText('sceneBadgeOverlay', badge);
+        view.setNarrative(description, []);
+        this.log(logMessage);
+        await wait(1600);
+        this.game.finishEncounter(0);
     }
 
     // ───────────── PNJ FIJOS ─────────────

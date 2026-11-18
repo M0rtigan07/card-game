@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura Gráfica Medieval - Babylon.js</title>
+    <!-- Tipografía medieval de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Importar Babylon.js -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Crimson Text', Georgia, serif;
+            background-color: #14110e;
+            color: #e6dcc8;
+            user-select: none;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            border: 6px solid #2b241d;
+            box-sizing: border-box;
+        }
+
+        /* Pantalla 3D superior */
+        #viewport {
+            position: relative;
+            width: 100%;
+            height: 68vh;
+            border-bottom: 4px solid #3a2e23;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Zonas sensibles de navegación en los bordes con estilo hierro/piedra */
+        .nav-zone {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 12%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            color: rgba(212, 175, 55, 0.25);
+            text-shadow: 2px 2px 4px #000;
+            transition: all 0.3s ease;
+        }
+        .nav-zone:hover {
+            background: linear-gradient(90deg, rgba(20, 15, 10, 0.7) 0%, transparent 100%);
+            color: #f3c65f;
+            cursor: pointer;
+        }
+        #nav-right:hover {
+            background: linear-gradient(-90deg, rgba(20, 15, 10, 0.7) 0%, transparent 100%);
+        }
+        #nav-left { left: 0; }
+        #nav-right { right: 0; }
+
+        /* Cartel superior flotante con el nombre del lugar */
+        #location-banner {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #2b231b 0%, #1a1510 100%);
+            border: 2px solid #7c6242;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8), inset 0 0 8px rgba(0,0,0,0.9);
+            padding: 6px 24px;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            color: #e8cfa1;
+            pointer-events: none;
+            z-index: 6;
+            border-radius: 3px;
+        }
+
+        /* Panel de Interfaz inferior estilo piedra y pergamino */
+        #hud-panel {
+            width: 100%;
+            height: 32vh;
+            /* Textura de piedra oscura generada con gradientes CSS */
+            background-color: #231f1c;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.4) 100%),
+                repeating-linear-gradient(45deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 6px);
+            border-top: 3px solid #6b5335;
+            display: flex;
+            box-sizing: border-box;
+            padding: 14px;
+            gap: 16px;
+        }
+
+        /* Ventana de texto estilo Pergamino Envejecido */
+        #text-box {
+            flex: 2.2;
+            background-color: #d8c7a3;
+            background-image: radial-gradient(ellipse at center, #e5d7b8 0%, #c4ae82 100%);
+            border: 4px ridge #7c6242;
+            box-shadow: inset 0 0 18px rgba(62, 42, 20, 0.65), 0 4px 8px rgba(0,0,0,0.7);
+            padding: 14px 18px;
+            font-size: 18px;
+            line-height: 1.45;
+            overflow-y: auto;
+            color: #2b1d0e; /* Tinta oscura sobre pergamino */
+        }
+        #text-box b {
+            color: #5c1a12;
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+        }
+
+        /* Panel de Inventario estilo Cofre / Madera y Hierro */
+        #inventory-box {
+            flex: 1;
+            background: linear-gradient(180deg, #1d1814 0%, #120f0c 100%);
+            border: 4px ridge #6b5335;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9), 0 4px 8px rgba(0,0,0,0.7);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #inventory-title {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: #c9a66b;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #4a3926;
+            padding-bottom: 5px;
+        }
+
+        #inventory-slots {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .slot {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #2c241d 0%, #16120e 100%);
+            border: 3px solid #59442b;
+            box-shadow: inset 0 0 10px #000;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 28px;
+            transition: transform 0.15s, border-color 0.2s;
+        }
+        .slot:hover {
+            border-color: #a8844c;
+        }
+        .slot.selected {
+            border-color: #f3c65f;
+            box-shadow: 0 0 12px rgba(243, 198, 95, 0.6), inset 0 0 8px rgba(243, 198, 95, 0.3);
+            transform: scale(1.06);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Vista del Mundo 3D -->
+        <div id="viewport">
+            <div id="location-banner">La Cabaña de Piedra</div>
+            <div id="nav-left" class="nav-zone" onclick="cambiarNodo(-1)" title="Ir a la izquierda">◄</div>
+            <div id="nav-right" class="nav-zone" onclick="cambiarNodo(1)" title="Ir a la derecha">►</div>
+            <canvas id="renderCanvas"></canvas>
+        </div>
+
+        <!-- Panel Inferior Medieval -->
+        <div id="hud-panel">
+            <div id="text-box">
+                Has cruzado el antiguo portalón. El aire fresco de la montaña reemplaza la humedad de la mazmorra.<br>
+                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería. Algo metálico destella junto al muro.
+            </div>
+            <div id="inventory-box">
+                <div id="inventory-title">Alforja</div>
+                <div id="inventory-slots">
+                    <div class="slot" id="slot-0" onclick="seleccionarObjeto(0)" title="Vacío"></div>
+                    <div class="slot" id="slot-1" onclick="seleccionarObjeto(1)" title="Vacío"></div>
+                    <div class="slot" id="slot-2" onclick="seleccionarObjeto(2)" title="Vacío"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true);
+
+        let currentNodeIndex = 0;
+        let camera;
+        let inventario = [];
+        let objetoSeleccionado = null;
+        let llaveCogida = false;
+        let puertaAbierta = false;
+
+        const nodes = [
+            {
+                name: "La Cabaña de Piedra",
+                position: new BABYLON.Vector3(0, 1.6, 0),
+                target: new BABYLON.Vector3(0, 1.6, 10),
+                desc: "Ante ti se alza una construcción rústica de mampostería. Algo metálico destella junto al muro."
+            },
+            {
+                name: "El Monolito del Paso",
+                position: new BABYLON.Vector3(15, 1.6, 10),
+                target: new BABYLON.Vector3(15, 1.6, 20),
+                desc: "Una imponente formación rocosa bloquea el sendero. En su base hay un portón de madera reforzada."
+            }
+        ];
+
+        // --- GENERADOR DE TEXTURAS PROCEDURALES PARA BABYLON ---
+        function crearTexturaPiedra(scene) {
+            const tex = new BABYLON.DynamicTexture("piedraTex", 512, scene, false);
+            const ctx = tex.getContext();
+            ctx.fillStyle = "#5c554d";
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Dibujar bloques irregulares de piedra rústica
+            for (let y = 0; y < 512; y += 32) {
+                let offset = (y / 32) % 2 === 0 ? 0 : 25;
+                for (let x = -32; x < 512; x += 64) {
+                    const tono = 75 + Math.floor(Math.random() * 35);
+                    ctx.fillStyle = `rgb(${tono + 8}, ${tono + 3}, ${tono - 5})`;
+                    ctx.fillRect(x + offset + 2, y + 2, 60, 28);
+                    ctx.strokeStyle = "#332e29";
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(x + offset + 2, y + 2, 60, 28);
+                }
+            }
+            tex.update();
+            tex.uScale = 3;
+            tex.vScale = 3;
+            return tex;
+        }
+
+        function crearTexturaHierba(scene) {
+            const tex = new BABYLON.DynamicTexture("hierbaTex", 512, scene, false);
+            const ctx = tex.getContext();
+            ctx.fillStyle = "#37472a";
+            ctx.fillRect(0, 0, 512, 512);
+
+            for (let i = 0; i < 4000; i++) {
+                const x = Math.random() * 512;
+                const y = Math.random() * 512;
+                ctx.fillStyle = Math.random() > 0.5 ? "#465934" : "#29361f";
+                ctx.fillRect(x, y, 3, 6);
+            }
+            tex.update();
+            tex.uScale = 12;
+            tex.vScale = 12;
+            return tex;
+        }
+
+        function crearTexturaMadera(scene) {
+            const tex = new BABYLON.DynamicTexture("maderaTex", 256, scene, false);
+            const ctx = tex.getContext();
+            ctx.fillStyle = "#4a2e1b";
+            ctx.fillRect(0, 0, 256, 256);
+
+            // Tablones verticales
+            for (let x = 0; x < 256; x += 32) {
+                ctx.fillStyle = x % 64 === 0 ? "#3d2515" : "#543520";
+                ctx.fillRect(x, 0, 30, 256);
+                ctx.fillStyle = "#1f1209";
+                ctx.fillRect(x + 30, 0, 2, 256);
+            }
+            // Herrajes de hierro horizontales
+            ctx.fillStyle = "#222426";
+            ctx.fillRect(0, 45, 256, 18);
+            ctx.fillRect(0, 190, 256, 18);
+            tex.update();
+            return tex;
+        }
+
+        let meshLlave, meshPuerta;
+
+        const createScene = function () {
+            const scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(0.45, 0.55, 0.65); // Cielo de montaña
+            scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+            scene.fogDensity = 0.015;
+            scene.fogColor = new BABYLON.Color3(0.5, 0.58, 0.65);
+
+            // Iluminación natural
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.85;
+            const sun = new BABYLON.DirectionalLight("sun", new BABYLON.Vector3(-1, -2, 1), scene);
+            sun.intensity = 0.6;
+
+            // Suelo con textura de prado
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 80, height: 80}, scene);
+            const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+            groundMat.diffuseTexture = crearTexturaHierba(scene);
+            groundMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+            ground.material = groundMat;
+
+            // Material de piedra rústica compartido
+            const matPiedra = new BABYLON.StandardMaterial("matPiedra", scene);
+            matPiedra.diffuseTexture = crearTexturaPiedra(scene);
+            matPiedra.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+
+            // --- NODO 1: Cabaña de piedra y Llave ---
+            const cabana = BABYLON.MeshBuilder.CreateBox("cabana", {width: 5, height: 4, depth: 6}, scene);
+            cabana.position = new BABYLON.Vector3(-3.5, 2, 10);
+            cabana.material = matPiedra;
+
+            // Tejado inclinado simple
+            const tejado = BABYLON.MeshBuilder.CreateCylinder("tejado", {diameter: 7.2, height: 6.2, tessellation: 3}, scene);
+            tejado.rotation.z = Math.PI / 2;
+            tejado.rotation.y = Math.PI / 2;
+            tejado.position = new BABYLON.Vector3(-3.5, 4.8, 10);
+            const matTejado = new BABYLON.StandardMaterial("matTejado", scene);
+            matTejado.diffuseColor = new BABYLON.Color3(0.35, 0.22, 0.16);
+            tejado.material = matTejado;
+
+            // Llave antigua en el suelo
+            meshLlave = BABYLON.MeshBuilder.CreateBox("llave", {width: 0.5, height: 0.08, depth: 0.25}, scene);
+            meshLlave.position = new BABYLON.Vector3(-0.8, 0.08, 6.5);
+            const matLlave = new BABYLON.StandardMaterial("matLlave", scene);
+            matLlave.diffuseColor = new BABYLON.Color3(0.85, 0.65, 0.15);
+            matLlave.emissiveColor = new BABYLON.Color3(0.25, 0.18, 0.02);
+            meshLlave.material = matLlave;
+
+            meshLlave.actionManager = new BABYLON.ActionManager(scene);
+            meshLlave.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                if (!llaveCogida) {
+                    llaveCogida = true;
+                    inventario.push({ id: "llave", nombre: "Llave de Hierro Antiguo", icono: "🗝️" });
+                    meshLlave.dispose();
+                    actualizarInventario();
+                    mostrarTexto("Has recogido una pesada <b>Llave de Hierro Antiguo</b> del suelo y la has guardado en tu alforja.");
+                }
+            }));
+
+            // --- NODO 2: Monolito de piedra y Portón de madera ---
+            const monolito = BABYLON.MeshBuilder.CreateCylinder("monolito", {height: 9, diameterTop: 3.5, diameterBottom: 4.5, tessellation: 7}, scene);
+            monolito.position = new BABYLON.Vector3(15, 4.5, 25);
+            monolito.material = matPiedra;
+
+            meshPuerta = BABYLON.MeshBuilder.CreateBox("puerta", {width: 1.6, height: 2.6, depth: 0.25}, scene);
+            meshPuerta.position = new BABYLON.Vector3(15, 1.3, 22.8);
+            const matPuerta = new BABYLON.StandardMaterial("matPuerta", scene);
+            matPuerta.diffuseTexture = crearTexturaMadera(scene);
+            meshPuerta.material = matPuerta;
+
+            meshPuerta.actionManager = new BABYLON.ActionManager(scene);
+            meshPuerta.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                if (puertaAbierta) {
+                    mostrarTexto("El portón de madera ya está abierto, revelando un estrecho pasaje excavado en la roca.");
+                    return;
+                }
+
+                if (objetoSeleccionado === "llave") {
+                    puertaAbierta = true;
+                    // Animar la apertura de la puerta rotándola
+                    BABYLON.Animation.CreateAndStartAnimation(
+                        "abrirPuerta", meshPuerta, "rotation.y", 30, 30,
+                        0, Math.PI / 2.2, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+                    );
+                    meshPuerta.position.x -= 0.7;
+                    meshPuerta.position.z -= 0.6;
+                    mostrarTexto("¡La <b>Llave de Hierro Antiguo</b> encaja con un chasquido seco! Los goznes chirrían mientras el portón se abre.");
+                } else {
+                    mostrarTexto("El portón de roble está cerrado a cal y canto. Tiene una cerradura oxidada en el centro.");
+                }
+            }));
+
+            // Cámara en primera persona
+            camera = new BABYLON.UniversalCamera("Cam", nodes[0].position, scene);
+            camera.setTarget(nodes[0].target);
+            camera.angularSensibility = 1500;
+
+            return scene;
+        };
+
+        const scene = createScene();
+
+        window.cambiarNodo = function(direction) {
+            currentNodeIndex += direction;
+            if (currentNodeIndex < 0) currentNodeIndex = nodes.length - 1;
+            if (currentNodeIndex >= nodes.length) currentNodeIndex = 0;
+
+            const targetNode = nodes[currentNodeIndex];
+
+            BABYLON.Animation.CreateAndStartAnimation(
+                "camMove", camera, "position", 30, 25,
+                camera.position, targetNode.position,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
+
+            document.getElementById("location-banner").innerText = targetNode.name;
+            mostrarTexto(`<b>${targetNode.name}:</b> ${targetNode.desc}`);
+        };
+
+        function mostrarTexto(texto) {
+            document.getElementById("text-box").innerHTML = texto;
+        }
+
+        function actualizarInventario() {
+            for (let i = 0; i < 3; i++) {
+                const slot = document.getElementById(`slot-${i}`);
+                if (inventario[i]) {
+                    slot.innerText = inventario[i].icono;
+                    slot.title = inventario[i].nombre;
+                } else {
+                    slot.innerText = "";
+                    slot.title = "Vacío";
+                }
+            }
+        }
+
+        window.seleccionarObjeto = function(index) {
+            if (inventario[index]) {
+                if (objetoSeleccionado === inventario[index].id) {
+                    objetoSeleccionado = null;
+                    document.getElementById(`slot-${index}`).classList.remove("selected");
+                    mostrarTexto("Has guardado el objeto en tu alforja.");
+                } else {
+                    objetoSeleccionado = inventario[index].id;
+                    for (let i = 0; i < 3; i++) {
+                        document.getElementById(`slot-${i}`).classList.remove("selected");
+                    }
+                    document.getElementById(`slot-${index}`).classList.add("selected");
+                    mostrarTexto(`Sostienes en tu mano: <b>${inventario[index].nombre}</b>. Haz clic sobre aquello con lo que quieras interactuar.`);
+                }
+            }
+        };
+
+        engine.runRenderLoop(function () {
+            scene.render();
+        });
+
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>

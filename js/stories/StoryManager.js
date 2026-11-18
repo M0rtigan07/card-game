@@ -31,6 +31,20 @@ export class StoryManager {
         ];
     }
 
+    buildEncounter(story, chapter) {
+        const content = chapter.createEncounter?.(this.player) || chapter;
+        const description = content.description ?? chapter.description ?? '';
+
+        return {
+            storyId: story.id,
+            storyTitle: story.title,
+            chapterId: chapter.id,
+            img: content.img ?? chapter.img,
+            description: description.replace('{monkName}', this.getMonkName()),
+            choices: content.choices ?? chapter.choices
+        };
+    }
+
     /**
      * Devuelve el siguiente encuentro narrativo
      * o null si no toca historia.
@@ -87,25 +101,7 @@ export class StoryManager {
                 continue;
             }
 
-            return {
-
-                storyId: story.id,
-
-                storyTitle:
-                    story.title,
-
-                chapterId:
-                    chapter.id,
-
-                img:
-                    chapter.img,
-
-                description:
-                    chapter.description.replace('{monkName}', this.getMonkName()),
-
-                choices:
-                    chapter.choices
-            };
+            return this.buildEncounter(story, chapter);
         }
 
         return null;
@@ -137,23 +133,7 @@ export class StoryManager {
             return null;
         }
 
-        return {
-
-            storyId: story.id,
-
-            storyTitle: story.title,
-
-            chapterId: chapter.id,
-
-            img: chapter.img,
-
-            description:
-                chapter.description.replace('{monkName}', this.getMonkName()),
-
-            choices:
-                chapter.choices
-
-        };
+        return this.buildEncounter(story, chapter);
 
     }
 

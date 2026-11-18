@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventura Gráfica - Estilo Lost in Time</title>
+    <!-- Importar Babylon.js -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #050505;
+            color: #d4d4d4;
+            user-select: none;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Pantalla 3D superior */
+        #viewport {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            cursor: default;
+        }
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Zonas sensibles de navegación en los bordes de la pantalla 3D */
+        .nav-zone {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 15%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.2);
+            transition: background 0.3s, color 0.3s;
+            pointer-events: auto;
+        }
+        .nav-zone:hover {
+            background: rgba(0, 0, 0, 0.4);
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+        }
+        #nav-left { left: 0; }
+        #nav-right { right: 0; }
+
+        /* Panel de Interfaz inferior estilo años 90 */
+        #hud-panel {
+            width: 100%;
+            height: 30vh;
+            background-color: #121216;
+            border-top: 4px solid #333;
+            display: flex;
+            box-sizing: border-box;
+            padding: 10px;
+            gap: 15px;
+        }
+
+        /* Ventana de texto/diálogos del juego */
+        #text-box {
+            flex: 2;
+            background-color: #08080a;
+            border: 2px inset #444;
+            padding: 15px;
+            font-size: 15px;
+            line-height: 1.4;
+            overflow-y: auto;
+            color: #55ff55; /* Estilo terminal clásica */
+        }
+
+        /* Panel de Inventario */
+        #inventory-box {
+            flex: 1;
+            background-color: #08080a;
+            border: 2px inset #444;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #inventory-title {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 3px;
+        }
+
+        #inventory-slots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            background-color: #1a1a22;
+            border: 2px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        .slot.selected {
+            border-color: #ffcc00;
+            background-color: #2a2a35;
+        }
+
+        /* Cursor personalizado */
+        .cursor-examine { cursor: zoom-in; }
+        .cursor-action { cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Vista del Mundo 3D -->
+        <div id="viewport">
+            <div id="nav-left" class="nav-zone" onclick="cambiarNodo(-1)">◄</div>
+            <div id="nav-right" class="nav-zone" onclick="cambiarNodo(1)">►</div>
+            <canvas id="renderCanvas"></canvas>
+        </div>
+
+        <!-- Panel Inferior de Aventura Gráfica -->
+        <div id="hud-panel">
+            <div id="text-box">
+                > Has cruzado el portalón dimensional. El aire aquí es denso y huele a piedra antigua.<br>
+                > **Nodo 1: La Cabaña de Piedra.** Observas una estructura rústica. Hay un objeto brillante en el suelo.
+            </div>
+            <div id="inventory-box">
+                <div id="inventory-title">Inventario</div>
+                <div id="inventory-slots">
+                    <div class="slot" id="slot-0" onclick="seleccionarObjeto(0)" title="Vacío"></div>
+                    <div class="slot" id="slot-1" onclick="seleccionarObjeto(1)" title="Vacío"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true);
+
+        let currentNodeIndex = 0;
+        let camera;
+        let inventario = [];
+        let objetoSeleccionado = null;
+        let llaveCogida = false;
+        let puertaAbierta = false;
+
+        // Definición de Nodos del mundo abierto
+        const nodes = [
+            {
+                name: "Nodo 1: La Cabaña de Piedra",
+                position: new BABYLON.Vector3(0, 1.6, 0),
+                target: new BABYLON.Vector3(0, 1.6, 10),
+                desc: "Estás frente a la cabaña rústica de piedra. Algo brilla cerca de los cimientos."
+            },
+            {
+                name: "Nodo 2: El Monolito Antiguo",
+                position: new BABYLON.Vector3(15, 1.6, 10),
+                target: new BABYLON.Vector3(15, 1.6, 20),
+                desc: "Te encuentras ante el monolito de piedra colosal. Hay una pesada puerta cerrada con una cerradura extraña."
+            }
+        ];
+
+        let meshLlave, meshPuerta;
+
+        const createScene = function () {
+            const scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(0.1, 0.12, 0.15);
+
+            // Iluminación
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.8;
+
+            // Suelo
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 60, height: 60}, scene);
+            const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+            groundMat.diffuseColor = new BABYLON.Color3(0.25, 0.28, 0.25);
+            ground.material = groundMat;
+
+            // --- NODO 1: Cabaña y Objeto coleccionable (Llave de Piedra) ---
+            const cabana = BABYLON.MeshBuilder.CreateBox("cabana", {width: 5, height: 4, depth: 6}, scene);
+            cabana.position = new BABYLON.Vector3(-4, 2, 10);
+            const matCabana = new BABYLON.StandardMaterial("matCabana", scene);
+            matCabana.diffuseColor = new BABYLON.Color3(0.4, 0.35, 0.3);
+            cabana.material = matCabana;
+
+            // La Llave en el suelo del Nodo 1
+            meshLlave = BABYLON.MeshBuilder.CreateBox("llave", {width: 0.6, height: 0.1, depth: 0.3}, scene);
+            meshLlave.position = new BABYLON.Vector3(-1, 0.1, 6);
+            const matLlave = new BABYLON.StandardMaterial("matLlave", scene);
+            matLlave.diffuseColor = new BABYLON.Color3(0.9, 0.8, 0.2); // Dorada/Brillante
+            meshLlave.material = matLlave;
+
+            // Interacción con la llave (Coger objeto)
+            meshLlave.actionManager = new BABYLON.ActionManager(scene);
+            meshLlave.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                if (!llaveCogida) {
+                    llaveCogida = true;
+                    inventario.push({ id: "llave", nombre: "Llave de Piedra", icono: "🔑" });
+                    meshLlave.dispose(); // Desaparece del escenario
+                    actualizarInventario();
+                    mostrarTexto("> Has cogido la **Llave de Piedra** del suelo.");
+                }
+            }));
+
+
+            // --- NODO 2: Monolito y Puerta interactiva ---
+            const monolito = BABYLON.MeshBuilder.CreateCylinder("monolito", {height: 8, diameter: 3}, scene);
+            monolito.position = new BABYLON.Vector3(15, 4, 25);
+            const matMonolito = new BABYLON.StandardMaterial("matMonolito", scene);
+            matMonolito.diffuseColor = new BABYLON.Color3(0.35, 0.35, 0.4);
+            monolito.material = matMonolito;
+
+            // Puerta del Monolito
+            meshPuerta = BABYLON.MeshBuilder.CreateBox("puerta", {width: 1.5, height: 2.5, depth: 0.2}, scene);
+            meshPuerta.position = new BABYLON.Vector3(15, 1.25, 23.4);
+            const matPuerta = new BABYLON.StandardMaterial("matPuerta", scene);
+            matPuerta.diffuseColor = new BABYLON.Color3(0.5, 0.2, 0.2); // Roja cerrada
+            meshPuerta.material = matPuerta;
+
+            // Interacción con la puerta (Usar llave o examinar)
+            meshPuerta.actionManager = new BABYLON.ActionManager(scene);
+            meshPuerta.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                if (puertaAbierta) {
+                    mostrarTexto("> La puerta ya está abierta. El camino hacia lo desconocido aguarda.");
+                    return;
+                }
+
+                if (objetoSeleccionado === "llave") {
+                    puertaAbierta = true;
+                    matPuerta.diffuseColor = new BABYLON.Color3(0.2, 0.7, 0.2); // Se vuelve verde
+                    mostrarTexto("> ¡Has usado la **Llave de Piedra**! La pesada puerta se desliza lentamente revelando un nuevo pasaje.");
+                } else {
+                    mostrarTexto("> La puerta está cerrada herméticamente con una cerradura de piedra. Necesitas algún objeto para abrirla.");
+                }
+            }));
+
+            // Configurar Cámara Inicial
+            camera = new BABYLON.UniversalCamera("Cam", nodes[0].position, scene);
+            camera.setTarget(nodes[0].target);
+            camera.angularSensibility = 1200;
+
+            return scene;
+        };
+
+        const scene = createScene();
+
+        // Función para cambiar de nodo con transición cinemática
+        window.cambiarNodo = function(direction) {
+            currentNodeIndex += direction;
+            if (currentNodeIndex < 0) currentNodeIndex = nodes.length - 1;
+            if (currentNodeIndex >= nodes.length) currentNodeIndex = 0;
+
+            const targetNode = nodes[currentNodeIndex];
+
+            BABYLON.Animation.CreateAndStartAnimation(
+                "camMove", camera, "position", 30, 20,
+                camera.position, targetNode.position,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
+
+            mostrarTexto(`> Has cambiado de posición.<br>> **${targetNode.name}**. ${targetNode.desc}`);
+        };
+
+        function mostrarTexto(texto) {
+            document.getElementById("text-box").innerHTML = texto;
+        }
+
+        function actualizarInventario() {
+            const slot0 = document.getElementById("slot-0");
+            if (inventario.length > 0) {
+                slot0.innerText = inventario[0].icono;
+                slot0.title = inventario[0].nombre;
+            } else {
+                slot0.innerText = "";
+                slot0.title = "Vacío";
+            }
+        }
+
+        window.seleccionarObjeto = function(index) {
+            if (inventario[index]) {
+                if (objetoSeleccionado === inventario[index].id) {
+                    objetoSeleccionado = null; // Deseleccionar
+                    document.getElementById(`slot-${index}`).classList.remove("selected");
+                    mostrarTexto("> Has deseleccionado el objeto.");
+                } else {
+                    objetoSeleccionado = inventario[index].id;
+                    document.getElementById("slot-0").classList.remove("selected");
+                    document.getElementById(`slot-${index}`).classList.add("selected");
+                    mostrarTexto(`> Has seleccionado: **${inventario[index].nombre}**. Haz clic en el elemento del escenario donde quieras usarlo.`);
+                }
+            }
+        };
+
+        engine.runRenderLoop(function () {
+            scene.render();
+        });
+
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>

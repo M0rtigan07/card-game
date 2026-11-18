@@ -1,4 +1,7 @@
-import { setText } from '../ui/helpers.js';
+import { setText, wait } from '../ui/helpers.js';
+
+const PORTAL_TRANSITION_MS = 1500;
+const WORLD_REVEAL_DELAY_MS = 850;
 
 const REGIONS = [
     {
@@ -10,7 +13,7 @@ const REGIONS = [
     {
         label: 'BOSQUE',
         title: 'El bosque petrificado',
-        image: 'img/portalon.jpg',
+        image: 'img/moscuro/bosque.jpg',
         description: 'Sigues las huellas entre árboles convertidos en piedra. Junto a ellas aparecen marcas recientes de una bota pequeña; la princesa aún puede estar cerca.'
     },
     {
@@ -58,6 +61,24 @@ export class DarkWorld {
         document.body.classList.add('dark-world');
         this.game.ui.setRealmMode(true, REGIONS[0].label);
         this.game.loadNextEvent();
+    }
+
+    async enterThroughPortal() {
+        const reducedMotion = typeof window !== 'undefined'
+            && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+        if (reducedMotion) {
+            this.enter();
+            return;
+        }
+
+        document.body.classList.add('portal-transition');
+        try {
+            await wait(WORLD_REVEAL_DELAY_MS);
+            this.enter();
+            await wait(PORTAL_TRANSITION_MS - WORLD_REVEAL_DELAY_MS);
+        } finally {
+            document.body.classList.remove('portal-transition');
+        }
     }
 
     loadNext() {

@@ -197,7 +197,8 @@ export const NPC_DATABASE = {
             talk: 'img/busgosu_habla.jpg',
             offer: 'img/busgosu_ofrece.jpg',
             riddle: 'img/busgosu_acertijo.jpg',
-            portal: 'img/busgosu_portalon.jpg'
+            portal: 'img/busgosu_portalon.jpg',
+            enraged: 'img/busgosu_enfado.jpg'
         },
         type: 'folklore',
         archetype: 'un hombre cabra de la mitología asturiana, guardián de la viesca y de sus antiguos secretos',

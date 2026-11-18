@@ -1,9 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { BUSGOSU_PORTAL } from './common/busgosuPortal.js';
+import {
+    BUSGOSU_PORTAL,
+    BUSGOSU_RIDDLES,
+    createBusgosuRiddleEncounter
+} from './common/busgosuPortal.js';
 import { StoryManager } from './StoryManager.js';
 import { StoryResolver } from './StoryResolver.js';
 import { advanceDarkWorldState, createDarkWorldState, DarkWorld } from '../systems/DarkWorld.js';
+import { NPC_DATABASE } from '../data/npcs.js';
+import { Exploration } from '../systems/Exploration.js';
 
 test('Busgosu is the first global story at floor 21', () => {
     const player = { className: 'Guerrero' };
@@ -13,16 +19,38 @@ test('Busgosu is the first global story at floor 21', () => {
     assert.equal(encounter.chapterId, 1);
 });
 
-test('wrong riddle answers allow another attempt and the correct answer opens the portal chapter', () => {
+test('a wrong riddle answer ends Busgosu’s story while the correct answer opens the portal chapter', () => {
     const player = { storyState: { busgosu: 2 } };
-    const [correctAnswer, wrongAnswer] = BUSGOSU_PORTAL.chapters[1].choices;
+    const riddle = new StoryManager(player).getStoryEncounter(21);
+    const wrongAnswer = riddle.choices.find(choice => choice.action === 'fail_busgosu_riddle');
 
     StoryResolver.applyChoice(player, wrongAnswer);
-    assert.equal(player.storyState.busgosu, 2);
+    assert.equal(player.storyState.busgosu, -1);
 
-    StoryResolver.applyChoice(player, correctAnswer);
-    assert.equal(player.storyState.busgosu, 3);
-    assert.equal(new StoryManager(player).getStoryEncounter(23).chapterId, 3);
+    const correctPlayer = { storyState: { busgosu: 2 } };
+    const correctEncounter = new StoryManager(correctPlayer).getStoryEncounter(21);
+    const correctAnswer = correctEncounter.choices.find(choice => choice.nextChapter === 3);
+    StoryResolver.applyChoice(correctPlayer, correctAnswer);
+    assert.equal(correctPlayer.storyState.busgosu, 3);
+    assert.equal(new StoryManager(correctPlayer).getStoryEncounter(23).chapterId, 3);
+});
+
+test('Busgosu randomly selects every riddle and marks only its answer as correct', () => {
+    const selectedQuestions = new Set();
+
+    BUSGOSU_RIDDLES.forEach((riddle, index) => {
+        const encounter = createBusgosuRiddleEncounter({}, () => index / BUSGOSU_RIDDLES.length);
+        const correct = encounter.choices.find(choice => choice.nextChapter === 3);
+        const wrong = encounter.choices.filter(choice => choice.action === 'fail_busgosu_riddle');
+
+        assert.ok(encounter.description.includes(riddle.question));
+        assert.equal(correct.text, riddle.answer);
+        assert.equal(wrong.length, 2);
+        assert.ok(wrong.every(choice => choice.nextChapter === -1));
+        selectedQuestions.add(riddle.question);
+    });
+
+    assert.equal(selectedQuestions.size, BUSGOSU_RIDDLES.length);
 });
 
 test('entering the dark world records the active search for the king’s daughter', () => {
@@ -46,6 +74,93 @@ test('declining the portal completes the encounter without entering the parallel
 
     assert.equal(player.storyState.busgosu, -1);
     assert.equal(player.storyState.darkWorld, undefined);
+});
+
+test('rejecting Busgosu’s cider shows his angry image, skips his story, and advances the floor', async () => {
+    const originalDocument = globalThis.document;
+    const badge = { textContent: '' };
+    const player = { storyState: { busgosu: 1 } };
+    const rendered = [];
+    const sceneImages = [];
+    const finishedEncounters = [];
+    const logs = [];
+    const game = {
+        player,
+        ui: { logEvent(message) { logs.push(message); } },
+        finishEncounter(delay) { finishedEncounters.push(delay); }
+    };
+    const exploration = Object.create(Exploration.prototype);
+    exploration.game = game;
+    exploration.lockChoices = () => {};
+    exploration.render = () => ({
+        setNarrative(description, choices) {
+            rendered.push({ description, choices });
+        }
+    });
+    exploration.setSceneImage = (image) => sceneImages.push(image);
+    globalThis.document = {
+        getElementById(id) { return id === 'sceneBadgeOverlay' ? badge : null; }
+    };
+
+    try {
+        await exploration.onStoryChoice(BUSGOSU_PORTAL.chapters[0].choices[1], 'busgosu');
+
+        assert.equal(player.storyState.busgosu, -1);
+        assert.equal(NPC_DATABASE.busgosu.images.enraged, 'img/busgosu_enfado.jpg');
+        assert.deepEqual(sceneImages, ['img/busgosu_enfado.jpg']);
+        assert.match(rendered[0].description, /Nun te daré sidra/i);
+        assert.deepEqual(rendered[0].choices, []);
+        assert.equal(badge.textContent, 'EL BUSGOSU SE ENFADA');
+        assert.deepEqual(finishedEncounters, [0]);
+        assert.ok(logs.some(message => message.includes('no comparte su historia')));
+    } finally {
+        globalThis.document = originalDocument;
+    }
+});
+
+test('a wrong riddle answer makes Busgosu say goodbye without revealing the answer', async () => {
+    const originalDocument = globalThis.document;
+    const badge = { textContent: '' };
+    const player = { storyState: { busgosu: 2 } };
+    const rendered = [];
+    const sceneImages = [];
+    const finishedEncounters = [];
+    const logs = [];
+    const riddle = createBusgosuRiddleEncounter(player, () => 0);
+    const wrongAnswer = riddle.choices.find(choice => choice.action === 'fail_busgosu_riddle');
+    const correctAnswer = riddle.choices.find(choice => choice.nextChapter === 3);
+    const game = {
+        player,
+        ui: { logEvent(message) { logs.push(message); } },
+        finishEncounter(delay) { finishedEncounters.push(delay); }
+    };
+    const exploration = Object.create(Exploration.prototype);
+    exploration.game = game;
+    exploration.lockChoices = () => {};
+    exploration.render = () => ({
+        setNarrative(description, choices) {
+            rendered.push({ description, choices });
+        }
+    });
+    exploration.setSceneImage = (image) => sceneImages.push(image);
+    globalThis.document = {
+        getElementById(id) { return id === 'sceneBadgeOverlay' ? badge : null; }
+    };
+
+    try {
+        await exploration.onStoryChoice(wrongAnswer, 'busgosu');
+
+        assert.equal(player.storyState.busgosu, -1);
+        assert.deepEqual(sceneImages, ['img/busgosu_habla.jpg']);
+        assert.match(rendered[0].description, /Fallasti.*Nun hai más intentos/i);
+        assert.ok(!rendered[0].description.includes(correctAnswer.text));
+        assert.deepEqual(rendered[0].choices, []);
+        assert.equal(badge.textContent, 'EL BUSGOSU SE DESPIDE');
+        assert.deepEqual(finishedEncounters, [0]);
+        assert.ok(logs.some(message => message.includes('se despide')));
+    } finally {
+        globalThis.document = originalDocument;
+    }
 });
 
 test('dark-world travel advances its own route without changing the saved dungeon floor', () => {
@@ -116,5 +231,45 @@ test('the portal enters the dark-world scene and returns to the same dungeon flo
         assert.equal(returnedToDungeon, true);
     } finally {
         globalThis.document = originalDocument;
+    }
+});
+
+test('crossing the portal respects reduced-motion preference and still enters the dark world', async () => {
+    const originalDocument = globalThis.document;
+    const originalWindow = globalThis.window;
+    const bodyClasses = new Set();
+    let loadedWorld = false;
+    const game = {
+        dungeonLevel: 23,
+        player: { gold: 50, storyState: {} },
+        ui: {
+            setRealmMode() {},
+            setMerchantGold() {}
+        },
+        loadNextEvent() { loadedWorld = true; }
+    };
+    const darkWorld = new DarkWorld(game);
+    globalThis.document = {
+        body: {
+            classList: {
+                add(value) { bodyClasses.add(value); },
+                remove(value) { bodyClasses.delete(value); }
+            }
+        }
+    };
+    globalThis.window = {
+        matchMedia() { return { matches: true }; }
+    };
+
+    try {
+        await darkWorld.enterThroughPortal();
+
+        assert.equal(game.player.storyState.darkWorld.active, true);
+        assert.ok(bodyClasses.has('dark-world'));
+        assert.ok(!bodyClasses.has('portal-transition'));
+        assert.equal(loadedWorld, true);
+    } finally {
+        globalThis.document = originalDocument;
+        globalThis.window = originalWindow;
     }
 });
