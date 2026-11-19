@@ -426,9 +426,12 @@
 
             <!-- CUADRO DE DIÁLOGO FLOTANTE -->
             <div id="dialogue-box">
-                <div id="dialogue-avatar">🧙‍♂️</div>
+                <div id="dialogue-avatar">
+                    <img id="dialogue-avatar-image" alt="" hidden>
+                    <span id="dialogue-avatar-fallback">🧭</span>
+                </div>
                 <div id="dialogue-content">
-                    <div id="dialogue-speaker">Varis (Mago)</div>
+                    <div id="dialogue-speaker">Acompañante</div>
                     <div id="dialogue-text">Texto inicial...</div>
                     <button id="dialogue-close" onclick="cerrarDialogo()">Continuar</button>
                 </div>
@@ -464,6 +467,12 @@
         let llaveCogida = false;
         let puertaAbierta = false;
         let animadoNPC;
+        const dialogueParams = new URLSearchParams(window.location.search);
+        const companionName = dialogueParams.get("companionName")?.trim() || "HÉROE";
+        const requestedCompanionImage = dialogueParams.get("companionImage") || "";
+        const companionAvatar = /^img\/[A-Za-z0-9/_-]+\.(png|jpe?g|webp)$/i.test(requestedCompanionImage)
+            ? requestedCompanionImage
+            : "🧭";
 
         const nodes = [
             {
@@ -487,9 +496,25 @@
 
         function mostrarDialogo(nombre, avatar, texto) {
             document.getElementById("dialogue-speaker").innerText = nombre;
-            document.getElementById("dialogue-avatar").innerText = avatar;
+            const avatarImage = document.getElementById("dialogue-avatar-image");
+            const avatarFallback = document.getElementById("dialogue-avatar-fallback");
+            if (avatar.startsWith("img/")) {
+                avatarImage.src = avatar;
+                avatarImage.alt = nombre;
+                avatarImage.hidden = false;
+                avatarFallback.hidden = true;
+            } else {
+                avatarImage.removeAttribute("src");
+                avatarImage.hidden = true;
+                avatarFallback.innerText = avatar;
+                avatarFallback.hidden = false;
+            }
             document.getElementById("dialogue-text").innerHTML = texto;
             document.getElementById("dialogue-box").style.display = "flex";
+        }
+
+        function mostrarDialogoCompanero(texto) {
+            mostrarDialogo(companionName, companionAvatar, texto);
         }
 
         window.cerrarDialogo = function () {
@@ -506,7 +531,7 @@
                 mostrarDialogo("Anciano Místico", "🧙‍♂️", "«Habéis cruzado el velo, viajeros. Si queréis cruzar ese portón, necesitaréis la llave que custodian las viejas piedras.»");
 
                 setTimeout(() => {
-                    mostrarDialogo("Varis (Mago)", "🧙‍♂️", "Sus palabras están cargadas de magia arcana... prestad atención.");
+                    mostrarDialogoCompanero("Sus palabras están cargadas de misterio... prestad atención.");
                 }, 4500);
 
             } else if (tipo === 'examinar') {
@@ -624,7 +649,7 @@
                     document.getElementById("text-box").innerHTML = "Has recogido una pesada <b>Llave de Hierro Antiguo</b>.";
 
                     setTimeout(() => {
-                        mostrarDialogo("Lyra (Picara)", "🧝‍♀️", "¡Perfecto! Guarda eso bien. Apostaría a que abre la puerta del monolito al otro lado.");
+                        mostrarDialogoCompanero("¡Perfecto! Guarda eso bien. Apostaría a que abre la puerta del monolito al otro lado.");
                     }, 500);
                 }
             }));
@@ -655,11 +680,11 @@
                     document.getElementById("text-box").innerHTML = "¡La llave abre el portón del monolito!";
 
                     setTimeout(() => {
-                        mostrarDialogo("Varis (Mago)", "🧙‍♂️", "Las runas de la puerta se han apagado. El camino está abierto.");
+                        mostrarDialogoCompanero("Las runas de la puerta se han apagado. El camino está abierto.");
                     }, 600);
                 } else {
                     document.getElementById("text-box").innerHTML = "El portón de roble está cerrado herméticamente.";
-                    mostrarDialogo("Varis (Mago)", "🧙‍♂️", "Necesitamos encontrar una llave o un mecanismo para abrir este portón.");
+                    mostrarDialogoCompanero("Necesitamos encontrar una llave o un mecanismo para abrir este portón.");
                 }
             }));
 
@@ -742,7 +767,7 @@
 
             if (currentNodeIndex === 1) {
                 setTimeout(() => {
-                    mostrarDialogo("Lyra (Picara)", "🧝‍♀️", "Mirad... hay un anciano a la izquierda del monolito. Pasa el ratón sobre él para hablar.");
+                    mostrarDialogoCompanero("Mirad... hay un anciano a la izquierda del monolito. Quizas sabe algo, vamos  a hablar con él.");
                 }, 800);
             }
         };

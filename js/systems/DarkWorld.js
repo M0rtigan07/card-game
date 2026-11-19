@@ -132,12 +132,22 @@ export class DarkWorld {
         }
 
         if (!frame.dataset.loaded) {
+            const companion = this.game.party.active.find(ally => ally.health > 0);
+            const worldUrl = new URL('../../mundo-oscuro.html', import.meta.url);
+            worldUrl.searchParams.set(
+                'companionName',
+                companion?.name ?? this.game.playerName ?? 'HÉROE'
+            );
+            if (companion?.card) {
+                worldUrl.searchParams.set('companionImage', companion.card);
+            }
+
             frame.addEventListener('load', () => {
                 screen.classList.add('parallel-world-ready');
                 loading.hidden = true;
             }, { once: true });
             frame.dataset.loaded = 'true';
-            frame.src = new URL('../../mundo-oscuro.html', import.meta.url).href;
+            frame.src = worldUrl.href;
         }
 
         this.game.ui.showScreen('darkWorldScreen');

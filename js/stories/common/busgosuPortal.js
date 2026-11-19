@@ -83,7 +83,7 @@ export const BUSGOSU_PORTAL = {
             id: 3,
             minLevel: 23,
             img: 'img/busgosu_portalon.jpg',
-            description: '«¡Acertasti, viaxeru!», ríe el Busgosu. Aparta la maleza y revela un portalón de piedra cubierto de símbolos. Las hojas se abren y, al otro lado, aguarda una luz verde imposible.',
+            description: '«¡Acertasti, viaxeru!», ríe el Busgosu. La sonrisa fáise-y seria: «La fía del rei perdióse nel Mundu Escuru. Cruzó esti portalón y namás quedaron les sos buelgues xunto al broche real. Ayúdame a atopala, si tienes valor». Aparta la maleza y revela un portalón de piedra cubierto de símbolos. Les fueyes ábrense; al otru llau, una lluz verde imposible anuncia el mundu que la tien atrapada.',
             choices: [
                 {
                     text: '🌀 Cruzar el portalón y seguir las huellas',

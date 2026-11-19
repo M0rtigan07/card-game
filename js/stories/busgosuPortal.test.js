@@ -32,7 +32,11 @@ test('a wrong riddle answer ends Busgosu’s story while the correct answer open
     const correctAnswer = correctEncounter.choices.find(choice => choice.nextChapter === 3);
     StoryResolver.applyChoice(correctPlayer, correctAnswer);
     assert.equal(correctPlayer.storyState.busgosu, 3);
-    assert.equal(new StoryManager(correctPlayer).getStoryEncounter(23).chapterId, 3);
+    const portalEncounter = new StoryManager(correctPlayer).getStoryEncounter(23);
+    assert.equal(portalEncounter.chapterId, 3);
+    assert.equal(portalEncounter.img, 'img/busgosu_portalon.jpg');
+    assert.match(portalEncounter.description, /fía del rei perdióse nel Mundu Escuru/i);
+    assert.match(portalEncounter.description, /portalón de piedra cubierto de símbolos/i);
 });
 
 test('Busgosu randomly selects every riddle and marks only its answer as correct', () => {
@@ -199,7 +203,14 @@ test('following footprints from the forest opens the separate adventure without 
     const shownScreens = [];
     const game = {
         dungeonLevel: 23,
+        playerName: 'Manuel',
         player: { gold: 50, storyState: {} },
+        party: {
+            active: [
+                { name: 'Fuera de combate', card: 'img/npcs/cartaArquero.png', health: 0 },
+                { name: 'Astrid', card: 'img/npcs/cartaVikinga.png', health: 32 }
+            ]
+        },
         ui: {
             setRealmMode() {},
             setMerchantGold() {},
@@ -252,10 +263,10 @@ test('following footprints from the forest opens the separate adventure without 
         assert.deepEqual(audioEvents, ['portal', 'portal']);
         assert.equal(game.dungeonLevel, 23);
         assert.ok(bodyClasses.has('dark-world'));
-        assert.equal(elements.darkWorldFrame.src, new URL(
-            '../../mundo-oscuro.html',
-            import.meta.url
-        ).href);
+        const worldUrl = new URL('../../mundo-oscuro.html', import.meta.url);
+        worldUrl.searchParams.set('companionName', 'Astrid');
+        worldUrl.searchParams.set('companionImage', 'img/npcs/cartaVikinga.png');
+        assert.equal(elements.darkWorldFrame.src, worldUrl.href);
         assert.deepEqual(shownScreens, ['darkWorldScreen']);
 
         elements.darkWorldFrame.loadListener();
