@@ -179,6 +179,7 @@
         #dialogue-avatar {
             width: 70px;
             height: 70px;
+            overflow: hidden;
             background: #2c241d;
             border: 2px solid #7c6242;
             border-radius: 50%;
@@ -188,6 +189,13 @@
             font-size: 36px;
             flex-shrink: 0;
             box-shadow: inset 0 0 10px #000;
+        }
+
+        #dialogue-avatar-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         #dialogue-speaker {
@@ -469,9 +477,9 @@
         let animadoNPC;
         const dialogueParams = new URLSearchParams(window.location.search);
         const companionName = dialogueParams.get("companionName")?.trim() || "HÉROE";
-        const requestedCompanionImage = dialogueParams.get("companionImage") || "";
-        const companionAvatar = /^img\/[A-Za-z0-9/_-]+\.(png|jpe?g|webp)$/i.test(requestedCompanionImage)
-            ? requestedCompanionImage
+        const requestedCompanionPortrait = dialogueParams.get("companionPortrait") || "";
+        const companionAvatar = /^img\/[A-Za-z0-9/_-]+\.(png|jpe?g|webp)$/i.test(requestedCompanionPortrait)
+            ? requestedCompanionPortrait
             : "🧭";
 
         const nodes = [
@@ -503,6 +511,11 @@
                 avatarImage.alt = nombre;
                 avatarImage.hidden = false;
                 avatarFallback.hidden = true;
+                avatarImage.onerror = () => {
+                    avatarImage.hidden = true;
+                    avatarFallback.innerText = "🧭";
+                    avatarFallback.hidden = false;
+                };
             } else {
                 avatarImage.removeAttribute("src");
                 avatarImage.hidden = true;

@@ -8,6 +8,7 @@ import {
 import { StoryManager } from './StoryManager.js';
 import { StoryResolver } from './StoryResolver.js';
 import { advanceDarkWorldState, createDarkWorldState, DarkWorld } from '../systems/DarkWorld.js';
+import { ALLIES } from '../data/allyCatalog.js';
 import { NPC_DATABASE } from '../data/npcs.js';
 import { Exploration } from '../systems/Exploration.js';
 
@@ -55,6 +56,13 @@ test('Busgosu randomly selects every riddle and marks only its answer as correct
     });
 
     assert.equal(selectedQuestions.size, BUSGOSU_RIDDLES.length);
+});
+
+test('all party members have portrait art separate from their cards', () => {
+    Object.values(ALLIES).forEach(ally => {
+        assert.ok(ally.portrait, `${ally.id} needs a dialogue portrait`);
+        assert.notEqual(ally.portrait, ally.card, `${ally.id} must not use its card as a portrait`);
+    });
 });
 
 test('entering the dark world records the active search for the king’s daughter', () => {
@@ -208,7 +216,12 @@ test('following footprints from the forest opens the separate adventure without 
         party: {
             active: [
                 { name: 'Fuera de combate', card: 'img/npcs/cartaArquero.png', health: 0 },
-                { name: 'Astrid', card: 'img/npcs/cartaVikinga.png', health: 32 }
+                {
+                    name: 'Astrid',
+                    card: 'img/npcs/cartaVikinga.png',
+                    portrait: 'img/npcs/vikinga_hablando1.jpg',
+                    health: 32
+                }
             ]
         },
         ui: {
@@ -265,7 +278,7 @@ test('following footprints from the forest opens the separate adventure without 
         assert.ok(bodyClasses.has('dark-world'));
         const worldUrl = new URL('../../mundo-oscuro.html', import.meta.url);
         worldUrl.searchParams.set('companionName', 'Astrid');
-        worldUrl.searchParams.set('companionImage', 'img/npcs/cartaVikinga.png');
+        worldUrl.searchParams.set('companionPortrait', 'img/npcs/vikinga_hablando1.jpg');
         assert.equal(elements.darkWorldFrame.src, worldUrl.href);
         assert.deepEqual(shownScreens, ['darkWorldScreen']);
 

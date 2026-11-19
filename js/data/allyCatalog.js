@@ -2,6 +2,7 @@
 // Personajes que pueden unirse a tu grupo si los convences en una conversación (la clave es el id del PNJ en npcs.js).
 //
 //   card        Arte de su carta de aliado (se ve en el panel "Grupo")
+//   portrait    Retrato del personaje para diálogos, separado del arte de su carta
 //   ability     Lo que hace por ti al empezar cada uno de tus turnos de combate, sin gastar energía:
 //                 type  atk | def | drain | poison | heal   (mismos efectos que tus cartas)
 //                 base + perLevel × tu nivel = valor;  every = cada cuántos turnos actúa (1 = siempre)
@@ -18,6 +19,7 @@
 export const ALLIES = {
     mongol: {
         id: 'mongol', name: 'Batu Jan', card: 'img/npcs/cartaArquero.png',
+        portrait: 'img/npcs/mongol_habla.jpg',
         ability: { name: '🏹 Lluvia de Flechas', type: 'atk', base: 6, perLevel: 2, every: 1, text: 'Dispara al enemigo cada turno' },
         battleLines: [
             '¡Que mis flechas te encuentren!',
@@ -39,6 +41,7 @@ export const ALLIES = {
 
     vikinga: {
         id: 'vikinga', name: 'Astrid', card: 'img/npcs/cartaVikinga.png',
+        portrait: 'img/npcs/vikinga_hablando1.jpg',
         ability: { name: '🛡️ Muro de Escudos', type: 'def', base: 6, perLevel: 2, every: 1, text: 'Te cubre con su escudo cada turno' },
         battleLines: [
             '¡Tras mi escudo, nadie caerá!',
@@ -59,6 +62,7 @@ export const ALLIES = {
 
     valerius: {
         id: 'valerius', name: 'Conde Valerius', card: 'img/npcs/cartaConde.png',
+        portrait: 'img/npcs/conde_charla.jpg',
         ability: { name: '🦇 Mordisco Carmesí', type: 'drain', base: 4, perLevel: 2, every: 1, text: 'Muerde al enemigo y te cura cada turno' },
         battleLines: [
             'Tu sangre pagará esta insolencia.',
@@ -79,6 +83,7 @@ export const ALLIES = {
 
     necro: {
         id: 'necro', name: 'Malakar', card: 'img/npcs/cartaNecro.png',
+        portrait: 'img/npcs/necroretrato.png',
         ability: { name: '☠️ Maldición Necrótica', type: 'poison', base: 5, perLevel: 2, turns: 3, every: 1, text: 'Envenena al enemigo cada turno' },
         battleLines: [
             '¡Que la putrefacción te consuma!',
@@ -99,6 +104,7 @@ export const ALLIES = {
 
     pirata: {
         id: 'pirata', name: 'Capitana Zafira', card: 'img/npcs/cartaPirata.png',
+        portrait: 'img/npcs/mujerPirata_hablando.jpg',
         ability: { name: '💣 Cañonazo', type: 'atk', base: 15, perLevel: 4, every: 2, text: 'Dispara su cañón un turno sí y otro no' },
         battleLines: [
             '¡A babor! ¡Que hable el cañón!',
@@ -119,6 +125,7 @@ export const ALLIES = {
 
     vampira: {
         id: 'vampira', name: 'La Dama de la Noche', card: 'img/npcs/cartaVampira.png',
+        portrait: 'img/npcs/vampira.jpg',
         ability: { name: '🩸 Beso Sombrío', type: 'drain', base: 10, perLevel: 3, every: 2, text: 'Drena al enemigo un turno sí y otro no' },
         battleLines: [
             'Ven, criatura; deja que te robe el aliento.',

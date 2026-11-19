@@ -138,8 +138,8 @@ export class DarkWorld {
                 'companionName',
                 companion?.name ?? this.game.playerName ?? 'HÉROE'
             );
-            if (companion?.card) {
-                worldUrl.searchParams.set('companionImage', companion.card);
+            if (companion?.portrait) {
+                worldUrl.searchParams.set('companionPortrait', companion.portrait);
             }
 
             frame.addEventListener('load', () => {
