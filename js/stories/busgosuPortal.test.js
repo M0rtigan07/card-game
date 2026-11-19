@@ -173,23 +173,37 @@ test('dark-world travel advances its own route without changing the saved dungeo
     assert.equal(nextLocation.steps, 1);
 });
 
-test('the portal enters directly and following footprints advances the separate route without changing floors', async () => {
+test('following footprints from the forest opens the separate adventure without changing dungeon floors', async () => {
     const originalDocument = globalThis.document;
     const originalWindow = globalThis.window;
     const bodyClasses = new Set();
+    const parallelWorldClasses = new Set();
     const elements = {
         dungeonTitle: { textContent: '' },
-        sceneBadgeOverlay: { textContent: '' }
+        sceneBadgeOverlay: { textContent: '' },
+        darkWorldFrame: {
+            dataset: {},
+            addEventListener(_event, listener) {
+                this.loadListener = listener;
+            }
+        },
+        darkWorldScreen: {
+            classList: {
+                add(value) { parallelWorldClasses.add(value); }
+            }
+        },
+        darkWorldLoading: { hidden: false }
     };
     const renderedChoices = [];
     const audioEvents = [];
-    let returnedToDungeon = false;
+    const shownScreens = [];
     const game = {
         dungeonLevel: 23,
         player: { gold: 50, storyState: {} },
         ui: {
             setRealmMode() {},
-            setMerchantGold() {}
+            setMerchantGold() {},
+            showScreen(id) { shownScreens.push(id); }
         },
         audio: { play(type) { audioEvents.push(type); } },
         exploration: {
@@ -204,10 +218,7 @@ test('the portal enters directly and following footprints advances the separate 
         }
     };
     const darkWorld = new DarkWorld(game);
-    game.loadNextEvent = () => {
-        if (game.player.storyState.darkWorld?.active) darkWorld.loadNext();
-        else returnedToDungeon = true;
-    };
+    game.loadNextEvent = () => darkWorld.loadNext();
     globalThis.document = {
         body: {
             classList: {
@@ -233,14 +244,23 @@ test('the portal enters directly and following footprints advances the separate 
         assert.equal(game.dungeonLevel, 23);
         assert.ok(bodyClasses.has('dark-world'));
         assert.ok(!bodyClasses.has('trail-transition'));
+        assert.equal(elements.dungeonTitle.textContent, 'Mundo Oscuro · El bosque petrificado');
+        assert.equal(elements.darkWorldFrame.src, undefined);
 
-        await renderedChoices[1].callback();
-        assert.equal(game.player.storyState.darkWorld.active, false);
-        assert.deepEqual(audioEvents, ['portal', 'portalReturn']);
-        assert.ok(!bodyClasses.has('dark-world'));
-        assert.ok(!bodyClasses.has('trail-return-transition'));
+        await renderedChoices[0].callback();
+        assert.equal(game.player.storyState.darkWorld.location, 2);
+        assert.deepEqual(audioEvents, ['portal', 'portal']);
         assert.equal(game.dungeonLevel, 23);
-        assert.equal(returnedToDungeon, true);
+        assert.ok(bodyClasses.has('dark-world'));
+        assert.equal(elements.darkWorldFrame.src, new URL(
+            '../../mundo-oscuro.html',
+            import.meta.url
+        ).href);
+        assert.deepEqual(shownScreens, ['darkWorldScreen']);
+
+        elements.darkWorldFrame.loadListener();
+        assert.ok(parallelWorldClasses.has('parallel-world-ready'));
+        assert.equal(elements.darkWorldLoading.hidden, true);
     } finally {
         globalThis.document = originalDocument;
         globalThis.window = originalWindow;

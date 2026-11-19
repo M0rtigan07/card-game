@@ -95,6 +95,7 @@ export class DarkWorld {
     }
 
     async followTracks() {
+        this.game.audio.play('portal');
         const reducedMotion = typeof window !== 'undefined'
             && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
         if (reducedMotion) {
@@ -115,10 +116,35 @@ export class DarkWorld {
     advanceAlongTracks() {
         this.game.player.storyState.darkWorld =
             advanceDarkWorldState(this.game.player.storyState.darkWorld);
+        if (this.game.player.storyState.darkWorld.location === 2) {
+            this.openParallelWorld();
+            return;
+        }
         this.loadNext();
     }
 
+    openParallelWorld() {
+        const frame = document.getElementById('darkWorldFrame');
+        const screen = document.getElementById('darkWorldScreen');
+        const loading = document.getElementById('darkWorldLoading');
+        if (!frame || !screen || !loading) {
+            throw new Error('No se encontró la pantalla del Mundo Oscuro.');
+        }
+
+        if (!frame.dataset.loaded) {
+            frame.addEventListener('load', () => {
+                screen.classList.add('parallel-world-ready');
+                loading.hidden = true;
+            }, { once: true });
+            frame.dataset.loaded = 'true';
+            frame.src = new URL('../../mundo-oscuro.html', import.meta.url).href;
+        }
+
+        this.game.ui.showScreen('darkWorldScreen');
+    }
+
     returnToDungeon() {
+        this.game.audio.play('portalReturn');
         const state = this.game.player.storyState.darkWorld;
         this.game.player.storyState.darkWorld = { ...state, active: false };
         document.body.classList.remove('dark-world');
