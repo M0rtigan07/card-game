@@ -1,7 +1,7 @@
 import { setText, wait } from '../ui/helpers.js';
 
-const PORTAL_TRANSITION_MS = 1500;
-const WORLD_REVEAL_DELAY_MS = 850;
+const TRAIL_TRANSITION_MS = 1500;
+const REGION_REVEAL_DELAY_MS = 850;
 
 const REGIONS = [
     {
@@ -63,24 +63,6 @@ export class DarkWorld {
         this.game.loadNextEvent();
     }
 
-    async enterThroughPortal() {
-        const reducedMotion = typeof window !== 'undefined'
-            && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
-        if (reducedMotion) {
-            this.enter();
-            return;
-        }
-
-        document.body.classList.add('portal-transition');
-        try {
-            await wait(WORLD_REVEAL_DELAY_MS);
-            this.enter();
-            await wait(PORTAL_TRANSITION_MS - WORLD_REVEAL_DELAY_MS);
-        } finally {
-            document.body.classList.remove('portal-transition');
-        }
-    }
-
     loadNext() {
         const state = this.game.player.storyState.darkWorld;
         const region = REGIONS[Math.min(state.location, REGIONS.length - 1)];
@@ -103,16 +85,37 @@ export class DarkWorld {
         view.setNarrative(description, [
             {
                 text: '🔎 Seguir las huellas de la hija del rey',
-                callback: () => {
-                    this.game.player.storyState.darkWorld = advanceDarkWorldState(state);
-                    this.loadNext();
-                }
+                callback: () => this.followTracks()
             },
             {
                 text: '↩️ Volver al portalón siguiendo tus propias huellas',
                 callback: () => this.returnToDungeon()
             }
         ]);
+    }
+
+    async followTracks() {
+        const reducedMotion = typeof window !== 'undefined'
+            && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+        if (reducedMotion) {
+            this.advanceAlongTracks();
+            return;
+        }
+
+        document.body.classList.add('trail-transition');
+        try {
+            await wait(REGION_REVEAL_DELAY_MS);
+            this.advanceAlongTracks();
+            await wait(TRAIL_TRANSITION_MS - REGION_REVEAL_DELAY_MS);
+        } finally {
+            document.body.classList.remove('trail-transition');
+        }
+    }
+
+    advanceAlongTracks() {
+        this.game.player.storyState.darkWorld =
+            advanceDarkWorldState(this.game.player.storyState.darkWorld);
+        this.loadNext();
     }
 
     returnToDungeon() {

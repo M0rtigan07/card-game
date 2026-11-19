@@ -38,6 +38,20 @@ export class AudioManager {
             gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
             gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
             osc.start(); osc.stop(this.ctx.currentTime + 0.04);
+        } else if (type === 'portal' || type === 'portalReturn') {
+            const returning = type === 'portalReturn';
+            const startFrequency = returning ? 660 : 110;
+            const endFrequency = returning ? 110 : 660;
+            const duration = 0.9;
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(startFrequency, this.ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(endFrequency, this.ctx.currentTime + duration);
+            gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.14, this.ctx.currentTime + 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+            osc.start();
+            osc.stop(this.ctx.currentTime + duration);
         }
     }
 }

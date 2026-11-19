@@ -1,0 +1,93 @@
+Paso 1: Preparar tus imágenes (Texturas)
+Para empezar, lo ideal es que consigas o recortes imágenes en formato .jpg o .png (idealmente sin costuras o seamless, aunque para empezar cualquier buena foto de una textura sirve).
+
+Crea una carpeta llamada textures en el mismo directorio donde tengas tu archivo HTML y guarda dentro archivos como:
+
+hierba.jpg (para el suelo)
+
+piedra_muro.jpg (para las paredes de la cabaña y el monolito)
+
+madera_puerta.jpg (para el portón)
+
+cielo_panoramico.jpg o un tono de cielo ambiental.
+
+Paso 2: Aplicar texturas al Suelo y ajustar la repetición (Tiling)
+Cuando pones una textura plana en un suelo muy grande, si no la repites, se verá estirada y borrosa. Usamos la propiedad uScale y vScale para multiplicarla.
+
+Código de ejemplo en Babylon.js:
+
+JavaScript
+const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+
+// 1. Cargar la imagen desde tu carpeta local
+groundMat.diffuseTexture = new BABYLON.Texture("textures/hierba.jpg", scene);
+
+// 2. Repetir la textura por el suelo para que no se vea pixelada (ej: 20 veces)
+groundMat.diffuseTexture.uScale = 20;
+groundMat.diffuseTexture.vScale = 20;
+
+// 3. Quitar brillo plástico natural
+groundMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+
+ground.material = groundMat;
+Paso 3: Texturizar Estructuras (Adiós a los bloques feos)
+Para que las estructuras de piedra dejen de parecer cubos aburridos y adopten la forma de muros rústicos, aplicamos la textura de piedra con un mapeo adecuado a cada cara.
+
+Código de ejemplo:
+
+JavaScript
+const matPiedra = new BABYLON.StandardMaterial("matPiedra", scene);
+matPiedra.diffuseTexture = new BABYLON.Texture("textures/piedra_muro.jpg", scene);
+
+// Ajustar escala para que las piedras se vean a una escala realista respecto a la puerta
+matPiedra.diffuseTexture.uScale = 2;
+matPiedra.diffuseTexture.vScale = 2;
+
+// Asignarla a la cabaña o al monolito
+cabana.material = matPiedra;
+monolito.material = matPiedra;
+Truco Pro de Inmersión (Bump Map / Relieve): Si a ese matPiedra le añades una textura de relieve en blanco y negro (mapa de normales o bump map), la luz del sol creará sombras reales en las rendijas de las piedras de tus fotos:
+
+JavaScript
+matPiedra.bumpTexture = new BABYLON.Texture("textures/piedra_normal.jpg", scene);
+Paso 4: Ambientar el Cielo (Atmósfera y Profundidad)
+Un cielo plano de color azul o gris rompe la magia. Tienes dos opciones principales en Babylon.js:
+
+Cielo con niebla atmosférica (Neblina): Como viste en el código anterior, difumina los bordes del escenario simulando humedad o bruma de montaña:
+
+JavaScript
+scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+scene.fogDensity = 0.012; // Densidad de la bruma
+scene.fogColor = new BABYLON.Color3(0.5, 0.55, 0.6); // Tono gris-azulado montañoso
+Cúpula de Cielo (SkyDome / PhotoDome): Puedes envolver todo tu mundo con una foto panorámica de un cielo real o nublado utilizando el componente nativo de Babylon.js:
+
+JavaScript
+const skybox = new BABYLON.PhotoDome(
+    "skyDome",
+    "textures/cielo_panoramico.jpg",
+    { resolution: 32, size: 1000 },
+    scene
+);
+Paso 5: Mejorar los Objetos Pequeños (La Llave y Detalles)
+Los objetos pequeños que se recogen (como la llave) no necesitan texturas complejas, pero ganan muchísima presencia visual si se usa emisión (que parezca que brillan levemente con luz propia) para que el jugador los distinga enseguida en el escenario.
+
+Código de ejemplo:
+
+JavaScript
+const matObjeto = new BABYLON.StandardMaterial("matObjeto", scene);
+matObjeto.diffuseTexture = new BABYLON.Texture("textures/metal_dorado.jpg", scene);
+// Hace que brille ligeramente en la penumbra
+matObjeto.emissiveColor = new BABYLON.Color3(0.2, 0.18, 0.05); 
+Resumen de la Estructura de Archivos recomendada:
+Cuando exportes o organices tu proyecto localmente para trabajar con esto, tu carpeta se verá así:
+
+Plaintext
+mi-juego-rol/
+│
+├── index.html  (El código del juego)
+└── textures/
+    ├── hierba.jpg
+    ├── piedra_muro.jpg
+    ├── piedra_normal.jpg
+    ├── madera_puerta.jpg
+    └── cielo_panoramico.jpg

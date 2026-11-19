@@ -173,14 +173,16 @@ test('dark-world travel advances its own route without changing the saved dungeo
     assert.equal(nextLocation.steps, 1);
 });
 
-test('the portal enters the dark-world scene and returns to the same dungeon floor by following footprints', () => {
+test('the portal enters directly and following footprints advances the separate route without changing floors', async () => {
     const originalDocument = globalThis.document;
+    const originalWindow = globalThis.window;
     const bodyClasses = new Set();
     const elements = {
         dungeonTitle: { textContent: '' },
         sceneBadgeOverlay: { textContent: '' }
     };
     const renderedChoices = [];
+    const audioEvents = [];
     let returnedToDungeon = false;
     const game = {
         dungeonLevel: 23,
@@ -189,6 +191,7 @@ test('the portal enters the dark-world scene and returns to the same dungeon flo
             setRealmMode() {},
             setMerchantGold() {}
         },
+        audio: { play(type) { audioEvents.push(type); } },
         exploration: {
             render() {
                 return {
@@ -214,60 +217,30 @@ test('the portal enters the dark-world scene and returns to the same dungeon flo
         },
         getElementById(id) { return elements[id]; }
     };
-
-    try {
-        darkWorld.enter();
-        assert.ok(bodyClasses.has('dark-world'));
-        assert.equal(elements.dungeonTitle.textContent, 'Mundo Oscuro · El umbral sin estrellas');
-
-        renderedChoices[0].callback();
-        assert.equal(game.player.storyState.darkWorld.location, 1);
-        assert.equal(game.dungeonLevel, 23);
-
-        renderedChoices[1].callback();
-        assert.equal(game.player.storyState.darkWorld.active, false);
-        assert.ok(!bodyClasses.has('dark-world'));
-        assert.equal(game.dungeonLevel, 23);
-        assert.equal(returnedToDungeon, true);
-    } finally {
-        globalThis.document = originalDocument;
-    }
-});
-
-test('crossing the portal respects reduced-motion preference and still enters the dark world', async () => {
-    const originalDocument = globalThis.document;
-    const originalWindow = globalThis.window;
-    const bodyClasses = new Set();
-    let loadedWorld = false;
-    const game = {
-        dungeonLevel: 23,
-        player: { gold: 50, storyState: {} },
-        ui: {
-            setRealmMode() {},
-            setMerchantGold() {}
-        },
-        loadNextEvent() { loadedWorld = true; }
-    };
-    const darkWorld = new DarkWorld(game);
-    globalThis.document = {
-        body: {
-            classList: {
-                add(value) { bodyClasses.add(value); },
-                remove(value) { bodyClasses.delete(value); }
-            }
-        }
-    };
     globalThis.window = {
         matchMedia() { return { matches: true }; }
     };
 
     try {
-        await darkWorld.enterThroughPortal();
-
-        assert.equal(game.player.storyState.darkWorld.active, true);
+        darkWorld.enter();
         assert.ok(bodyClasses.has('dark-world'));
-        assert.ok(!bodyClasses.has('portal-transition'));
-        assert.equal(loadedWorld, true);
+        assert.ok(!bodyClasses.has('trail-transition'));
+        assert.equal(elements.dungeonTitle.textContent, 'Mundo Oscuro · El umbral sin estrellas');
+
+        await renderedChoices[0].callback();
+        assert.equal(game.player.storyState.darkWorld.location, 1);
+        assert.deepEqual(audioEvents, ['portal']);
+        assert.equal(game.dungeonLevel, 23);
+        assert.ok(bodyClasses.has('dark-world'));
+        assert.ok(!bodyClasses.has('trail-transition'));
+
+        await renderedChoices[1].callback();
+        assert.equal(game.player.storyState.darkWorld.active, false);
+        assert.deepEqual(audioEvents, ['portal', 'portalReturn']);
+        assert.ok(!bodyClasses.has('dark-world'));
+        assert.ok(!bodyClasses.has('trail-return-transition'));
+        assert.equal(game.dungeonLevel, 23);
+        assert.equal(returnedToDungeon, true);
     } finally {
         globalThis.document = originalDocument;
         globalThis.window = originalWindow;

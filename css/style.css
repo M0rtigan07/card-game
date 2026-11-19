@@ -74,7 +74,8 @@ body.dark-world .choice-btn {
     border-color: #75b795;
 }
 
-body.portal-transition::before {
+body.trail-transition::before,
+body.trail-return-transition::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -83,30 +84,47 @@ body.portal-transition::before {
     background:
         radial-gradient(circle at center, rgba(147, 255, 195, .92) 0%, rgba(57, 193, 128, .72) 18%, rgba(1, 13, 8, .97) 52%, #000 100%);
     filter: drop-shadow(0 0 28px rgba(106, 255, 179, .9));
-    animation: portal-entry-veil 1.5s ease-in-out both;
 }
 
-body.portal-transition #gameScreen .container {
+body.trail-transition::before {
+    animation: trail-following-veil 1.5s ease-in-out both;
+}
+
+body.trail-return-transition::before {
+    animation: trail-following-veil 1.5s ease-in-out reverse both;
+}
+
+body.trail-transition #gameScreen .container,
+body.trail-return-transition #gameScreen .container {
     transform-origin: center;
-    animation: portal-entry-pull 1.5s cubic-bezier(.45, 0, .55, 1) both;
 }
 
-@keyframes portal-entry-veil {
+body.trail-transition #gameScreen .container {
+    animation: trail-following-step 1.5s cubic-bezier(.45, 0, .55, 1) both;
+}
+
+body.trail-return-transition #gameScreen .container {
+    animation: trail-following-step 1.5s cubic-bezier(.45, 0, .55, 1) reverse both;
+}
+
+@keyframes trail-following-veil {
     0% { opacity: 0; transform: scale(.12) rotate(0deg); }
     22% { opacity: 1; }
     72% { opacity: 1; transform: scale(1.25) rotate(120deg); }
     100% { opacity: 0; transform: scale(2.4) rotate(220deg); }
 }
 
-@keyframes portal-entry-pull {
+@keyframes trail-following-step {
     0%, 100% { transform: scale(1); filter: none; }
     35% { transform: scale(.96) rotateX(2deg); filter: brightness(1.55) saturate(1.5) blur(1px); }
     78% { transform: scale(1.025); filter: brightness(.75) blur(2px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    body.portal-transition::before,
-    body.portal-transition #gameScreen .container {
+    body.trail-transition::before,
+    body.trail-return-transition::before,
+    body.trail-transition #gameScreen .container,
+    body.trail-return-transition #gameScreen .container {
         animation: none;
     }
 }

@@ -252,7 +252,7 @@ export class Exploration {
             return;
         }
         if (choice.action === 'enter_dark_world') {
-            await this.game.darkWorld.enterThroughPortal();
+            this.game.darkWorld.enter();
             return;
         }
         if (choice.action === 'decline_portal') {
