@@ -1033,36 +1033,167 @@
         function crearTexturaPiedra(scene) {
             const tex = new BABYLON.DynamicTexture("piedraTex", 512, scene, false);
             const ctx = tex.getContext();
-            ctx.fillStyle = "#5c554d";
+            let seed = 8147;
+            const aleatorio = () => {
+                seed = (seed * 1664525 + 1013904223) >>> 0;
+                return seed / 4294967296;
+            };
+
+            ctx.fillStyle = "#171b20";
             ctx.fillRect(0, 0, 512, 512);
-            for (let y = 0; y < 512; y += 32) {
-                let offset = (y / 32) % 2 === 0 ? 0 : 25;
-                for (let x = -32; x < 512; x += 64) {
-                    const tono = 75 + Math.floor(Math.random() * 35);
-                    ctx.fillStyle = `rgb(${tono + 8}, ${tono + 3}, ${tono - 5})`;
-                    ctx.fillRect(x + offset + 2, y + 2, 60, 28);
+            for (let row = 0; row < 8; row++) {
+                const y = row * 64;
+                const offset = row % 2 === 0 ? 0 : -64;
+                for (let x = offset; x < 512; x += 128) {
+                    const tone = 67 + Math.floor(aleatorio() * 28);
+                    ctx.fillStyle = `rgb(${tone}, ${tone + 3}, ${tone + 8})`;
+                    ctx.fillRect(x + 3, y + 3, 122, 58);
+                    ctx.fillStyle = "rgba(211, 222, 230, 0.12)";
+                    ctx.fillRect(x + 5, y + 5, 118, 2);
+                    ctx.fillStyle = "rgba(4, 7, 10, 0.32)";
+                    ctx.fillRect(x + 5, y + 58, 118, 2);
+
+                    for (let fleck = 0; fleck < 18; fleck++) {
+                        const shade = aleatorio() > 0.5 ? 255 : 0;
+                        ctx.fillStyle = `rgba(${shade}, ${shade}, ${shade}, ${0.025 + aleatorio() * 0.07})`;
+                        ctx.fillRect(
+                            x + 5 + aleatorio() * 116,
+                            y + 7 + aleatorio() * 48,
+                            2 + aleatorio() * 8,
+                            1 + aleatorio() * 3
+                        );
+                    }
                 }
             }
+
             tex.update();
-            tex.uScale = 3; tex.vScale = 3;
+            tex.uScale = 2.5;
+            tex.vScale = 2.5;
+            tex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+            tex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
+            return tex;
+        }
+
+        function crearTexturaCielo(scene) {
+            const tex = new BABYLON.DynamicTexture("cieloOscuroTex", { width: 1024, height: 512 }, scene, false);
+            const ctx = tex.getContext();
+            let seed = 1279;
+            const aleatorio = () => {
+                seed = (seed * 1664525 + 1013904223) >>> 0;
+                return seed / 4294967296;
+            };
+            const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+            gradient.addColorStop(0, "#050812");
+            gradient.addColorStop(0.55, "#111a2b");
+            gradient.addColorStop(1, "#39485a");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1024, 512);
+
+            const horizonGlow = ctx.createRadialGradient(512, 470, 8, 512, 470, 430);
+            horizonGlow.addColorStop(0, "rgba(143, 111, 92, 0.48)");
+            horizonGlow.addColorStop(0.4, "rgba(62, 70, 91, 0.24)");
+            horizonGlow.addColorStop(1, "rgba(16, 22, 38, 0)");
+            ctx.fillStyle = horizonGlow;
+            ctx.fillRect(0, 100, 1024, 412);
+
+            for (let star = 0; star < 420; star++) {
+                const x = aleatorio() * 1024;
+                const y = aleatorio() * 360;
+                const radius = 0.25 + aleatorio() * 0.65;
+                const alpha = 0.3 + aleatorio() * 0.65;
+                ctx.fillStyle = `rgba(222, 230, 255, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            tex.update();
+            tex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+            tex.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
             return tex;
         }
 
         function crearTexturaHierba(scene) {
-            const tex = new BABYLON.DynamicTexture("hierbaTex", 512, scene, false);
+            const tex = new BABYLON.DynamicTexture("hierbaTex", 1024, scene, false);
             const ctx = tex.getContext();
-            ctx.fillStyle = "#37472a";
-            ctx.fillRect(0, 0, 512, 512);
+            let seed = 3907;
+            const aleatorio = () => {
+                seed = (seed * 1664525 + 1013904223) >>> 0;
+                return seed / 4294967296;
+            };
+            ctx.fillStyle = "#2b342b";
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            for (let patch = 0; patch < 2400; patch++) {
+                const moss = aleatorio() > 0.48;
+                ctx.fillStyle = moss
+                    ? `rgba(91, 105, 61, ${0.04 + aleatorio() * 0.11})`
+                    : `rgba(8, 15, 16, ${0.03 + aleatorio() * 0.1})`;
+                ctx.beginPath();
+                ctx.ellipse(
+                    aleatorio() * 1024,
+                    aleatorio() * 1024,
+                    2 + aleatorio() * 20,
+                    2 + aleatorio() * 12,
+                    aleatorio() * Math.PI,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+
+            for (let blade = 0; blade < 6000; blade++) {
+                const x = aleatorio() * 1024;
+                const y = aleatorio() * 1024;
+                ctx.strokeStyle = aleatorio() > 0.55
+                    ? "rgba(130, 139, 84, 0.2)"
+                    : "rgba(5, 12, 12, 0.22)";
+                ctx.lineWidth = 0.7 + aleatorio();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + aleatorio() * 4 - 2, y - 2 - aleatorio() * 6);
+                ctx.stroke();
+            }
+
             tex.update();
-            tex.uScale = 12; tex.vScale = 12;
+            tex.uScale = 22;
+            tex.vScale = 34;
+            tex.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+            tex.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE;
             return tex;
         }
 
         function crearTexturaMadera(scene) {
-            const tex = new BABYLON.DynamicTexture("maderaTex", 256, scene, false);
+            const tex = new BABYLON.DynamicTexture("maderaTex", 512, scene, false);
             const ctx = tex.getContext();
-            ctx.fillStyle = "#4a2e1b";
-            ctx.fillRect(0, 0, 256, 256);
+            let seed = 719;
+            const aleatorio = () => {
+                seed = (seed * 1664525 + 1013904223) >>> 0;
+                return seed / 4294967296;
+            };
+            ctx.fillStyle = "#241912";
+            ctx.fillRect(0, 0, 512, 512);
+            for (let plank = 0; plank < 4; plank++) {
+                const x = plank * 128;
+                const tone = 54 + Math.floor(aleatorio() * 25);
+                ctx.fillStyle = `rgb(${tone}, ${Math.floor(tone * 0.67)}, ${Math.floor(tone * 0.42)})`;
+                ctx.fillRect(x + 3, 0, 122, 512);
+                ctx.fillStyle = "rgba(8, 5, 3, 0.55)";
+                ctx.fillRect(x, 0, 3, 512);
+                for (let grain = 0; grain < 24; grain++) {
+                    const gx = x + 8 + aleatorio() * 108;
+                    ctx.strokeStyle = `rgba(14, 8, 4, ${0.12 + aleatorio() * 0.2})`;
+                    ctx.lineWidth = 1 + aleatorio() * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(gx, 0);
+                    ctx.bezierCurveTo(
+                        gx + aleatorio() * 8 - 4, 170,
+                        gx + aleatorio() * 8 - 4, 340,
+                        gx + aleatorio() * 8 - 4, 512
+                    );
+                    ctx.stroke();
+                }
+            }
             tex.update();
             return tex;
         }
@@ -1095,18 +1226,40 @@
 
         const createScene = function () {
             const scene = new BABYLON.Scene(engine);
-            scene.clearColor = new BABYLON.Color3(0.45, 0.55, 0.65);
+            scene.clearColor = new BABYLON.Color3(0.03, 0.05, 0.09);
+            scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
+            scene.fogDensity = 0.0035;
+            scene.fogColor = new BABYLON.Color3(0.09, 0.12, 0.18);
+
+            const skybox = BABYLON.MeshBuilder.CreateSphere(
+                "darkWorldSky",
+                { diameter: 700, segments: 24, sideOrientation: BABYLON.Mesh.BACKSIDE },
+                scene
+            );
+            skybox.infiniteDistance = true;
+            skybox.isPickable = false;
+            const skyMaterial = new BABYLON.StandardMaterial("darkWorldSkyMaterial", scene);
+            skyMaterial.backFaceCulling = false;
+            skyMaterial.disableLighting = true;
+            skyMaterial.disableDepthWrite = true;
+            skyMaterial.fogEnabled = false;
+            skyMaterial.emissiveTexture = crearTexturaCielo(scene);
+            skybox.material = skyMaterial;
 
             const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-            light.intensity = 0.85;
+            light.intensity = 0.92;
+            light.diffuse = new BABYLON.Color3(0.72, 0.79, 1);
+            light.groundColor = new BABYLON.Color3(0.12, 0.16, 0.13);
 
             const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 140 }, scene);
             const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
             groundMat.diffuseTexture = crearTexturaHierba(scene);
+            groundMat.specularColor = new BABYLON.Color3(0.04, 0.05, 0.04);
             ground.material = groundMat;
 
             const matPiedra = new BABYLON.StandardMaterial("matPiedra", scene);
             matPiedra.diffuseTexture = crearTexturaPiedra(scene);
+            matPiedra.specularColor = new BABYLON.Color3(0.12, 0.14, 0.17);
             construirLaberinto(scene, matPiedra);
 
             // --- NODO 1: Cabaña y Llave ---
@@ -1114,19 +1267,52 @@
             cabana.position = new BABYLON.Vector3(-3.5, 2, 10);
             cabana.material = matPiedra;
 
-            meshLlave = BABYLON.MeshBuilder.CreateBox("llave", { width: 0.5, height: 0.08, depth: 0.25 }, scene);
-            meshLlave.position = new BABYLON.Vector3(-0.8, 0.08, 6.5);
+            const keyRoot = new BABYLON.TransformNode("llave-antigua", scene);
+            keyRoot.position = new BABYLON.Vector3(-0.8, 0.075, 6.5);
+            const keyParts = [];
             const matLlave = new BABYLON.StandardMaterial("matLlave", scene);
-            matLlave.diffuseColor = new BABYLON.Color3(0.85, 0.65, 0.15);
-            matLlave.emissiveColor = new BABYLON.Color3(0.2, 0.15, 0.02);
+            matLlave.diffuseColor = new BABYLON.Color3(0.62, 0.39, 0.12);
+            matLlave.specularColor = new BABYLON.Color3(0.9, 0.72, 0.36);
+            matLlave.emissiveColor = new BABYLON.Color3(0.08, 0.045, 0.008);
+            meshLlave = BABYLON.MeshBuilder.CreateBox(
+                "llave",
+                { width: 0.56, height: 0.055, depth: 0.09 },
+                scene
+            );
+            meshLlave.parent = keyRoot;
+            meshLlave.position.x = 0.1;
             meshLlave.material = matLlave;
+            keyParts.push(meshLlave);
 
-            meshLlave.actionManager = new BABYLON.ActionManager(scene);
-            meshLlave.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+            const keyRing = BABYLON.MeshBuilder.CreateTorus(
+                "llave-anilla",
+                { diameter: 0.38, thickness: 0.055, tessellation: 28 },
+                scene
+            );
+            keyRing.parent = keyRoot;
+            keyRing.position.x = -0.22;
+            keyRing.rotation.x = Math.PI / 2;
+            keyRing.material = matLlave;
+            keyParts.push(keyRing);
+
+            for (const toothX of [0.26, 0.4]) {
+                const tooth = BABYLON.MeshBuilder.CreateBox(
+                    "llave-diente",
+                    { width: 0.07, height: 0.055, depth: 0.13 },
+                    scene
+                );
+                tooth.parent = keyRoot;
+                tooth.position.set(toothX, 0, -0.055);
+                tooth.material = matLlave;
+                keyParts.push(tooth);
+            }
+
+            const recogerLlave = () => {
                 if (!llaveCogida) {
                     llaveCogida = true;
                     inventario.push({ id: "llave", nombre: "Llave de Hierro Antiguo", icono: "🗝️" });
-                    meshLlave.dispose();
+                    keyRoot.dispose();
+                    keyLight.dispose();
                     setCanvasCursor("cursor-default");
                     actualizarInventario();
                     document.getElementById("text-box").innerHTML = "Has recogido una pesada <b>Llave de Hierro Antiguo</b>.";
@@ -1135,7 +1321,23 @@
                         mostrarDialogoCompanero("¡Perfecto! Guarda eso bien. Apostaría a que abre la puerta del monolito al otro lado.");
                     }, 500);
                 }
-            }));
+            };
+            keyParts.forEach(part => {
+                part.metadata = { isAncientKey: true };
+                part.actionManager = new BABYLON.ActionManager(scene);
+                part.actionManager.registerAction(
+                    new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, recogerLlave)
+                );
+            });
+
+            const keyLight = new BABYLON.PointLight(
+                "keyLight",
+                new BABYLON.Vector3(-0.8, 1.1, 6.5),
+                scene
+            );
+            keyLight.diffuse = new BABYLON.Color3(0.92, 0.67, 0.3);
+            keyLight.intensity = 0.35;
+            keyLight.range = 7;
 
             // --- NODO 2: Monolito y Puerta ---
             const monolito = BABYLON.MeshBuilder.CreateCylinder("monolito", { height: 9, diameterTop: 3.5, diameterBottom: 4.5 }, scene);
@@ -1208,7 +1410,7 @@
                 const pickMesh = scene.pick(scene.pointerX, scene.pointerY);
                 if (pickMesh && pickMesh.hit && pickMesh.pickedMesh) {
                     const nombre = pickMesh.pickedMesh.name;
-                    if (nombre === "llave") {
+                    if (nombre === "llave" || pickMesh.pickedMesh.metadata?.isAncientKey) {
                         setCanvasCursor("cursor-examine"); // Lupa sobre objetos
                         return;
                     }
@@ -1234,7 +1436,9 @@
             };
 
             camera = new BABYLON.UniversalCamera("Cam", nodes[0].position, scene);
-            camera.setTarget(nodes[0].target);
+            const initialTarget = nodes[0].target.clone();
+            initialTarget.y -= 0.75;
+            camera.setTarget(initialTarget);
             camera.angularSensibility = 1500;
 
             return scene;
@@ -1370,7 +1574,9 @@
             const startPosition = camera.position.clone();
             const startRotation = camera.rotation.clone();
             camera.position.copyFrom(targetNode.position);
-            camera.setTarget(targetNode.target);
+            const cameraTarget = targetNode.target.clone();
+            cameraTarget.y -= 0.75;
+            camera.setTarget(cameraTarget);
             const targetRotation = camera.rotation.clone();
             camera.position.copyFrom(startPosition);
             camera.rotation.copyFrom(startRotation);
