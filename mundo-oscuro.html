@@ -1132,6 +1132,31 @@
             ? requestedCompanionPortrait
             : "🧭";
 
+        // --- MEMORIA DE VILLANOS LIBERADOS Y ADVERTENCIA ---
+        const VILLAIN_STORAGE_KEY = "mundo_oscuro_villains_v1";
+
+        function cargarMemoriaVillanos() {
+            try {
+                const raw = localStorage.getItem(VILLAIN_STORAGE_KEY);
+                const parsed = raw ? JSON.parse(raw) : {};
+                return {
+                    prisionera: Boolean(parsed.prisionera),
+                    prisionero: Boolean(parsed.prisionero),
+                    lastVillainRole: parsed.lastVillainRole || null
+                };
+            } catch (e) {
+                return { prisionera: false, prisionero: false, lastVillainRole: null };
+            }
+        }
+
+        function guardarMemoriaVillanos(state) {
+            try {
+                localStorage.setItem(VILLAIN_STORAGE_KEY, JSON.stringify(state));
+            } catch (e) { /* Ignorar si localStorage no está disponible */ }
+        }
+
+        const villainMemory = cargarMemoriaVillanos();
+
         // --- PRISIONERA (LOCA, RESPONDE CON PREGUNTAS) Y PRISIONERO (SERIO Y ENIGMÁTICO) ---
         const personajesCelda = {
             prisionera: {
@@ -1148,7 +1173,9 @@
                 ],
                 peticionSalida: "«¿Me vas a dejar aquí riéndome con las sombras? ¡Abre este cerrojo y dime... qué harás cuando veas de qué lado estoy?»",
                 respuestaAliado: "«¡Ja! ¡Salió el cerrojo! ¿Ves qué fácil era confiar en la loca? ¡Vamos, muévete antes de que la oscuridad nos alcance!»",
-                respuestaVillanoLiberado: "«¡Qué inocencia la tuya! ¿De verdad creías que una sonrisa tras estas rejas era inocente? ¡Pronto verás el precio de abrirme!»"
+                respuestaVillanoLiberado: "«¡Qué inocencia la tuya! ¿De verdad creías que una sonrisa tras estas rejas era inocente? ¡Pronto verás el precio de abrirme!»",
+                historiaAnciano: "«¡Cuidado con esa mujer! Hace inviernos jugaba con las mentes de los viajeros junto a las fisuras: finge locura y devuelve preguntas para confundir a su presa antes de saquearla. No creas que ha desaparecido para siempre... en el Mundo Oscuro los embaucadores siempre vuelven a acechar.»",
+                reencuentroAdvertido: "«¡Mira quién vuelve a tropezar! Ya sabes lo que soy... ¿y aun así creías que esta vez tendrías el control?»"
             },
             prisionero: {
                 rol: "prisionero",
@@ -1161,7 +1188,9 @@
                 loreSerio: "«Este dominio existió antes que los mapas del reino. Las piedras guardan antiguos juramentos y los ecos despiertan a quienes no saben guardar silencio.»",
                 peticionSalida: "«El hierro me retiene, pero mis ojos han leído estos muros más tiempo del que imaginas. Libérame... y sabrás si mi paso es tu escudo o tu ruina.»",
                 respuestaAliado: "«El cerrojo ha cedido. A partir de este instante, mi filo camina contigo hasta que las sombras caigan.»",
-                respuestaVillanoLiberado: "«Has cometido un error antiguo, forastero. Algunos encerrados aquí no fueron víctimas... sino quienes abrieron las grietas.»"
+                respuestaVillanoLiberado: "«Has cometido un error antiguo, forastero. Algunos encerrados aquí no fueron víctimas... sino quienes abrieron las grietas.»",
+                historiaAnciano: "«Ese hombre no fue encerrado por error. Antaño sirvió a los señores de la grieta y robó llaves y reliquias para abrir los umbrales prohibidos. Si te ha traicionado, mantén los ojos abiertos: estos dominios retuercen los caminos y volveréis a cruzaros.»",
+                reencuentroAdvertido: "«Ya conoces mi filo y mi silencio, forastero. Esta vez vienes advertido... pero la sombra sigue siendo mía.»"
             }
         };
 
@@ -1226,11 +1255,13 @@
             const base = elegirPrisionera
                 ? personajesCelda.prisionera
                 : personajesCelda.prisionero;
-            const esHeroe = Math.random() < 0.5;
+            const yaAdvertidoDeEsteVillano = Boolean(villainMemory[base.rol]);
+            const esHeroe = yaAdvertidoDeEsteVillano ? false : (Math.random() < 0.5);
 
             encuentroCeldaActual = {
                 ...base,
                 alineacion: esHeroe ? "heroe" : "villano",
+                yaAdvertido: yaAdvertidoDeEsteVillano,
                 preguntaIdx: 0
             };
         }
@@ -1333,6 +1364,32 @@
                         : encuentroCeldaActual.imgHabla);
             }
 
+            if (encuentroCeldaActual.yaAdvertido) {
+                mostrarDialogo(
+                    encuentroCeldaActual.nombre,
+                    encuentroCeldaActual.imgPerfil,
+                    `${encuentroCeldaActual.reencuentroAdvertido}<br><br><i>(Ya conoces su traición gracias a la advertencia del Anciano. Mantén la guardia alta.)</i>`
+                );
+                document.getElementById("text-box").innerHTML =
+                    `<b>Reencuentro con ${encuentroCeldaActual.nombre} (Advertido):</b> Sabes que es un villano. Puedes vigilar tu alforja o decidir si vuelves a arriesgarte.`;
+                mostrarOpcionesLaberinto([
+                    {
+                        label: `🛡️ Mantener distancia y vigilar la alforja`,
+                        action: () => {
+                            cerrarDialogo();
+                            if (img) img.src = encuentroCeldaActual.imgCelda;
+                            document.getElementById("text-box").innerHTML =
+                                `<b>Reencuentro con ${encuentroCeldaActual.nombre}:</b> Estás advertido y no le das ventaja.`;
+                        }
+                    },
+                    {
+                        label: `🔓 Abrir la celda de todos modos (${encuentroCeldaActual.nombre})`,
+                        action: () => liberarPersonajeCelda()
+                    }
+                ]);
+                return;
+            }
+
             if (encuentroCeldaActual.rol === "prisionera") {
                 const preguntaLore = encuentroCeldaActual.preguntasMundoOscuro[
                     encuentroCeldaActual.preguntaIdx % encuentroCeldaActual.preguntasMundoOscuro.length
@@ -1405,8 +1462,12 @@
                 );
             } else {
                 traicionPendiente = true;
+                villainMemory[encuentroCeldaActual.rol] = true;
+                villainMemory.lastVillainRole = encuentroCeldaActual.rol;
+                guardarMemoriaVillanos(villainMemory);
+
                 document.getElementById("text-box").innerHTML =
-                    `<b>Celda Abierta:</b> Has sacado de las rejas a <b>${encuentroCeldaActual.nombre}</b>. Algo en su actitud resulta inquietante...`;
+                    `<b>Celda Abierta:</b> Has sacado de las rejas a <b>${encuentroCeldaActual.nombre}</b>. Algo en su actitud resulta inquietante... Quizás el Anciano sepa quién es en realidad.`;
                 mostrarDialogo(
                     encuentroCeldaActual.nombre,
                     encuentroCeldaActual.imgPerfil,
@@ -1708,9 +1769,37 @@
             document.getElementById("npc-menu").style.display = "none";
         };
 
+        function obtenerVillanoParaAnciano() {
+            if (encuentroCeldaActual && encuentroCeldaActual.alineacion === "villano") {
+                return personajesCelda[encuentroCeldaActual.rol];
+            }
+            if (villainMemory.lastVillainRole && personajesCelda[villainMemory.lastVillainRole]) {
+                return personajesCelda[villainMemory.lastVillainRole];
+            }
+            if (villainMemory.prisionero) return personajesCelda.prisionero;
+            if (villainMemory.prisionera) return personajesCelda.prisionera;
+            return null;
+        }
+
         window.accionNPC = function (tipo) {
             cerrarMenuNPC();
             if (tipo === 'hablar') {
+                const villanoRelacionado = obtenerVillanoParaAnciano();
+                if (villanoRelacionado) {
+                    mostrarDialogo(
+                        "Anciano Místico",
+                        "🧙‍♂️",
+                        `«Habéis cruzado el velo, viajeros...»<br><br>${villanoRelacionado.historiaAnciano}`
+                    );
+                    document.getElementById("text-box").innerHTML =
+                        `<b>El Anciano te advierte sobre ${villanoRelacionado.nombre}:</b> Conoces su pasado traicionero y sabes que puede volver a cruzarse en tu camino.`;
+
+                    setTimeout(() => {
+                        mostrarDialogoCompanero(`Quedamos advertidos sobre ${villanoRelacionado.nombre}. Si volvemos a verle, no bajaremos la guardia.`);
+                    }, 5200);
+                    return;
+                }
+
                 mostrarDialogo("Anciano Místico", "🧙‍♂️", "«Habéis cruzado el velo, viajeros. Si queréis cruzar ese portón, necesitaréis la llave que custodian las viejas piedras.»");
 
                 setTimeout(() => {
@@ -1848,7 +1937,6 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 1024, 512);
 
-            // Fisura / resplandor extraño en el horizonte
             const riftGlow = ctx.createRadialGradient(540, 415, 6, 540, 415, 340);
             riftGlow.addColorStop(0, "rgba(186, 128, 214, 0.42)");
             riftGlow.addColorStop(0.35, "rgba(116, 78, 152, 0.22)");
@@ -1857,7 +1945,6 @@
             ctx.fillStyle = riftGlow;
             ctx.fillRect(140, 120, 800, 392);
 
-            // Bandas de bruma/nubes fracturadas en altura
             for (let band = 0; band < 18; band++) {
                 const bx = aleatorio() * 1024;
                 const by = 180 + aleatorio() * 210;
@@ -1983,7 +2070,6 @@
             matRuina.diffuseColor = new BABYLON.Color3(0.76, 0.72, 0.86);
             matRuina.specularColor = new BABYLON.Color3(0.14, 0.13, 0.18);
 
-            // Columnas rotas y pilares inclinados alrededor de la cabaña y el enclave
             const columnas = [
                 [-6.8, 1.8, 4.2, 0.85, 3.6, 0.08, -0.14],
                 [-5.6, 1.1, 14.8, 0.75, 2.2, -0.18, 0.22],
@@ -2004,7 +2090,6 @@
                 col.isPickable = false;
             });
 
-            // Bloques derruidos y losas en el suelo
             const bloques = [
                 [-4.5, 0.35, 5.2, 1.6, 0.7, 1.2, 0.2],
                 [2.4, 0.25, 13.0, 1.9, 0.5, 1.3, -0.35],
@@ -2023,7 +2108,6 @@
                 block.isPickable = false;
             });
 
-            // Arco derruido cerca del enclave del anciano
             const arcoIzq = BABYLON.MeshBuilder.CreateBox("ruina-arco-izq", { width: 0.75, height: 3.4, depth: 0.75 }, scene);
             arcoIzq.position.set(7.6, 1.7, 17.5);
             arcoIzq.rotation.z = 0.08;
@@ -2656,132 +2740,4 @@
             cintaRealGlow = null;
             reportMissionProgress();
 
-            document.getElementById("text-box").innerHTML =
-                "<b>El Nicho de la Cinta Morada:</b> Has recogido la cinta con el sello real." +
-                "<p>Grabado en la pared: «El bruto persigue ecos. La hija del rey hacía rodar una piedra por la galería contraria y cruzaba pegada al muro».</p>";
-            mostrarDialogoCompanero("La cinta es de la princesa. Y la inscripción nos da una forma de distraer al minotauro.");
-        }
-
-        window.cambiarNodo = function (direction) {
-            const currentNode = nodes[currentNodeIndex];
-            const directionName = direction < 0 ? "left" : "right";
-            const targetId = currentNode.connections[directionName];
-            if (!targetId) return;
-
-            if (targetId === "labyrinth-entrance" && !puertaAbierta) {
-                document.getElementById("text-box").innerHTML =
-                    "El portón del monolito sigue cerrado. Necesitas la llave de hierro.";
-                return;
-            }
-
-            if (currentNode.id === "minotaur-guard" && directionName === "right"
-                && !minotaurDistracted && !minotaurDefeated) {
-                document.getElementById("text-box").innerHTML =
-                    "El minotauro bloquea la galería. Engáñalo o enfréntate a él antes de continuar.";
-                return;
-            }
-
-            irANodoPorId(targetId);
-        };
-
-        function crearIconoCintaMorada() {
-            const svgNamespace = "http://www.w3.org/2000/svg";
-            const icon = document.createElementNS(svgNamespace, "svg");
-            icon.setAttribute("viewBox", "0 0 32 32");
-            icon.setAttribute("width", "34");
-            icon.setAttribute("height", "34");
-            icon.setAttribute("aria-hidden", "true");
-
-            const paths = [
-                "M14 14C8 5 2 9 6 15c2 4 6 4 11 1z",
-                "M18 14c6-9 12-5 8 1-2 4-6 4-11 1z",
-                "M14 17 8 28l7-3 2 6 4-12z",
-                "M18 17 24 28l-7-3-2 6-4-12z"
-            ];
-            paths.forEach((shape, index) => {
-                const path = document.createElementNS(svgNamespace, "path");
-                path.setAttribute("d", shape);
-                path.setAttribute("fill", index < 2 ? "#a653d2" : "#7f32ad");
-                path.setAttribute("stroke", "#e7c2ff");
-                path.setAttribute("stroke-width", "1.2");
-                path.setAttribute("stroke-linejoin", "round");
-                icon.appendChild(path);
-            });
-            const knot = document.createElementNS(svgNamespace, "circle");
-            knot.setAttribute("cx", "16");
-            knot.setAttribute("cy", "16");
-            knot.setAttribute("r", "3");
-            knot.setAttribute("fill", "#d397f1");
-            icon.appendChild(knot);
-            return icon;
-        }
-
-        function actualizarInventario() {
-            for (let i = 0; i < 3; i++) {
-                const slot = document.getElementById(`slot-${i}`);
-                if (inventario[i]) {
-                    slot.replaceChildren();
-                    if (inventario[i].id === "cinta-real") {
-                        slot.appendChild(crearIconoCintaMorada());
-                    } else {
-                        slot.textContent = inventario[i].icono;
-                    }
-                    slot.title = inventario[i].nombre;
-                } else {
-                    slot.replaceChildren();
-                    slot.title = "Vacío";
-                }
-            }
-        }
-
-        window.seleccionarObjeto = function (index) {
-            if (inventario[index]) {
-                if (objetoSeleccionado === inventario[index].id) {
-                    objetoSeleccionado = null;
-                    document.getElementById(`slot-${index}`).classList.remove("selected");
-                    setCanvasCursor("cursor-default");
-                    document.getElementById("text-box").innerHTML = "Has guardado el objeto en la alforja.";
-                } else {
-                    objetoSeleccionado = inventario[index].id;
-                    for (let i = 0; i < 3; i++) document.getElementById(`slot-${i}`).classList.remove("selected");
-                    document.getElementById(`slot-${index}`).classList.add("selected");
-                    setCanvasCursor(inventario[index].id === "llave" ? "cursor-key" : "cursor-default");
-                    document.getElementById("text-box").innerHTML = `Sostienes: <b>${inventario[index].nombre}</b>. Haz clic en el elemento del escenario donde quieras usarlo.`;
-                }
-            }
-        };
-
-        window.addEventListener("message", event => {
-            if (event.origin !== window.location.origin || event.source !== window.parent) return;
-            if (event.data?.type !== "dark-world:minotaur-defeated") return;
-
-            minotaurDefeated = true;
-            minotaurDistracted = true;
-            minotaurCombatRequested = false;
-            missionProgress.guardianPassed = true;
-            missionProgress.guardianDefeated = true;
-            reportMissionProgress();
-            if (minotaurSprite) {
-                minotaurSprite.dispose();
-                minotaurSprite = null;
-            }
-            if (nodes[currentNodeIndex].id === "minotaur-guard") {
-                document.getElementById("text-box").innerHTML =
-                    "<b>La Guardia del Minotauro:</b> El guardián ha caído. La galería queda libre.";
-                actualizarNavegacion(nodes[currentNodeIndex]);
-                mostrarDialogoCompanero("Habéis vencido al guardián. Las huellas de la princesa siguen al otro lado.");
-            }
-        });
-
-        actualizarHUDGrupo();
-        prepararDiarioMision();
-        prepararPergaminoAntiguo();
-        reportMissionProgress();
-        actualizarNavegacion(nodes[currentNodeIndex]);
-        aplicarAtmosferaNodo(Boolean(nodes[currentNodeIndex].horrorInterior));
-        engine.runRenderLoop(() => scene.render());
-        window.addEventListener("resize", () => engine.resize());
-    </script>
-</body>
-
-</html>
+            document.getElementById("text-box
