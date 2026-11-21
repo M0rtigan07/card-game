@@ -1225,6 +1225,14 @@ h1 {
     height: clamp(110px, 18vh, 155px);
 }
 
+#enemySceneImage[src*="minotauro_retrato_combate.png"] {
+    max-height: none;
+    height: clamp(150px, 24vh, 185px);
+    image-rendering: auto;
+    background: radial-gradient(ellipse at center, rgba(110, 55, 31, .55), transparent 72%);
+    filter: drop-shadow(0 0 7px rgba(180, 34, 20, .6));
+}
+
 .combat-arena .character-tag {
     max-width: 100%;
     overflow-wrap: anywhere;

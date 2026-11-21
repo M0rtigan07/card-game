@@ -279,6 +279,11 @@ test('following footprints from the forest opens the separate adventure without 
         const worldUrl = new URL('../../mundo-oscuro.html', import.meta.url);
         worldUrl.searchParams.set('companionName', 'Astrid');
         worldUrl.searchParams.set('companionPortrait', 'img/npcs/vikinga_hablando1.jpg');
+        worldUrl.searchParams.set('missionPortalCrossed', '1');
+        worldUrl.searchParams.set('missionRoyalClueFound', '0');
+        worldUrl.searchParams.set('missionGuardianPassed', '0');
+        worldUrl.searchParams.set('missionGuardianDefeated', '0');
+        worldUrl.searchParams.set('missionPrincessTrailFound', '0');
         assert.equal(elements.darkWorldFrame.src, worldUrl.href);
         assert.deepEqual(shownScreens, ['darkWorldScreen']);
 

@@ -97,6 +97,10 @@
             background: linear-gradient(-90deg, rgba(20, 15, 10, 0.7) 0%, transparent 100%);
         }
 
+        .nav-zone[hidden] {
+            display: none;
+        }
+
         #location-banner {
             position: absolute;
             top: 15px;
@@ -113,6 +117,204 @@
             pointer-events: none;
             z-index: 6;
             border-radius: 3px;
+        }
+
+        #journal-toggle {
+            position: absolute;
+            top: 15px;
+            right: 14px;
+            z-index: 8;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border: 1px solid #8e7042;
+            border-radius: 4px;
+            background: rgba(26, 21, 16, .94);
+            color: #f3e5c4;
+            font: 600 12px 'Cinzel', serif;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .7);
+        }
+
+        #journal-toggle:hover,
+        #journal-toggle:focus-visible {
+            background: #59442b;
+            outline: 2px solid #f3c65f;
+        }
+
+        #mission-count-badge {
+            color: #f3c65f;
+            white-space: nowrap;
+        }
+
+        #mission-journal {
+            width: min(600px, calc(100vw - 28px));
+            max-height: min(82vh, 720px);
+            margin: auto;
+            padding: 0;
+            border: 3px ridge #a8844c;
+            border-radius: 5px;
+            background: linear-gradient(180deg, #eadbb8 0%, #cbb88e 100%);
+            color: #2b1d0e;
+            box-shadow: 0 16px 55px rgba(0, 0, 0, .85);
+            overflow-y: auto;
+        }
+
+        #mission-journal::backdrop {
+            background: rgba(8, 7, 6, .82);
+            backdrop-filter: blur(2px);
+        }
+
+        .journal-panel {
+            padding: clamp(16px, 4vw, 28px);
+        }
+
+        .journal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(92, 56, 23, .4);
+        }
+
+        .journal-eyebrow {
+            margin: 0 0 4px;
+            color: #77562f;
+            font: 700 11px 'Cinzel', serif;
+            letter-spacing: 1.5px;
+        }
+
+        #mission-journal-title {
+            margin: 0;
+            color: #4a2e1b;
+            font: 700 clamp(18px, 4vw, 25px) 'Cinzel', serif;
+        }
+
+        #journal-close {
+            flex: 0 0 auto;
+            width: 34px;
+            height: 34px;
+            border: 1px solid #7c6242;
+            border-radius: 3px;
+            background: #38281b;
+            color: #f3e5c4;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        #journal-close:hover,
+        #journal-close:focus-visible {
+            background: #6a3d2c;
+            outline: 2px solid #f3c65f;
+        }
+
+        #mission-summary {
+            margin: 14px 0 12px;
+            line-height: 1.4;
+        }
+
+        #mission-progress-track {
+            height: 12px;
+            overflow: hidden;
+            border: 1px solid #76603e;
+            border-radius: 8px;
+            background: #74694f;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, .45);
+        }
+
+        #mission-progress-bar {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #b37b25, #4f8038);
+            transition: width .25s ease;
+        }
+
+        #mission-progress-count {
+            margin: 6px 0 14px;
+            color: #604522;
+            font: 600 12px 'Cinzel', serif;
+            text-align: right;
+        }
+
+        #mission-objectives {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .mission-objective {
+            display: grid;
+            grid-template-columns: 30px minmax(0, 1fr) auto;
+            align-items: start;
+            gap: 10px;
+            padding: 11px;
+            border: 1px solid rgba(96, 68, 34, .55);
+            border-radius: 4px;
+            background: rgba(255, 249, 229, .42);
+        }
+
+        .mission-objective.is-current {
+            border-color: #9c6a24;
+            background: rgba(255, 248, 220, .8);
+            box-shadow: inset 3px 0 #bd842f;
+        }
+
+        .mission-step-mark {
+            display: grid;
+            width: 27px;
+            height: 27px;
+            place-items: center;
+            border: 1px solid #8a7047;
+            border-radius: 50%;
+            color: #634a2c;
+            font: 700 13px 'Cinzel', serif;
+        }
+
+        .mission-objective.is-complete .mission-step-mark {
+            border-color: #476b35;
+            background: #55783f;
+            color: #fff9e7;
+        }
+
+        .mission-objective-copy h3 {
+            margin: 0;
+            color: #4a2e1b;
+            font: 700 14px 'Cinzel', serif;
+        }
+
+        .mission-objective-copy p {
+            margin: 4px 0 0;
+            line-height: 1.3;
+        }
+
+        .mission-objective-status {
+            color: #6b5737;
+            font: 600 10px 'Cinzel', serif;
+            white-space: nowrap;
+        }
+
+        .mission-objective.is-complete .mission-objective-status {
+            color: #476b35;
+        }
+
+        #mission-next {
+            margin: 14px 0 0;
+            color: #4a2e1b;
+            font-weight: 600;
+        }
+
+        .journal-future-note {
+            margin: 10px 0 0;
+            color: #6b5737;
+            font-size: 13px;
+            font-style: italic;
         }
 
         /* MENÚ FLOTANTE DEL NPC */
@@ -258,6 +460,30 @@
             font-size: 15px;
         }
 
+        .node-choice-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .node-choice-button {
+            padding: 8px 10px;
+            border: 1px solid #7c6242;
+            border-radius: 3px;
+            background: #2c241d;
+            color: #f3e5c4;
+            font: 600 14px 'Cinzel', serif;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .node-choice-button:hover,
+        .node-choice-button:focus-visible {
+            background: #59442b;
+            outline: 2px solid #f3c65f;
+        }
+
         #inventory-box {
             flex: 1;
             background: linear-gradient(180deg, #1d1814 0%, #120f0c 100%);
@@ -322,15 +548,36 @@
 
             #location-banner {
                 top: 8px;
-                max-width: 76vw;
+                max-width: 90vw;
                 padding: 5px 10px;
                 font-size: clamp(11px, 3.5vw, 15px);
-                white-space: nowrap;
+                line-height: 1.2;
+                text-align: center;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            #journal-toggle {
+                top: 48px;
+                right: 8px;
+                gap: 5px;
+                padding: 5px 8px;
+                font-size: 11px;
             }
 
             .nav-zone {
                 width: 15%;
                 font-size: 1.8rem;
+            }
+
+            .mission-objective {
+                grid-template-columns: 27px minmax(0, 1fr);
+                gap: 8px;
+                padding: 9px;
+            }
+
+            .mission-objective-status {
+                grid-column: 2;
             }
 
             #hud-panel {
@@ -421,6 +668,12 @@
     <div id="game-container">
         <div id="viewport">
             <div id="location-banner">La Cabaña de Piedra</div>
+            <button id="journal-toggle" type="button" aria-label="Abrir diario de misiones"
+                aria-controls="mission-journal" aria-haspopup="dialog" aria-expanded="false">
+                <span aria-hidden="true">📜</span>
+                <span>Diario</span>
+                <span id="mission-count-badge">1/4</span>
+            </button>
             <div id="nav-left" class="nav-zone" onclick="cambiarNodo(-1)" title="Ir a la izquierda">◄</div>
             <div id="nav-right" class="nav-zone" onclick="cambiarNodo(1)" title="Ir a la derecha">►</div>
 
@@ -464,6 +717,27 @@
         </div>
     </div>
 
+    <dialog id="mission-journal" aria-labelledby="mission-journal-title">
+        <div class="journal-panel">
+            <header class="journal-header">
+                <div>
+                    <p class="journal-eyebrow">DIARIO DE MISIÓN</p>
+                    <h2 id="mission-journal-title">Tras las huellas de la hija del rey</h2>
+                </div>
+                <button id="journal-close" type="button" aria-label="Cerrar diario">×</button>
+            </header>
+            <p id="mission-summary"></p>
+            <div id="mission-progress-track" role="progressbar" aria-label="Progreso de la misión"
+                aria-valuemin="0" aria-valuemax="4" aria-valuenow="1">
+                <span id="mission-progress-bar"></span>
+            </div>
+            <p id="mission-progress-count"></p>
+            <ol id="mission-objectives"></ol>
+            <p id="mission-next"></p>
+            <p class="journal-future-note">Tu avance se conserva para retomarlo cuando regreses a esta aventura desde las mazmorras.</p>
+        </div>
+    </dialog>
+
     <script>
         const canvas = document.getElementById("renderCanvas");
         const engine = new BABYLON.Engine(canvas, true);
@@ -474,8 +748,20 @@
         let objetoSeleccionado = null;
         let llaveCogida = false;
         let puertaAbierta = false;
+        let minotaurSprite = null;
+        let minotaurCombatRequested = false;
         let animadoNPC;
         const dialogueParams = new URLSearchParams(window.location.search);
+        const missionProgress = {
+            portalCrossed: dialogueParams.get("missionPortalCrossed") !== "0",
+            royalClueFound: dialogueParams.get("missionRoyalClueFound") === "1",
+            guardianPassed: dialogueParams.get("missionGuardianPassed") === "1",
+            guardianDefeated: dialogueParams.get("missionGuardianDefeated") === "1",
+            princessTrailFound: dialogueParams.get("missionPrincessTrailFound") === "1"
+        };
+        let minotaurClueFound = missionProgress.royalClueFound;
+        let minotaurDistracted = missionProgress.guardianPassed && !missionProgress.guardianDefeated;
+        let minotaurDefeated = missionProgress.guardianDefeated;
         const companionName = dialogueParams.get("companionName")?.trim() || "HÉROE";
         const requestedCompanionPortrait = dialogueParams.get("companionPortrait") || "";
         const companionAvatar = /^img\/[A-Za-z0-9/_-]+\.(png|jpe?g|webp)$/i.test(requestedCompanionPortrait)
@@ -484,18 +770,177 @@
 
         const nodes = [
             {
+                id: "cabin",
                 name: "La Cabaña de Piedra",
                 position: new BABYLON.Vector3(0, 1.6, 0),
                 target: new BABYLON.Vector3(0, 1.6, 10),
-                desc: "Ante ti se alza una construcción rústica de mampostería. Una llave de hierro descansa en el suelo."
+                desc: "Ante ti se alza una construcción rústica de mampostería. Una llave de hierro descansa en el suelo.",
+                connections: { right: "elder-enclave" }
             },
             {
+                id: "elder-enclave",
                 name: "El Enclave del Anciano",
                 position: new BABYLON.Vector3(15, 1.6, 10),
                 target: new BABYLON.Vector3(15, 1.6, 20),
-                desc: "Un monolito colosal de piedra marca este lugar. El anciano místico aguarda a la izquierda del portón."
+                desc: "Un monolito colosal de piedra marca este lugar. El anciano místico aguarda a la izquierda del portón.",
+                connections: { left: "cabin", right: "labyrinth-entrance" }
+            },
+            {
+                id: "labyrinth-entrance",
+                name: "La Entrada del Laberinto",
+                position: new BABYLON.Vector3(15, 1.6, 31),
+                target: new BABYLON.Vector3(15, 1.6, 41),
+                desc: "Tras el portón, un corredor de piedra se hunde en la oscuridad. Unas huellas pequeñas avanzan hacia el interior.",
+                connections: { left: "elder-enclave", right: "footprint-corridor" }
+            },
+            {
+                id: "footprint-corridor",
+                name: "La Bifurcación de las Huellas",
+                position: new BABYLON.Vector3(15, 1.6, 42),
+                target: new BABYLON.Vector3(15, 1.6, 52),
+                desc: "Las huellas de la hija del rey se dividen en dos. A la izquierda, una cámara cubierta de polvo; a la derecha, el eco de un bramido.",
+                connections: { left: "royal-clue", right: "minotaur-guard" }
+            },
+            {
+                id: "royal-clue",
+                name: "El Nicho de la Cinta Azul",
+                position: new BABYLON.Vector3(7, 1.6, 52),
+                target: new BABYLON.Vector3(2, 1.6, 52),
+                desc: "Un trozo de tela azul con el sello real está atrapado entre las piedras. Las huellas de la princesa regresan hacia la galería del eco.",
+                connections: { left: "footprint-corridor", right: "minotaur-guard" }
+            },
+            {
+                id: "minotaur-guard",
+                name: "La Guardia del Minotauro",
+                position: new BABYLON.Vector3(23, 1.6, 52),
+                target: new BABYLON.Vector3(33, 1.6, 52),
+                desc: "Un minotauro armado patrulla la galería. Su mirada recorre el pasillo, atento a cualquier ruido.",
+                connections: { left: "footprint-corridor", right: "echo-gallery" }
+            },
+            {
+                id: "echo-gallery",
+                name: "La Galería del Eco",
+                position: new BABYLON.Vector3(35, 1.6, 52),
+                target: new BABYLON.Vector3(43, 1.6, 52),
+                desc: "Al otro lado de la guardia, las huellas siguen junto a marcas de una pequeña mano en el muro.",
+                connections: { left: "minotaur-guard", right: "princess-sanctum" }
+            },
+            {
+                id: "princess-sanctum",
+                name: "El Rastro de la Princesa",
+                position: new BABYLON.Vector3(43, 1.6, 52),
+                target: new BABYLON.Vector3(43, 1.6, 62),
+                desc: "Un broche real yace junto a una puerta entreabierta. La hija del rey ha pasado por aquí y se adentró en las ruinas.",
+                connections: { left: "echo-gallery" }
             }
         ];
+
+        const missionObjectives = [
+            {
+                key: "portalCrossed",
+                title: "Cruzar el portalón",
+                description: "Entraste en el Mundo Oscuro y comenzaste a seguir las huellas."
+            },
+            {
+                key: "royalClueFound",
+                title: "Encontrar una pista real",
+                description: "Busca señales de la princesa en el nicho de la cinta azul."
+            },
+            {
+                key: "guardianPassed",
+                title: "Superar la guardia del minotauro",
+                description: "Engaña al guardián con un eco o véncelo en combate."
+            },
+            {
+                key: "princessTrailFound",
+                title: "Confirmar el rastro de la princesa",
+                description: "Encuentra el broche real al otro lado del laberinto."
+            }
+        ];
+
+        function actualizarDiarioMision() {
+            const completedCount = missionObjectives
+                .filter(objective => missionProgress[objective.key]).length;
+            const currentIndex = missionObjectives
+                .findIndex(objective => !missionProgress[objective.key]);
+            const percentage = Math.round(completedCount / missionObjectives.length * 100);
+            const badge = document.getElementById("mission-count-badge");
+            const progressTrack = document.getElementById("mission-progress-track");
+            const progressBar = document.getElementById("mission-progress-bar");
+            const list = document.getElementById("mission-objectives");
+
+            badge.textContent = `${completedCount}/${missionObjectives.length}`;
+            progressTrack.setAttribute("aria-valuemax", String(missionObjectives.length));
+            progressTrack.setAttribute("aria-valuenow", String(completedCount));
+            progressBar.style.width = `${percentage}%`;
+            document.getElementById("mission-progress-count").textContent =
+                `${completedCount} / ${missionObjectives.length} objetivos completados`;
+            document.getElementById("mission-summary").textContent =
+                completedCount === missionObjectives.length
+                    ? "Has atravesado el laberinto y confirmado que la hija del rey pasó por aquí."
+                    : "Las huellas de la hija del rey continúan dentro del laberinto. Sigue reuniendo pistas.";
+
+            const nextObjective = missionObjectives[currentIndex];
+            document.getElementById("mission-next").textContent = nextObjective
+                ? `Siguiente paso: ${nextObjective.title}.`
+                : "El rastro conduce más allá de las ruinas. La búsqueda continúa.";
+
+            const entries = missionObjectives.map((objective, index) => {
+                const completed = missionProgress[objective.key];
+                const current = index === currentIndex;
+                const item = document.createElement("li");
+                item.className = `mission-objective${completed ? " is-complete" : ""}${current ? " is-current" : ""}`;
+                if (current) item.setAttribute("aria-current", "step");
+
+                const mark = document.createElement("span");
+                mark.className = "mission-step-mark";
+                mark.setAttribute("aria-hidden", "true");
+                mark.textContent = completed ? "✓" : String(index + 1);
+
+                const copy = document.createElement("div");
+                copy.className = "mission-objective-copy";
+                const title = document.createElement("h3");
+                title.textContent = objective.title;
+                const description = document.createElement("p");
+                description.textContent = objective.description;
+                copy.append(title, description);
+
+                const status = document.createElement("span");
+                status.className = "mission-objective-status";
+                status.textContent = completed ? "Completado" : current ? "En curso" : "Pendiente";
+
+                item.append(mark, copy, status);
+                return item;
+            });
+            list.replaceChildren(...entries);
+        }
+
+        function reportMissionProgress() {
+            actualizarDiarioMision();
+            if (window.parent === window) return;
+
+            const targetOrigin = window.location.origin === "null" ? "*" : window.location.origin;
+            window.parent.postMessage(
+                { type: "dark-world:mission-progress", progress: { ...missionProgress } },
+                targetOrigin
+            );
+        }
+
+        function prepararDiarioMision() {
+            const toggle = document.getElementById("journal-toggle");
+            const journal = document.getElementById("mission-journal");
+            toggle.addEventListener("click", () => {
+                actualizarDiarioMision();
+                journal.showModal();
+                toggle.setAttribute("aria-expanded", "true");
+            });
+            document.getElementById("journal-close").addEventListener("click", () => {
+                journal.close();
+                toggle.setAttribute("aria-expanded", "false");
+            });
+            journal.addEventListener("cancel", () => toggle.setAttribute("aria-expanded", "false"));
+            journal.addEventListener("close", () => toggle.setAttribute("aria-expanded", "false"));
+        }
 
         // Función auxiliar para cambiar el cursor del canvas
         function setCanvasCursor(claseCursor) {
@@ -622,6 +1067,30 @@
             return tex;
         }
 
+        function crearParedLaberinto(scene, material, x, z, width, depth) {
+            const wall = BABYLON.MeshBuilder.CreateBox(
+                `maze-wall-${x}-${z}-${width}-${depth}`,
+                { width, height: 4, depth },
+                scene
+            );
+            wall.position.set(x, 2, z);
+            wall.material = material;
+        }
+
+        function construirLaberinto(scene, material) {
+            [
+                [25, 38, 50, 1], [25, 65, 50, 1],
+                [0, 51, 1, 28], [50, 51, 1, 28],
+                [14, 43, 1, 10], [14, 59, 1, 10],
+                [26, 43, 1, 10], [26, 59, 1, 10],
+                [38, 43, 1, 10], [38, 59, 1, 10],
+                [7, 48, 10, 1], [20, 48, 10, 1],
+                [7, 54, 10, 1], [20, 54, 10, 1]
+            ].forEach(([x, z, width, depth]) => {
+                crearParedLaberinto(scene, material, x, z, width, depth);
+            });
+        }
+
         let meshLlave, meshPuerta;
 
         const createScene = function () {
@@ -631,13 +1100,14 @@
             const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
             light.intensity = 0.85;
 
-            const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 80 }, scene);
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 140 }, scene);
             const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
             groundMat.diffuseTexture = crearTexturaHierba(scene);
             ground.material = groundMat;
 
             const matPiedra = new BABYLON.StandardMaterial("matPiedra", scene);
             matPiedra.diffuseTexture = crearTexturaPiedra(scene);
+            construirLaberinto(scene, matPiedra);
 
             // --- NODO 1: Cabaña y Llave ---
             const cabana = BABYLON.MeshBuilder.CreateBox("cabana", { width: 5, height: 4, depth: 6 }, scene);
@@ -701,6 +1171,18 @@
                 }
             }));
 
+            const minotaurManager = new BABYLON.SpriteManager(
+                "minotaurManager",
+                "img/moscuro/minotauro_idle.png",
+                1,
+                { width: 264, height: 472 },
+                scene
+            );
+            minotaurSprite = new BABYLON.Sprite("minotaurGuard", minotaurManager);
+            minotaurSprite.position = new BABYLON.Vector3(32, 2.4, 52);
+            minotaurSprite.size = 4.5;
+            minotaurSprite.playAnimation(0, 17, true, 110);
+
             // --- SPRITE ANIMADO DEL ANCIANO ---
             limpiarFondoSprite("img/moscuro/anciano.png", function (imagenLimpiaBase64, cellW, cellH) {
                 const spriteManagerAnim = new BABYLON.SpriteManager("spriteAnim", imagenLimpiaBase64, 1, { width: cellW, height: cellH }, scene);
@@ -759,28 +1241,163 @@
         };
 
         const scene = createScene();
+        if (minotaurDefeated && minotaurSprite) {
+            minotaurSprite.dispose();
+            minotaurSprite = null;
+        } else if (minotaurDistracted && minotaurSprite) {
+            minotaurSprite.isVisible = false;
+        }
+
+        function actualizarNavegacion(node) {
+            document.getElementById("nav-left").hidden = !node.connections.left;
+            document.getElementById("nav-right").hidden = !node.connections.right;
+        }
+
+        function mostrarOpcionesLaberinto(options) {
+            const list = document.createElement("div");
+            list.className = "node-choice-list";
+            options.forEach(({ label, action }) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "node-choice-button";
+                button.textContent = label;
+                button.addEventListener("click", action);
+                list.appendChild(button);
+            });
+            document.getElementById("text-box").appendChild(list);
+        }
+
+        function solicitarCombateMinotauro() {
+            if (minotaurCombatRequested) return;
+            minotaurCombatRequested = true;
+            cerrarDialogo();
+            document.getElementById("text-box").innerHTML +=
+                "<p>El minotauro os ha descubierto. ¡Preparaos para combatir!</p>";
+
+            if (window.parent === window) {
+                minotaurCombatRequested = false;
+                document.getElementById("text-box").innerHTML +=
+                    "<p>No se pudo iniciar el combate: abre esta aventura desde el juego principal.</p>";
+                return;
+            }
+
+            const targetOrigin = window.location.origin === "null" ? "*" : window.location.origin;
+            window.parent.postMessage({ type: "dark-world:start-minotaur-combat" }, targetOrigin);
+        }
+
+        function resolverEntradaNodo(node) {
+            const textBox = document.getElementById("text-box");
+            if (node.id === "royal-clue") {
+                minotaurClueFound = true;
+                missionProgress.royalClueFound = true;
+                reportMissionProgress();
+                if (!inventario.some(item => item.id === "cinta-real")) {
+                    inventario.push({ id: "cinta-real", nombre: "Cinta con el sello real", icono: "🎗️" });
+                    actualizarInventario();
+                }
+                textBox.innerHTML +=
+                    "<p>Grabado en la pared: «El bruto persigue ecos. La hija del rey hacía rodar una piedra por la galería contraria y cruzaba pegada al muro».</p>";
+                mostrarDialogoCompanero("La princesa dejó una pista: podemos engañar el oído del guardián con un eco.");
+            }
+
+            if (node.id === "minotaur-guard") {
+                if (minotaurDefeated) {
+                    textBox.innerHTML += "<p>El guardián yace vencido; el camino está despejado.</p>";
+                    return;
+                }
+                if (minotaurDistracted) {
+                    textBox.innerHTML += "<p>El minotauro sigue buscando el ruido en el otro corredor. Avanzad en silencio.</p>";
+                    return;
+                }
+                mostrarOpcionesLaberinto([
+                    {
+                        label: "Hacer rodar una piedra por el corredor opuesto y avanzar pegados al muro",
+                        action: () => {
+                            if (!minotaurClueFound) {
+                                solicitarCombateMinotauro();
+                                return;
+                            }
+                            minotaurDistracted = true;
+                            minotaurSprite.isVisible = false;
+                            missionProgress.guardianPassed = true;
+                            reportMissionProgress();
+                            textBox.innerHTML =
+                                "<b>La Guardia del Minotauro:</b> El eco atrae al guardián hacia el pasillo falso. Pasáis sin que os vea.";
+                            mostrarDialogoCompanero("¡Buen plan! La princesa dejó el camino preparado para quien supiera leer sus señales.");
+                        }
+                    },
+                    {
+                        label: "Echar a correr por el centro del corredor",
+                        action: solicitarCombateMinotauro
+                    }
+                ]);
+            }
+
+            if (node.id === "princess-sanctum") {
+                minotaurClueFound = true;
+                missionProgress.princessTrailFound = true;
+                reportMissionProgress();
+                if (!inventario.some(item => item.id === "broche-real")) {
+                    inventario.push({ id: "broche-real", nombre: "Broche de la hija del rey", icono: "👑" });
+                    actualizarInventario();
+                }
+                textBox.innerHTML +=
+                    "<p>El broche confirma que la hija del rey cruzó el laberinto. Sus huellas continúan hacia las ruinas.</p>";
+            }
+        }
 
         window.cambiarNodo = function (direction) {
-            currentNodeIndex += direction;
-            if (currentNodeIndex < 0) currentNodeIndex = nodes.length - 1;
-            if (currentNodeIndex >= nodes.length) currentNodeIndex = 0;
+            const currentNode = nodes[currentNodeIndex];
+            const directionName = direction < 0 ? "left" : "right";
+            const targetId = currentNode.connections[directionName];
+            if (!targetId) return;
 
+            if (targetId === "labyrinth-entrance" && !puertaAbierta) {
+                document.getElementById("text-box").innerHTML =
+                    "El portón del monolito sigue cerrado. Necesitas la llave de hierro.";
+                return;
+            }
+
+            if (currentNode.id === "minotaur-guard" && directionName === "right"
+                && !minotaurDistracted && !minotaurDefeated) {
+                document.getElementById("text-box").innerHTML =
+                    "El minotauro bloquea la galería. Engáñalo o enfréntate a él antes de continuar.";
+                return;
+            }
+
+            currentNodeIndex = nodes.findIndex(node => node.id === targetId);
             const targetNode = nodes[currentNodeIndex];
+            const startPosition = camera.position.clone();
+            const startRotation = camera.rotation.clone();
+            camera.position.copyFrom(targetNode.position);
+            camera.setTarget(targetNode.target);
+            const targetRotation = camera.rotation.clone();
+            camera.position.copyFrom(startPosition);
+            camera.rotation.copyFrom(startRotation);
 
             BABYLON.Animation.CreateAndStartAnimation(
                 "camMove", camera, "position", 30, 25,
                 camera.position, targetNode.position,
                 BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
             );
+            BABYLON.Animation.CreateAndStartAnimation(
+                "camTurn", camera, "rotation", 30, 25,
+                startRotation, targetRotation,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
 
             document.getElementById("location-banner").innerText = targetNode.name;
             document.getElementById("text-box").innerHTML = `<b>${targetNode.name}:</b> ${targetNode.desc}`;
+            actualizarNavegacion(targetNode);
             cerrarMenuNPC();
             cerrarDialogo();
+            resolverEntradaNodo(targetNode);
 
-            if (currentNodeIndex === 1) {
+            if (targetNode.id === "elder-enclave") {
                 setTimeout(() => {
-                    mostrarDialogoCompanero("Mirad... hay un anciano a la izquierda del monolito. Quizas sabe algo, vamos  a hablar con él.");
+                    if (nodes[currentNodeIndex].id === "elder-enclave") {
+                        mostrarDialogoCompanero("Mirad... hay un anciano a la izquierda del monolito. Quizás sabe algo; vamos a hablar con él.");
+                    }
                 }, 800);
             }
         };
@@ -815,6 +1432,31 @@
             }
         };
 
+        window.addEventListener("message", event => {
+            if (event.origin !== window.location.origin || event.source !== window.parent) return;
+            if (event.data?.type !== "dark-world:minotaur-defeated") return;
+
+            minotaurDefeated = true;
+            minotaurDistracted = true;
+            minotaurCombatRequested = false;
+            missionProgress.guardianPassed = true;
+            missionProgress.guardianDefeated = true;
+            reportMissionProgress();
+            if (minotaurSprite) {
+                minotaurSprite.dispose();
+                minotaurSprite = null;
+            }
+            if (nodes[currentNodeIndex].id === "minotaur-guard") {
+                document.getElementById("text-box").innerHTML =
+                    "<b>La Guardia del Minotauro:</b> El guardián ha caído. La galería queda libre.";
+                actualizarNavegacion(nodes[currentNodeIndex]);
+                mostrarDialogoCompanero("Habéis vencido al guardián. Las huellas de la princesa siguen al otro lado.");
+            }
+        });
+
+        prepararDiarioMision();
+        reportMissionProgress();
+        actualizarNavegacion(nodes[currentNodeIndex]);
         engine.runRenderLoop(() => scene.render());
         window.addEventListener("resize", () => engine.resize());
     </script>

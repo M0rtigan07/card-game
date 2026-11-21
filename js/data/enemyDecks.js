@@ -59,6 +59,13 @@ export const ENEMY_DECKS = {
         { name: '🩸 Drenaje Ígneo', type: 'drain', power: 1.2, leech: 0.6 },
         { name: '💥 Estallido de Fuego', type: 'atk', power: 2.0 }
     ],
+    minotauro: [
+        { name: '🐂 Cornada Salvaje', type: 'atk', power: 1.5, copies: 2 },
+        { name: '🪓 Hachazo del Guardián', type: 'atk', power: 1.3 },
+        { name: '🌪️ Carga del Laberinto', type: 'multi', power: 0.65, hits: 3 },
+        { name: '🧱 Muro de Cuernos', type: 'def', val: 16 },
+        { name: '😤 Rugido Aterrador', type: 'buff', val: 3 }
+    ],
 
     // ───── Jefes (más cartas y más duras que las de un enemigo normal) ─────
     orco_jefe: [ // Brutal: golpes enormes y se cura con banquetes

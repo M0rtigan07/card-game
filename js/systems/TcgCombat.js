@@ -123,6 +123,7 @@ export class TcgCombat {
                 img: enemyData.img || FALLBACK_IMG,
                 deckId: enemyData.deckId,
                 speaker: enemyData.speaker, // quién habla (nombre, voz...); sin él, el enemigo no dice nada
+                returnToDarkWorld: Boolean(enemyData.returnToDarkWorld),
                 isBoss: Boolean(enemyData.isBoss),
                 armor: enemyData.armor ?? 0, // los jefes empiezan cada turno con esta guardia
                 phases: enemyData.phases ?? [],
@@ -562,6 +563,11 @@ export class TcgCombat {
         this.view.setVictory(false);
 
         await this.chooseReward({ boss });
+
+        if (defeated.returnToDarkWorld) {
+            this.game.darkWorld.returnFromMinotaurCombat();
+            return;
+        }
 
         this.game.dungeonLevel++;
         await this.game.loadNextEvent();

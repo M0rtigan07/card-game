@@ -35,7 +35,18 @@ export function createDarkWorldState(entryFloor) {
         active: true,
         entryFloor,
         location: 0,
-        steps: 0
+        steps: 0,
+        mission: createDarkWorldMissionProgress()
+    };
+}
+
+export function createDarkWorldMissionProgress() {
+    return {
+        portalCrossed: true,
+        royalClueFound: false,
+        guardianPassed: false,
+        guardianDefeated: false,
+        princessTrailFound: false
     };
 }
 
@@ -50,12 +61,24 @@ export function advanceDarkWorldState(state) {
 export class DarkWorld {
     constructor(game) {
         this.game = game;
+        this.parallelWorldMessageHandler = null;
     }
 
     enter() {
         const storyState = this.game.player.storyState;
         if (!storyState.darkWorld?.active) {
-            storyState.darkWorld = createDarkWorldState(this.game.dungeonLevel);
+            const previousState = storyState.darkWorld;
+            storyState.darkWorld = previousState
+                ? {
+                    ...previousState,
+                    active: true,
+                    entryFloor: this.game.dungeonLevel,
+                    mission: {
+                        ...createDarkWorldMissionProgress(),
+                        ...previousState.mission
+                    }
+                }
+                : createDarkWorldState(this.game.dungeonLevel);
         }
 
         document.body.classList.add('dark-world');
@@ -131,8 +154,20 @@ export class DarkWorld {
             throw new Error('No se encontró la pantalla del Mundo Oscuro.');
         }
 
+        if (!this.parallelWorldMessageHandler && typeof window !== 'undefined'
+            && typeof window.addEventListener === 'function') {
+            this.parallelWorldMessageHandler = event => this.handleParallelWorldMessage(event);
+            window.addEventListener('message', this.parallelWorldMessageHandler);
+        }
+
         if (!frame.dataset.loaded) {
             const companion = this.game.party.active.find(ally => ally.health > 0);
+            const storyState = this.game.player.storyState;
+            if (!storyState.darkWorld) {
+                storyState.darkWorld = createDarkWorldState(this.game.dungeonLevel);
+            }
+            const mission = storyState.darkWorld.mission
+                ?? (storyState.darkWorld.mission = createDarkWorldMissionProgress());
             const worldUrl = new URL('../../mundo-oscuro.html', import.meta.url);
             worldUrl.searchParams.set(
                 'companionName',
@@ -141,6 +176,11 @@ export class DarkWorld {
             if (companion?.portrait) {
                 worldUrl.searchParams.set('companionPortrait', companion.portrait);
             }
+            worldUrl.searchParams.set('missionPortalCrossed', mission.portalCrossed ? '1' : '0');
+            worldUrl.searchParams.set('missionRoyalClueFound', mission.royalClueFound ? '1' : '0');
+            worldUrl.searchParams.set('missionGuardianPassed', mission.guardianPassed ? '1' : '0');
+            worldUrl.searchParams.set('missionGuardianDefeated', mission.guardianDefeated ? '1' : '0');
+            worldUrl.searchParams.set('missionPrincessTrailFound', mission.princessTrailFound ? '1' : '0');
 
             frame.addEventListener('load', () => {
                 screen.classList.add('parallel-world-ready');
@@ -151,6 +191,68 @@ export class DarkWorld {
         }
 
         this.game.ui.showScreen('darkWorldScreen');
+    }
+
+    handleParallelWorldMessage(event) {
+        const frame = document.getElementById('darkWorldFrame');
+        if (event.origin !== window.location.origin || event.source !== frame?.contentWindow) return;
+        if (event.data?.type === 'dark-world:mission-progress') {
+            const worldState = this.game.player?.storyState?.darkWorld;
+            const progress = event.data.progress;
+            const missionFields = [
+                'portalCrossed',
+                'royalClueFound',
+                'guardianPassed',
+                'guardianDefeated',
+                'princessTrailFound'
+            ];
+            if (!worldState?.active || !progress
+                || !missionFields.every(field => typeof progress[field] === 'boolean')) return;
+
+            worldState.mission = {
+                ...createDarkWorldMissionProgress(),
+                ...worldState.mission,
+                portalCrossed: progress.portalCrossed,
+                royalClueFound: progress.royalClueFound,
+                guardianPassed: progress.guardianPassed,
+                guardianDefeated: progress.guardianDefeated,
+                princessTrailFound: progress.princessTrailFound
+            };
+            return;
+        }
+        if (event.data?.type !== 'dark-world:start-minotaur-combat') return;
+        if (this.game.combat.inCombat) return;
+
+        this.game.ui.showScreen('gameScreen');
+        this.game.combat.start({
+            name: 'Minotauro del Laberinto',
+            hp: 320,
+            maxHp: 320,
+            atk: 28,
+            img: 'img/moscuro/minotauro_retrato_combate.png',
+            deckId: 'minotauro',
+            speaker: {
+                id: 'minotauro',
+                name: 'Minotauro del Laberinto',
+                archetype: 'Guardián feroz del laberinto',
+                voice: 'Habla con gruñidos breves y amenazas directas.'
+            },
+            returnToDarkWorld: true
+        });
+    }
+
+    returnFromMinotaurCombat() {
+        const frame = document.getElementById('darkWorldFrame');
+        if (!frame?.contentWindow) {
+            throw new Error('No se encontró la aventura del Mundo Oscuro para regresar del combate.');
+        }
+
+        this.game.ui.showScreen('darkWorldScreen');
+        const targetOrigin = window.location.origin === 'null' ? '*' : window.location.origin;
+        frame.contentWindow.postMessage(
+            { type: 'dark-world:minotaur-defeated' },
+            targetOrigin
+        );
     }
 
     returnToDungeon() {
