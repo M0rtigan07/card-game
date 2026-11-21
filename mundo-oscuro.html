@@ -803,10 +803,10 @@
             },
             {
                 id: "royal-clue",
-                name: "El Nicho de la Cinta Azul",
+                name: "El Nicho de la Cinta Morada",
                 position: new BABYLON.Vector3(7, 1.6, 52),
                 target: new BABYLON.Vector3(2, 1.6, 52),
-                desc: "Un trozo de tela azul con el sello real está atrapado entre las piedras. Las huellas de la princesa regresan hacia la galería del eco.",
+                desc: "Una cinta morada con el sello real está prendida entre las piedras. Las huellas de la princesa regresan hacia la galería del eco.",
                 connections: { left: "footprint-corridor", right: "minotaur-guard" }
             },
             {
@@ -844,7 +844,7 @@
             {
                 key: "royalClueFound",
                 title: "Encontrar una pista real",
-                description: "Busca señales de la princesa en el nicho de la cinta azul."
+                description: "Busca la cinta morada con el sello real en el nicho."
             },
             {
                 key: "guardianPassed",
@@ -1222,7 +1222,9 @@
             });
         }
 
-        let meshLlave, meshPuerta;
+        let meshLlave, meshPuerta, meshCintaReal;
+        let cintaRealRoot = null;
+        let cintaRealGlow = null;
 
         const createScene = function () {
             const scene = new BABYLON.Scene(engine);
@@ -1373,6 +1375,86 @@
                 }
             }));
 
+            if (!missionProgress.royalClueFound) {
+                cintaRealRoot = new BABYLON.TransformNode("cinta-real-root", scene);
+                cintaRealRoot.position = new BABYLON.Vector3(0.62, 1.15, 52);
+
+                const materialCinta = new BABYLON.StandardMaterial("materialCintaMorada", scene);
+                materialCinta.diffuseColor = new BABYLON.Color3(0.55, 0.25, 0.78);
+                materialCinta.emissiveColor = new BABYLON.Color3(0.12, 0.035, 0.2);
+                materialCinta.specularColor = new BABYLON.Color3(0.18, 0.12, 0.24);
+
+                const partesCinta = [];
+                for (const z of [-0.13, 0.13]) {
+                    const lazo = BABYLON.MeshBuilder.CreateTorus(
+                        "cinta-lazo",
+                        { diameter: 0.34, thickness: 0.055, tessellation: 24 },
+                        scene
+                    );
+                    lazo.parent = cintaRealRoot;
+                    lazo.position.z = z;
+                    lazo.rotation.y = Math.PI / 2;
+                    lazo.scaling.set(0.85, 0.7, 1);
+                    lazo.material = materialCinta;
+                    partesCinta.push(lazo);
+                }
+
+                meshCintaReal = BABYLON.MeshBuilder.CreateBox(
+                    "cinta-real",
+                    { width: 0.055, height: 0.14, depth: 0.17 },
+                    scene
+                );
+                meshCintaReal.parent = cintaRealRoot;
+                meshCintaReal.material = materialCinta;
+                partesCinta.push(meshCintaReal);
+
+                for (const z of [-0.075, 0.075]) {
+                    const cola = BABYLON.MeshBuilder.CreateBox(
+                        "cinta-cola",
+                        { width: 0.045, height: 0.3, depth: 0.11 },
+                        scene
+                    );
+                    cola.parent = cintaRealRoot;
+                    cola.position.set(0, -0.2, z);
+                    cola.rotation.x = z < 0 ? 0.12 : -0.12;
+                    cola.material = materialCinta;
+                    partesCinta.push(cola);
+                }
+
+                const materialSello = new BABYLON.StandardMaterial("materialSelloReal", scene);
+                materialSello.diffuseColor = new BABYLON.Color3(0.88, 0.68, 0.28);
+                materialSello.emissiveColor = new BABYLON.Color3(0.12, 0.07, 0.015);
+                const sello = BABYLON.MeshBuilder.CreateSphere(
+                    "sello-real-cinta",
+                    { diameter: 0.085, segments: 12 },
+                    scene
+                );
+                sello.parent = cintaRealRoot;
+                sello.position.x = 0.04;
+                sello.material = materialSello;
+                partesCinta.push(sello);
+
+                partesCinta.forEach(parte => {
+                    parte.metadata = { isRoyalRibbon: true };
+                    parte.actionManager = new BABYLON.ActionManager(scene);
+                    parte.actionManager.registerAction(
+                        new BABYLON.ExecuteCodeAction(
+                            BABYLON.ActionManager.OnPickTrigger,
+                            recogerCintaReal
+                        )
+                    );
+                });
+
+                cintaRealGlow = new BABYLON.PointLight(
+                    "brilloCintaMorada",
+                    new BABYLON.Vector3(1.05, 1.45, 52),
+                    scene
+                );
+                cintaRealGlow.diffuse = new BABYLON.Color3(0.62, 0.3, 0.95);
+                cintaRealGlow.intensity = 0.3;
+                cintaRealGlow.range = 3.5;
+            }
+
             const minotaurManager = new BABYLON.SpriteManager(
                 "minotaurManager",
                 "img/moscuro/minotauro_idle.png",
@@ -1414,6 +1496,10 @@
                         setCanvasCursor("cursor-examine"); // Lupa sobre objetos
                         return;
                     }
+                    if (pickMesh.pickedMesh.metadata?.isRoyalRibbon) {
+                        setCanvasCursor("cursor-examine");
+                        return;
+                    }
                     if (nombre === "puerta") {
                         // Si tenemos la llave en la mano, muestra la llave; si no, muestra la mano
                         setCanvasCursor(objetoSeleccionado === "llave" ? "cursor-key" : "cursor-hand");
@@ -1445,6 +1531,14 @@
         };
 
         const scene = createScene();
+        if (missionProgress.royalClueFound) {
+            inventario.push({
+                id: "cinta-real",
+                nombre: "Cinta morada con el sello real",
+                icono: "🎀"
+            });
+            actualizarInventario();
+        }
         if (minotaurDefeated && minotaurSprite) {
             minotaurSprite.dispose();
             minotaurSprite = null;
@@ -1492,16 +1586,13 @@
         function resolverEntradaNodo(node) {
             const textBox = document.getElementById("text-box");
             if (node.id === "royal-clue") {
-                minotaurClueFound = true;
-                missionProgress.royalClueFound = true;
-                reportMissionProgress();
-                if (!inventario.some(item => item.id === "cinta-real")) {
-                    inventario.push({ id: "cinta-real", nombre: "Cinta con el sello real", icono: "🎗️" });
-                    actualizarInventario();
+                if (missionProgress.royalClueFound) {
+                    textBox.innerHTML +=
+                        "<p>El hueco conserva la marca de la cinta morada que ya recogiste. La inscripción explica cómo engañar al guardián.</p>";
+                } else {
+                    textBox.innerHTML +=
+                        "<p>Una cinta morada con el sello real está prendida entre las piedras. Haz clic sobre ella para recogerla.</p>";
                 }
-                textBox.innerHTML +=
-                    "<p>Grabado en la pared: «El bruto persigue ecos. La hija del rey hacía rodar una piedra por la galería contraria y cruzaba pegada al muro».</p>";
-                mostrarDialogoCompanero("La princesa dejó una pista: podemos engañar el oído del guardián con un eco.");
             }
 
             if (node.id === "minotaur-guard") {
@@ -1548,6 +1639,32 @@
                 textBox.innerHTML +=
                     "<p>El broche confirma que la hija del rey cruzó el laberinto. Sus huellas continúan hacia las ruinas.</p>";
             }
+        }
+
+        function recogerCintaReal() {
+            if (missionProgress.royalClueFound
+                || nodes[currentNodeIndex].id !== "royal-clue") return;
+
+            minotaurClueFound = true;
+            missionProgress.royalClueFound = true;
+            if (!inventario.some(item => item.id === "cinta-real")) {
+                inventario.push({
+                    id: "cinta-real",
+                    nombre: "Cinta morada con el sello real",
+                    icono: "🎀"
+                });
+                actualizarInventario();
+            }
+            cintaRealRoot?.dispose();
+            cintaRealRoot = null;
+            cintaRealGlow?.dispose();
+            cintaRealGlow = null;
+            reportMissionProgress();
+
+            document.getElementById("text-box").innerHTML =
+                "<b>El Nicho de la Cinta Morada:</b> Has recogido la cinta con el sello real." +
+                "<p>Grabado en la pared: «El bruto persigue ecos. La hija del rey hacía rodar una piedra por la galería contraria y cruzaba pegada al muro».</p>";
+            mostrarDialogoCompanero("La cinta es de la princesa. Y la inscripción nos da una forma de distraer al minotauro.");
         }
 
         window.cambiarNodo = function (direction) {
@@ -1608,14 +1725,51 @@
             }
         };
 
+        function crearIconoCintaMorada() {
+            const svgNamespace = "http://www.w3.org/2000/svg";
+            const icon = document.createElementNS(svgNamespace, "svg");
+            icon.setAttribute("viewBox", "0 0 32 32");
+            icon.setAttribute("width", "34");
+            icon.setAttribute("height", "34");
+            icon.setAttribute("aria-hidden", "true");
+
+            const paths = [
+                "M14 14C8 5 2 9 6 15c2 4 6 4 11 1z",
+                "M18 14c6-9 12-5 8 1-2 4-6 4-11 1z",
+                "M14 17 8 28l7-3 2 6 4-12z",
+                "M18 17 24 28l-7-3-2 6-4-12z"
+            ];
+            paths.forEach((shape, index) => {
+                const path = document.createElementNS(svgNamespace, "path");
+                path.setAttribute("d", shape);
+                path.setAttribute("fill", index < 2 ? "#a653d2" : "#7f32ad");
+                path.setAttribute("stroke", "#e7c2ff");
+                path.setAttribute("stroke-width", "1.2");
+                path.setAttribute("stroke-linejoin", "round");
+                icon.appendChild(path);
+            });
+            const knot = document.createElementNS(svgNamespace, "circle");
+            knot.setAttribute("cx", "16");
+            knot.setAttribute("cy", "16");
+            knot.setAttribute("r", "3");
+            knot.setAttribute("fill", "#d397f1");
+            icon.appendChild(knot);
+            return icon;
+        }
+
         function actualizarInventario() {
             for (let i = 0; i < 3; i++) {
                 const slot = document.getElementById(`slot-${i}`);
                 if (inventario[i]) {
-                    slot.innerText = inventario[i].icono;
+                    slot.replaceChildren();
+                    if (inventario[i].id === "cinta-real") {
+                        slot.appendChild(crearIconoCintaMorada());
+                    } else {
+                        slot.textContent = inventario[i].icono;
+                    }
                     slot.title = inventario[i].nombre;
                 } else {
-                    slot.innerText = "";
+                    slot.replaceChildren();
                     slot.title = "Vacío";
                 }
             }
@@ -1632,7 +1786,7 @@
                     objetoSeleccionado = inventario[index].id;
                     for (let i = 0; i < 3; i++) document.getElementById(`slot-${i}`).classList.remove("selected");
                     document.getElementById(`slot-${index}`).classList.add("selected");
-                    setCanvasCursor("cursor-key");
+                    setCanvasCursor(inventario[index].id === "llave" ? "cursor-key" : "cursor-default");
                     document.getElementById("text-box").innerHTML = `Sostienes: <b>${inventario[index].nombre}</b>. Haz clic en el elemento del escenario donde quieras usarlo.`;
                 }
             }
