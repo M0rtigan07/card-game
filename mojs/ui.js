@@ -14,6 +14,24 @@ let interiorAudioCtx = null;
 let interiorOsc1 = null;
 let interiorOsc2 = null;
 let interiorGain = null;
+let companionReplyTimeout = null;
+
+function programarRespuestaCompanero(texto, delayMs) {
+    if (companionReplyTimeout) {
+        clearTimeout(companionReplyTimeout);
+        companionReplyTimeout = null;
+    }
+    companionReplyTimeout = setTimeout(() => {
+        companionReplyTimeout = null;
+        mostrarDialogoCompanero(texto);
+    }, delayMs);
+}
+
+function sincronizarVistaCelda(esVistaCelda) {
+    const layer = document.getElementById("static-scene-layer");
+    if (!layer) return;
+    layer.classList.toggle("is-cell-view", Boolean(esVistaCelda));
+}
 
 export function setCanvasCursor(claseCursor, canvas) {
     canvas.className = claseCursor;
@@ -314,6 +332,7 @@ export function prepararPergaminoAntiguo() {
 
 export function aplicarImagenCeldaActual() {
     if (!state.encuentroCeldaActual) return;
+    sincronizarVistaCelda(true);
     const img = document.getElementById("static-scene-image");
     if (!img) return;
     img.src = state.celdaLiberada
@@ -394,9 +413,10 @@ export function registrarUIHandlers(canvas) {
                 document.getElementById("text-box").innerHTML =
                     `<b>El Anciano te advierte sobre ${villanoRelacionado.nombre}:</b> Conoces su pasado traicionero y sabes que puede volver a cruzarse en tu camino.`;
 
-                setTimeout(() => {
-                    mostrarDialogoCompanero(`Quedamos advertidos sobre ${villanoRelacionado.nombre}. Si volvemos a verle, no bajaremos la guardia.`);
-                }, 5200);
+                programarRespuestaCompanero(
+                    `Quedamos advertidos sobre ${villanoRelacionado.nombre}. Si volvemos a verle, no bajaremos la guardia.`,
+                    12500
+                );
                 return;
             }
 
@@ -407,9 +427,10 @@ export function registrarUIHandlers(canvas) {
                 "🧙‍♂️"
             );
 
-            setTimeout(() => {
-                mostrarDialogoCompanero("Sus palabras están cargadas de misterio... prestad atención.");
-            }, 4500);
+            programarRespuestaCompanero(
+                "Sus palabras están cargadas de misterio... prestad atención.",
+                11000
+            );
         } else if (tipo === "examinar") {
             document.getElementById("text-box").innerHTML = "Observas al anciano: su túnica de lino rústico y su bastón nudoso parecen haber resistido siglos a la intemperie de este lugar.";
         }
@@ -435,6 +456,7 @@ export function registrarUIHandlers(canvas) {
                 document.getElementById("text-box").innerHTML =
                     `<b>Rincón de Rejas y Antorcha:</b> Tras los barrotes se encuentra <b>${state.encuentroCeldaActual?.nombre || "una figura"}</b>. Haz clic sobre la celda para interactuar.`;
             } else {
+                sincronizarVistaCelda(false);
                 img.src = "img/moscuro/interior-cabana.jpg";
                 img.alt = "Interior oscuro de la cabaña medieval";
                 if (noteSpot) noteSpot.classList.remove("is-hidden");
@@ -453,6 +475,7 @@ export function registrarUIHandlers(canvas) {
         state.celdaLiberada = true;
         cerrarDialogo();
 
+        sincronizarVistaCelda(true);
         const img = document.getElementById("static-scene-image");
         if (img) img.src = state.encuentroCeldaActual.imgLibre;
 
@@ -498,6 +521,7 @@ export function registrarUIHandlers(canvas) {
             sortearEncuentroCelda();
         }
 
+        sincronizarVistaCelda(true);
         const img = document.getElementById("static-scene-image");
 
         if (state.celdaLiberada && state.encuentroCeldaActual.alineacion === "heroe") {

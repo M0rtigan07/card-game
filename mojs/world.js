@@ -572,7 +572,7 @@ export function createWorldScene() {
         animadoNPC.position = new BABYLON.Vector3(11.2, 1.5, 20.5);
         animadoNPC.size = 3.2;
         animadoNPC.isPickable = true;
-        animadoNPC.playAnimation(0, 3, true, 300);
+        animadoNPC.playAnimation(0, 3, true, 850);
     });
 
     scene.onPointerMove = function () {
