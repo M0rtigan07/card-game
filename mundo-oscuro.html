@@ -49,6 +49,72 @@
             outline: none;
         }
 
+        /* --- ESCENA ESTÁTICA ESTILO RESIDENT EVIL (CÁMARA FIJA) --- */
+        #static-scene-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1b1512 0%, #070606 100%);
+            overflow: hidden;
+        }
+
+        #static-scene-layer.is-active {
+            display: flex;
+        }
+
+        #static-scene-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: contrast(1.08) saturate(0.85) brightness(0.92);
+            transition: opacity 0.35s ease, filter 0.4s ease;
+        }
+
+        #static-scene-vignette {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 48%, transparent 38%, rgba(0, 0, 0, 0.88) 100%);
+        }
+
+        .static-hotspots {
+            position: absolute;
+            bottom: 64px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 7;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 82%;
+        }
+
+        .hotspot-btn {
+            background: rgba(20, 15, 12, 0.92);
+            border: 1px solid #9d7946;
+            color: #f3e5c4;
+            padding: 7px 14px;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 0.6px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.85);
+            transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .hotspot-btn:hover,
+        .hotspot-btn:focus-visible {
+            background: #4e3722;
+            border-color: #f3c65f;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
         /* --- CURSORES PERSONALIZADOS (SVG INCRUSTADOS) --- */
         .cursor-default {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'><path fill='%23f3c65f' stroke='%231a1510' stroke-width='1.5' d='M5 3l14 9-6 1.5L10 19z'/></svg>") 4 4, auto !important;
@@ -72,7 +138,7 @@
             top: 0;
             height: 100%;
             width: 12%;
-            z-index: 5;
+            z-index: 6;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -120,7 +186,7 @@
             letter-spacing: 1.5px;
             color: #e8cfa1;
             pointer-events: none;
-            z-index: 6;
+            z-index: 7;
             border-radius: 3px;
             transition: all 0.5s ease;
         }
@@ -582,6 +648,17 @@
                 font-size: 1.8rem;
             }
 
+            .static-hotspots {
+                bottom: 56px;
+                max-width: 92%;
+                gap: 6px;
+            }
+
+            .hotspot-btn {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
             .mission-objective {
                 grid-template-columns: 27px minmax(0, 1fr);
                 gap: 8px;
@@ -689,6 +766,17 @@
             <div id="nav-left" class="nav-zone" onclick="cambiarNodo(-1)" title="Ir a la izquierda">◄</div>
             <div id="nav-right" class="nav-zone" onclick="cambiarNodo(1)" title="Ir a la derecha">►</div>
 
+            <!-- ESCENA ESTÁTICA DE CÁMARA FIJA (INTERIOR DE LA CABAÑA) -->
+            <div id="static-scene-layer" aria-hidden="true">
+                <img id="static-scene-image" src="img/moscuro/interior-cabana.jpg" alt="Interior oscuro de la cabaña medieval">
+                <div id="static-scene-vignette"></div>
+                <div class="static-hotspots">
+                    <button type="button" class="hotspot-btn" onclick="examinarNotaInterior()">📜 Examinar Mesa y Nota</button>
+                    <button type="button" class="hotspot-btn" onclick="cambiarAnguloInterior()">🕯️ Mirar Rincón de Rejas</button>
+                    <button type="button" class="hotspot-btn" onclick="irANodoPorId('cabin')">🚪 Salir al Exterior</button>
+                </div>
+            </div>
+
             <!-- MENÚ FLOTANTE DEL NPC -->
             <div id="npc-menu">
                 <h3 id="npc-menu-title">Anciano Místico</h3>
@@ -716,7 +804,7 @@
         <div id="hud-panel">
             <div id="text-box">
                 Has cruzado el antiguo portalón dimensional.<br>
-                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería con una puerta entreabierta. Algo destella junto al muro.
+                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería con una puerta de madera. Algo destella junto al muro.
             </div>
             <div id="inventory-box">
                 <div id="inventory-title">Alforja</div>
@@ -761,7 +849,7 @@
         let objetoSeleccionado = null;
         let llaveCogida = false;
         let puertaAbierta = false;
-        let notaCabanaLeida = false;
+        let anguloInteriorAlternativo = false;
         let minotaurSprite = null;
         let minotaurCombatRequested = false;
         let animadoNPC;
@@ -850,7 +938,7 @@
                 name: "El Interior de la Cabaña",
                 position: new BABYLON.Vector3(-28, 1.6, 10),
                 target: new BABYLON.Vector3(-28, 1.4, 17),
-                desc: "El aire huele a humedad y ceniza. Una mesa rota y una nota rasgada yacen en la penumbra.",
+                desc: "El aire huele a humedad y cera quemada. Una vela ilumina un pergamino rasgado sobre la mesa de roble.",
                 horrorInterior: true,
                 connections: { left: "cabin" }
             },
@@ -1071,6 +1159,36 @@
             } else if (tipo === 'examinar') {
                 document.getElementById("text-box").innerHTML = "Observas al anciano: su túnica de lino rústico y su bastón nudoso parecen haber resistido siglos a la intemperie de este lugar.";
             }
+        };
+
+        window.examinarNotaInterior = function () {
+            document.getElementById("text-box").innerHTML =
+                "<b>Pergamino junto a la Vela:</b> <i>«La hija del rey pasó por aquí antes de que se apagara el fuego. Huyó hacia el monolito cuando algo golpeó los barrotes...»</i>";
+            mostrarDialogoCompanero("¿Escuchaste eso? Como si un hierro hubiera rozado la piedra en el rincón oscuro.");
+        };
+
+        window.cambiarAnguloInterior = function () {
+            anguloInteriorAlternativo = !anguloInteriorAlternativo;
+            const img = document.getElementById("static-scene-image");
+            const btn = document.querySelector(".hotspot-btn[onclick='cambiarAnguloInterior()']");
+            img.style.opacity = "0.25";
+            setTimeout(() => {
+                if (anguloInteriorAlternativo) {
+                    img.src = "img/moscuro/rincon-oscuro.jpg";
+                    img.alt = "Rincón oscuro con rejas de hierro y antorcha en la cabaña";
+                    if (btn) btn.textContent = "🕯️ Volver a la Mesa";
+                    document.getElementById("text-box").innerHTML =
+                        "<b>Rincón de Rejas y Antorcha:</b> Telarañas cubren la reja oxidada. Entre las sombras profundas parece brillar un par de ojos inmóviles.";
+                } else {
+                    img.src = "img/moscuro/interior-cabana.jpg";
+                    img.alt = "Interior oscuro de la cabaña medieval";
+                    if (btn) btn.textContent = "🕯️ Mirar Rincón de Rejas";
+                    document.getElementById("text-box").innerHTML =
+                        "<b>El Interior de la Cabaña:</b> Regresas la vista hacia la mesa de madera y la llama temblorosa de la vela.";
+                }
+                img.onload = () => { img.style.opacity = "1"; };
+                img.onerror = () => { img.style.opacity = "1"; };
+            }, 160);
         };
 
         function limpiarFondoSprite(urlImagen, callback) {
@@ -1298,7 +1416,7 @@
             });
         }
 
-        let meshLlave, meshPuerta, meshPuertaCabana, meshCintaReal, meshNotaCabana;
+        let meshLlave, meshPuerta, meshPuertaCabana, meshCintaReal;
         let cintaRealRoot = null;
         let cintaRealGlow = null;
 
@@ -1415,55 +1533,6 @@
                 new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
                     if (nodes[currentNodeIndex].id === "cabin") {
                         irANodoPorId("cabin-interior");
-                    }
-                })
-            );
-
-            // --- NODO INTERIOR DE LA CABAÑA (TERROR Y MISTERIO) ---
-            const salaCabana = BABYLON.MeshBuilder.CreateBox("salaCabana", {
-                width: 9,
-                height: 5,
-                depth: 9,
-                sideOrientation: BABYLON.Mesh.BACKSIDE
-            }, scene);
-            salaCabana.position = new BABYLON.Vector3(-28, 2.5, 14);
-            const matSalaCabana = new BABYLON.StandardMaterial("matSalaCabana", scene);
-            matSalaCabana.diffuseTexture = crearTexturaPiedra(scene);
-            matSalaCabana.diffuseColor = new BABYLON.Color3(0.35, 0.32, 0.34);
-            salaCabana.material = matSalaCabana;
-
-            const mesaCabana = BABYLON.MeshBuilder.CreateBox("mesaCabana", { width: 2.2, height: 0.85, depth: 1.2 }, scene);
-            mesaCabana.position = new BABYLON.Vector3(-28, 0.43, 15.8);
-            const matMesa = new BABYLON.StandardMaterial("matMesa", scene);
-            matMesa.diffuseTexture = matMadera;
-            mesaCabana.material = matMesa;
-
-            meshNotaCabana = BABYLON.MeshBuilder.CreateBox("notaCabana", { width: 0.48, height: 0.03, depth: 0.34 }, scene);
-            meshNotaCabana.position = new BABYLON.Vector3(-27.8, 0.88, 15.7);
-            meshNotaCabana.rotation.y = 0.25;
-            const matNotaCabana = new BABYLON.StandardMaterial("matNotaCabana", scene);
-            matNotaCabana.diffuseColor = new BABYLON.Color3(0.78, 0.72, 0.6);
-            matNotaCabana.emissiveColor = new BABYLON.Color3(0.12, 0.06, 0.06);
-            meshNotaCabana.material = matNotaCabana;
-
-            meshNotaCabana.actionManager = new BABYLON.ActionManager(scene);
-            meshNotaCabana.actionManager.registerAction(
-                new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-                    notaCabanaLeida = true;
-                    document.getElementById("text-box").innerHTML =
-                        "<b>Nota Rasgada en la Penumbra:</b> <i>«La princesa huyó hacia el monolito cuando las sombras cobraron voz aquí dentro... No te fíes de las pisadas que suenan detrás de ti.»</i>";
-                    mostrarDialogoCompanero("Esto explica por qué dejó su rastro hacia el laberinto. Salgamos con cuidado o sigamos adelante.");
-                })
-            );
-
-            const puertaSalidaCabana = BABYLON.MeshBuilder.CreateBox("puertaSalidaCabana", { width: 1.2, height: 2.2, depth: 0.18 }, scene);
-            puertaSalidaCabana.position = new BABYLON.Vector3(-28, 1.1, 9.7);
-            puertaSalidaCabana.material = matPuertaCabana;
-            puertaSalidaCabana.actionManager = new BABYLON.ActionManager(scene);
-            puertaSalidaCabana.actionManager.registerAction(
-                new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-                    if (nodes[currentNodeIndex].id === "cabin-interior") {
-                        irANodoPorId("cabin");
                     }
                 })
             );
@@ -1689,7 +1758,7 @@
                 const pickMesh = scene.pick(scene.pointerX, scene.pointerY);
                 if (pickMesh && pickMesh.hit && pickMesh.pickedMesh) {
                     const nombre = pickMesh.pickedMesh.name;
-                    if (nombre === "llave" || pickMesh.pickedMesh.metadata?.isAncientKey || nombre === "notaCabana") {
+                    if (nombre === "llave" || pickMesh.pickedMesh.metadata?.isAncientKey) {
                         setCanvasCursor("cursor-examine");
                         return;
                     }
@@ -1697,7 +1766,7 @@
                         setCanvasCursor("cursor-examine");
                         return;
                     }
-                    if (nombre === "puertaCabana" || nombre === "puertaSalidaCabana") {
+                    if (nombre === "puertaCabana") {
                         setCanvasCursor("cursor-hand");
                         return;
                     }
@@ -1757,8 +1826,17 @@
         function aplicarAtmosferaNodo(esHorrorInterior) {
             const viewport = document.getElementById("viewport");
             const banner = document.getElementById("location-banner");
+            const staticLayer = document.getElementById("static-scene-layer");
+            const staticImg = document.getElementById("static-scene-image");
+            const btn = document.querySelector(".hotspot-btn[onclick='cambiarAnguloInterior()']");
 
             if (esHorrorInterior) {
+                anguloInteriorAlternativo = false;
+                staticImg.src = "img/moscuro/interior-cabana.jpg";
+                staticImg.alt = "Interior oscuro de la cabaña medieval";
+                if (btn) btn.textContent = "🕯️ Mirar Rincón de Rejas";
+                staticLayer.classList.add("is-active");
+                staticLayer.setAttribute("aria-hidden", "false");
                 scene.clearColor = new BABYLON.Color3(0.06, 0.06, 0.07);
                 scene.fogDensity = 0.095;
                 scene.fogColor = new BABYLON.Color3(0.08, 0.08, 0.09);
@@ -1768,6 +1846,8 @@
                 banner.classList.add("horror-banner");
                 actualizarAudioInteriorCabana(true);
             } else {
+                staticLayer.classList.remove("is-active");
+                staticLayer.setAttribute("aria-hidden", "true");
                 scene.clearColor = new BABYLON.Color3(0.03, 0.05, 0.09);
                 scene.fogDensity = 0.0035;
                 scene.fogColor = new BABYLON.Color3(0.09, 0.12, 0.18);
@@ -1820,7 +1900,7 @@
             const textBox = document.getElementById("text-box");
             if (node.id === "cabin-interior") {
                 textBox.innerHTML +=
-                    "<p>Haz clic en la <b>nota</b> sobre la mesa para leerla, o en la <b>puerta</b> para volver al exterior.</p>";
+                    "<p>Usa los botones sobre la escena para examinar la mesa, mirar el rincón oscuro o volver al exterior.</p>";
             }
 
             if (node.id === "royal-clue") {
