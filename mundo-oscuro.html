@@ -49,6 +49,66 @@
             outline: none;
         }
 
+        /* --- HUD DE ACOMPAÑANTES EN ESQUINA --- */
+        #party-hud {
+            position: absolute;
+            top: 15px;
+            left: 14px;
+            z-index: 8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border: 1px solid #8e7042;
+            border-radius: 5px;
+            background: rgba(22, 17, 13, 0.92);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.78);
+            max-width: min(320px, 52vw);
+        }
+
+        .party-member-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 7px;
+            border-radius: 4px;
+            background: rgba(44, 35, 27, 0.85);
+            border: 1px solid rgba(168, 132, 76, 0.45);
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            color: #f3e5c4;
+            white-space: nowrap;
+        }
+
+        .party-member-chip.is-ally {
+            border-color: #6ea858;
+            background: rgba(29, 46, 25, 0.88);
+            color: #dff4d6;
+        }
+
+        .party-member-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: top center;
+            border: 1px solid #9d7946;
+            flex-shrink: 0;
+        }
+
+        .party-member-fallback {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #2b221a;
+            border: 1px solid #9d7946;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
         /* --- ESCENA ESTÁTICA ESTILO RESIDENT EVIL (CÁMARA FIJA) --- */
         #static-scene-layer {
             position: absolute;
@@ -99,12 +159,12 @@
             display: none;
         }
 
-        /* Zona clicable directa sobre el preso tras las rejas */
+        /* Zona clicable directa sobre el preso/prisionera tras las rejas */
         #cell-hotspot {
             position: absolute;
             left: 22%;
             top: 24%;
-            width: 19%;
+            width: 20%;
             height: 56%;
             z-index: 6;
             background: transparent;
@@ -626,6 +686,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: top center;
             border-radius: 50%;
         }
 
@@ -775,6 +836,18 @@
                 height: 58dvh;
             }
 
+            #party-hud {
+                top: 8px;
+                left: 8px;
+                padding: 4px 6px;
+                max-width: 44vw;
+            }
+
+            .party-member-chip {
+                font-size: 10px;
+                padding: 2px 5px;
+            }
+
             #location-banner {
                 top: 8px;
                 max-width: 90vw;
@@ -921,6 +994,7 @@
 
     <div id="game-container">
         <div id="viewport">
+            <div id="party-hud" aria-label="Grupo de acompañantes"></div>
             <div id="location-banner">La Cabaña de Piedra</div>
             <button id="journal-toggle" type="button" aria-label="Abrir diario de misiones"
                 aria-controls="mission-journal" aria-haspopup="dialog" aria-expanded="false">
@@ -938,8 +1012,8 @@
                 <button id="note-hotspot" type="button" aria-label="Examinar pergamino antiguo sobre la mesa"
                     title="Examinar pergamino antiguo" onclick="abrirPergaminoAntiguo()"></button>
                 <button id="cell-hotspot" type="button" class="is-hidden"
-                    aria-label="Hablar con el preso tras las rejas"
-                    title="Hablar con la figura tras las rejas" onclick="interactuarPresoCelda()"></button>
+                    aria-label="Hablar con quien está tras las rejas"
+                    title="Hablar con quien está tras las rejas" onclick="interactuarPresoCelda()"></button>
                 <div class="static-hotspots">
                     <button type="button" class="hotspot-btn" data-cursor="examine" onclick="abrirPergaminoAntiguo()">📜 Examinar Mesa y Nota</button>
                     <button type="button" class="hotspot-btn" onclick="cambiarAnguloInterior()">🕯️ Mirar Rincón de Rejas</button>
@@ -1058,55 +1132,124 @@
             ? requestedCompanionPortrait
             : "🧭";
 
-        // --- ENCUENTRO ALEATORIO EN LA CELDA (ESTILO BLADE RUNNER: HÉROE O VILLANO) ---
-        const presosAleatorios = [
-            {
-                id: "tomas-cantero",
-                nombre: "Tomás el Cantero",
-                avatar: "⛓️",
-                alineacion: "heroe",
-                lore: "«Los monolitos de este plano no fueron tallados por manos mortales; absorben los ecos de todo lo que muere y devuelven sombras que imitan a los vivos.»",
-                peticion: "«Por favor, haz saltar el cerrojo oxidado de esta celda. Si salgo de aquí, caminaré a tu lado y cubriré tu espalda en el laberinto.»",
-                aliadoNombre: "Tomás el Cantero (Aliado)"
+        // --- PRISIONERA (LOCA, RESPONDE CON PREGUNTAS) Y PRISIONERO (SERIO Y ENIGMÁTICO) ---
+        const personajesCelda = {
+            prisionera: {
+                rol: "prisionera",
+                nombre: "La Prisionera",
+                imgCelda: "img/moscuro/prisionera_celda.jpg",
+                imgHabla: "img/moscuro/prisionera_habla.jpg",
+                imgLibre: "img/moscuro/prisionera_libre.jpg",
+                imgPerfil: "img/moscuro/prisionera_perfil.jpg",
+                saludoLoco: "«¿Un visitante en el barro? ¡Qué divertido! ¿Acaso crees que la piedra no recuerda quién camina sobre ella? ¿O es que vienes a perderte también?»",
+                preguntasMundoOscuro: [
+                    "«¿Sabes qué hay detrás de los monolitos? ¿Y si te dijera que la niebla no oculta nada... sino que te borra a ti?»",
+                    "«¿Por qué todos buscan salidas en un lugar que respira? ¿Has oído alguna vez latir los barrotes cuando se apaga la vela?»"
+                ],
+                peticionSalida: "«¿Me vas a dejar aquí riéndome con las sombras? ¡Abre este cerrojo y dime... qué harás cuando veas de qué lado estoy?»",
+                respuestaAliado: "«¡Ja! ¡Salió el cerrojo! ¿Ves qué fácil era confiar en la loca? ¡Vamos, muévete antes de que la oscuridad nos alcance!»",
+                respuestaVillanoLiberado: "«¡Qué inocencia la tuya! ¿De verdad creías que una sonrisa tras estas rejas era inocente? ¡Pronto verás el precio de abrirme!»"
             },
-            {
-                id: "miren-vigia",
-                nombre: "Miren la Vigía",
-                avatar: "🕯️",
-                alineacion: "heroe",
-                lore: "«El Mundo Oscuro es un fragmento de un reino antiguo devorado por la niebla. Las bestias del corredor obedecen a las vibraciones de la piedra, no a la vista.»",
-                peticion: "«Sácame de estas rejas antes de que vuelva la ronda. Juro por los antiguos umbrales que lucharé junto a tu grupo.»",
-                aliadoNombre: "Miren la Vigía (Aliada)"
-            },
-            {
-                id: "vorn-cuervo",
-                nombre: "Vorn el Cuervo",
-                avatar: "🗡️",
-                alineacion: "villano",
-                lore: "«Dicen que los antiguos constructores sellaron aquí reliquias de otro tiempo... pero los únicos tesoros que quedan son los que otros cargan en su bolsa.»",
-                peticion: "«Eh, forastero... libera este pestillo y te diré un secreto de las ruinas. ¡Rápido, no me dejes pudrirme aquí!»",
-                traicionTexto: "<b>¡Traición!</b> Al ceder la reja, Vorn te golpea con un hierro oculto, arrebata un objeto de tu alforja y se esfuma entre las sombras riéndose."
-            },
-            {
-                id: "seraph-ceniza",
-                nombre: "Espectro de Ceniza",
-                avatar: "👁️",
-                alineacion: "villano",
-                lore: "«Este lugar fue prisión de reyes y verdugos por igual. Cuando el velo se rasga, las almas corrompidas toman forma humana para cazar incautos.»",
-                peticion: "«Abre la celda... necesito salir de la oscuridad. Prometo recompensarte cuando crucemos el umbral.»",
-                traicionTexto: "<b>¡Emboscada!</b> En cuanto la celda se abre, el prisionero arroja ceniza cegadora, te roba lo que llevabas encima y desaparece en la penumbra."
+            prisionero: {
+                rol: "prisionero",
+                nombre: "El Prisionero",
+                imgCelda: "img/moscuro/prisionero_celda.jpg",
+                imgHabla: "img/moscuro/prisionero_habla.jpg",
+                imgMisterio: "img/moscuro/prisionero_habla_misterio.jpg",
+                imgLibre: "img/moscuro/prisionero_libre.jpg",
+                imgPerfil: "img/moscuro/prisionero_perfil.jpg",
+                loreSerio: "«Este dominio existió antes que los mapas del reino. Las piedras guardan antiguos juramentos y los ecos despiertan a quienes no saben guardar silencio.»",
+                peticionSalida: "«El hierro me retiene, pero mis ojos han leído estos muros más tiempo del que imaginas. Libérame... y sabrás si mi paso es tu escudo o tu ruina.»",
+                respuestaAliado: "«El cerrojo ha cedido. A partir de este instante, mi filo camina contigo hasta que las sombras caigan.»",
+                respuestaVillanoLiberado: "«Has cometido un error antiguo, forastero. Algunos encerrados aquí no fueron víctimas... sino quienes abrieron las grietas.»"
             }
-        ];
+        };
 
         let encuentroCeldaActual = null;
-        let celdaResuelta = false;
-        let aliadosReclutados = [];
-        let traicionadoPorPreso = false;
+        let celdaLiberada = false;
+        let aliadosGrupo = [];
+        let traicionPendiente = false;
+        let traicionEjecutada = false;
+
+        function actualizarHUDGrupo() {
+            const hud = document.getElementById("party-hud");
+            if (!hud) return;
+
+            const chips = [];
+
+            const principalChip = document.createElement("div");
+            principalChip.className = "party-member-chip";
+            principalChip.title = `Compañero principal: ${companionName}`;
+            if (companionAvatar.startsWith("img/")) {
+                const img = document.createElement("img");
+                img.className = "party-member-avatar";
+                img.src = companionAvatar;
+                img.alt = companionName;
+                img.onerror = () => img.remove();
+                principalChip.appendChild(img);
+            } else {
+                const fb = document.createElement("span");
+                fb.className = "party-member-fallback";
+                fb.textContent = companionAvatar;
+                principalChip.appendChild(fb);
+            }
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = companionName;
+            principalChip.appendChild(nameSpan);
+            chips.push(principalChip);
+
+            aliadosGrupo.forEach(aliado => {
+                const chip = document.createElement("div");
+                chip.className = "party-member-chip is-ally";
+                chip.title = `${aliado.nombre} (Aliado en el Mundo Oscuro)`;
+
+                if (aliado.imgPerfil) {
+                    const img = document.createElement("img");
+                    img.className = "party-member-avatar";
+                    img.src = aliado.imgPerfil;
+                    img.alt = aliado.nombre;
+                    img.onerror = () => img.remove();
+                    chip.appendChild(img);
+                }
+                const label = document.createElement("span");
+                label.textContent = aliado.nombre;
+                chip.appendChild(label);
+                chips.push(chip);
+            });
+
+            hud.replaceChildren(...chips);
+        }
 
         function sortearEncuentroCelda() {
-            if (celdaResuelta) return;
-            const indice = Math.floor(Math.random() * presosAleatorios.length);
-            encuentroCeldaActual = presosAleatorios[indice];
+            if (celdaLiberada) return;
+            const elegirPrisionera = Math.random() < 0.5;
+            const base = elegirPrisionera
+                ? personajesCelda.prisionera
+                : personajesCelda.prisionero;
+            const esHeroe = Math.random() < 0.5;
+
+            encuentroCeldaActual = {
+                ...base,
+                alineacion: esHeroe ? "heroe" : "villano",
+                preguntaIdx: 0
+            };
+        }
+
+        function aplicarImagenCeldaActual() {
+            if (!encuentroCeldaActual) return;
+            const img = document.getElementById("static-scene-image");
+            if (!img) return;
+            if (celdaLiberada) {
+                img.src = encuentroCeldaActual.imgLibre;
+            } else if (encuentroCeldaActual.rol === "prisionera") {
+                img.src = encuentroCeldaActual.imgCelda;
+            } else {
+                img.src = encuentroCeldaActual.imgCelda;
+            }
+            img.onerror = () => {
+                img.src = "img/moscuro/rincon-oscuro.jpg";
+                img.onerror = null;
+            };
         }
 
         function notificarAliadoAlPadre(aliado) {
@@ -1118,94 +1261,160 @@
             );
         }
 
+        function ejecutarTraicionVillanoSiAplica(motivoTexto) {
+            if (!traicionPendiente || traicionEjecutada || !encuentroCeldaActual) return false;
+            traicionEjecutada = true;
+            traicionPendiente = false;
+
+            const objetoRobado = inventario.pop();
+            if (objetoRobado) {
+                if (objetoSeleccionado === objetoRobado.id) {
+                    objetoSeleccionado = null;
+                    setCanvasCursor("cursor-default");
+                }
+                for (let i = 0; i < 3; i++) {
+                    document.getElementById(`slot-${i}`).classList.remove("selected");
+                }
+                actualizarInventario();
+            }
+
+            const detalleRobo = objetoRobado
+                ? ` Te ha arrebatado <b>${objetoRobado.nombre}</b> de la alforja antes de desaparecer.`
+                : " No llevaba objetos valiosos que robarte, pero te ha dejado malherido.";
+
+            document.getElementById("text-box").innerHTML =
+                `<b>¡Traición de ${encuentroCeldaActual.nombre}!</b> ${motivoTexto}${detalleRobo}`;
+            mostrarDialogo(
+                encuentroCeldaActual.nombre,
+                encuentroCeldaActual.imgPerfil,
+                "«¡Qué fácil engaña la desesperación! Gracias por abrirme el paso... nos veremos entre las sombras.»"
+            );
+            return true;
+        }
+
         window.interactuarPresoCelda = function () {
             if (!anguloInteriorAlternativo) return;
-
-            if (celdaResuelta && traicionadoPorPreso) {
-                mostrarDialogo("Celda Vacía", "⛓️", "Las rejas cuelgan torcidas y vacías. El traidor se desvaneció en la oscuridad.");
-                document.getElementById("text-box").innerHTML =
-                    "<b>Rincón de Rejas:</b> La celda quedó abierta tras la traición. No queda rastro del preso.";
-                return;
-            }
-
-            if (celdaResuelta && aliadosReclutados.length > 0) {
-                const ultimoAliado = aliadosReclutados[aliadosReclutados.length - 1];
-                mostrarDialogo(ultimoAliado.nombre, ultimoAliado.avatar, "«La celda está libre. Mantengamos la guardia alta; este mundo oscuro no perdona descuidos.»");
-                return;
-            }
 
             if (!encuentroCeldaActual) {
                 sortearEncuentroCelda();
             }
 
-            mostrarDialogo(
-                encuentroCeldaActual.nombre,
-                encuentroCeldaActual.avatar,
-                `${encuentroCeldaActual.lore}<br><br>${encuentroCeldaActual.peticion}`
-            );
+            const img = document.getElementById("static-scene-image");
 
-            document.getElementById("text-box").innerHTML =
-                `<b>Rincón de Rejas (${encuentroCeldaActual.nombre}):</b> Te habla desde la penumbra. No sabes si es un alma noble o un villano disfrazado.<br>` +
-                `<i>${encuentroCeldaActual.lore}</i>`;
+            if (celdaLiberada && encuentroCeldaActual.alineacion === "heroe") {
+                if (img) img.src = encuentroCeldaActual.imgLibre;
+                mostrarDialogo(
+                    encuentroCeldaActual.nombre,
+                    encuentroCeldaActual.imgPerfil,
+                    encuentroCeldaActual.rol === "prisionera"
+                        ? "«¿Ya estás listo para correr, o te vas a quedar mirando la puerta abierta?»"
+                        : "«Mantente firme. Conozco los ecos de este lugar y no te daré la espalda.»"
+                );
+                return;
+            }
+
+            if (celdaLiberada && encuentroCeldaActual.alineacion === "villano") {
+                if (img) img.src = encuentroCeldaActual.imgLibre;
+                if (traicionPendiente) {
+                    ejecutarTraicionVillanoSiAplica(
+                        `${encuentroCeldaActual.nombre} aprovecha tu descuido junto a la celda abierta para asestarte un golpe y huir.`
+                    );
+                } else {
+                    mostrarDialogo(
+                        encuentroCeldaActual.nombre,
+                        encuentroCeldaActual.imgPerfil,
+                        "La celda está vacía. El traidor ya se esfumó entre las sombras."
+                    );
+                }
+                return;
+            }
+
+            if (img) {
+                img.src = encuentroCeldaActual.rol === "prisionera"
+                    ? encuentroCeldaActual.imgHabla
+                    : (encuentroCeldaActual.preguntaIdx % 2 === 1
+                        ? encuentroCeldaActual.imgMisterio
+                        : encuentroCeldaActual.imgHabla);
+            }
+
+            if (encuentroCeldaActual.rol === "prisionera") {
+                const preguntaLore = encuentroCeldaActual.preguntasMundoOscuro[
+                    encuentroCeldaActual.preguntaIdx % encuentroCeldaActual.preguntasMundoOscuro.length
+                ];
+                encuentroCeldaActual.preguntaIdx += 1;
+
+                mostrarDialogo(
+                    encuentroCeldaActual.nombre,
+                    encuentroCeldaActual.imgPerfil,
+                    `${encuentroCeldaActual.saludoLoco}<br><br>${preguntaLore}<br><br>${encuentroCeldaActual.peticionSalida}`
+                );
+                document.getElementById("text-box").innerHTML =
+                    `<b>Rincón de Rejas (${encuentroCeldaActual.nombre}):</b> Habla con risa nerviosa y mirada desquiciada, respondiendo a tus preguntas con otras preguntas sobre el Mundo Oscuro.`;
+            } else {
+                encuentroCeldaActual.preguntaIdx += 1;
+                mostrarDialogo(
+                    encuentroCeldaActual.nombre,
+                    encuentroCeldaActual.imgPerfil,
+                    `${encuentroCeldaActual.loreSerio}<br><br>${encuentroCeldaActual.peticionSalida}`
+                );
+                document.getElementById("text-box").innerHTML =
+                    `<b>Rincón de Rejas (${encuentroCeldaActual.nombre}):</b> Te observa con gravedad y misterio desde tras los barrotes.`;
+            }
 
             mostrarOpcionesLaberinto([
                 {
-                    label: `🔓 Ayudar a salir de la celda a ${encuentroCeldaActual.nombre}`,
-                    action: () => ayudarPresoCelda()
+                    label: `🔓 Ayudar a salir de la celda (${encuentroCeldaActual.nombre})`,
+                    action: () => liberarPersonajeCelda()
                 },
                 {
-                    label: "🚫 Dejarlo encerrado y retroceder",
+                    label: "❓ Insistir sobre el Mundo Oscuro sin abrir",
+                    action: () => interactuarPresoCelda()
+                },
+                {
+                    label: "🚫 Dejar encerrado y apartarse",
                     action: () => {
                         cerrarDialogo();
+                        if (img) img.src = encuentroCeldaActual.imgCelda;
                         document.getElementById("text-box").innerHTML =
-                            "<b>Rincón de Rejas:</b> Decides no arriesgarte a abrir la celda. El silencio vuelve a pesar en la sala.";
-                        mostrarDialogoCompanero("Prudente decisión. En este lugar, abrir una puerta sin saber qué hay detrás puede costar caro.");
+                            `<b>Rincón de Rejas:</b> Decides no abrir la celda de ${encuentroCeldaActual.nombre}.`;
                     }
                 }
             ]);
         };
 
-        window.ayudarPresoCelda = function () {
-            if (!encuentroCeldaActual || celdaResuelta) return;
-            celdaResuelta = true;
+        window.liberarPersonajeCelda = function () {
+            if (!encuentroCeldaActual || celdaLiberada) return;
+            celdaLiberada = true;
             cerrarDialogo();
 
+            const img = document.getElementById("static-scene-image");
+            if (img) img.src = encuentroCeldaActual.imgLibre;
+
             if (encuentroCeldaActual.alineacion === "heroe") {
-                aliadosReclutados.push({
-                    id: encuentroCeldaActual.id,
-                    nombre: encuentroCeldaActual.aliadoNombre,
-                    avatar: encuentroCeldaActual.avatar
-                });
-                notificarAliadoAlPadre(aliadosReclutados[aliadosReclutados.length - 1]);
+                const nuevoAliado = {
+                    id: `${encuentroCeldaActual.rol}-aliado`,
+                    nombre: encuentroCeldaActual.nombre,
+                    imgPerfil: encuentroCeldaActual.imgPerfil
+                };
+                aliadosGrupo.push(nuevoAliado);
+                actualizarHUDGrupo();
+                notificarAliadoAlPadre(nuevoAliado);
+
                 document.getElementById("text-box").innerHTML =
-                    `<b>¡Nuevo Aliado!</b> Al liberar a <b>${encuentroCeldaActual.nombre}</b>, descubres que decía la verdad: se une a tu grupo para ayudarte en el Mundo Oscuro.`;
+                    `<b>¡Nuevo Aliado!</b> Has liberado a <b>${encuentroCeldaActual.nombre}</b> y resulta ser de confianza: se une a tu grupo en el HUD.`;
                 mostrarDialogo(
                     encuentroCeldaActual.nombre,
-                    encuentroCeldaActual.avatar,
-                    "«¡Gracias, viajero! No te arrepentirás de haberme sacado de aquí. ¡Cuenta con mi acero!»"
+                    encuentroCeldaActual.imgPerfil,
+                    encuentroCeldaActual.respuestaAliado
                 );
             } else {
-                traicionadoPorPreso = true;
-                const objetoRobado = inventario.pop();
-                if (objetoRobado) {
-                    if (objetoSeleccionado === objetoRobado.id) {
-                        objetoSeleccionado = null;
-                        setCanvasCursor("cursor-default");
-                    }
-                    for (let i = 0; i < 3; i++) {
-                        document.getElementById(`slot-${i}`).classList.remove("selected");
-                    }
-                    actualizarInventario();
-                }
+                traicionPendiente = true;
                 document.getElementById("text-box").innerHTML =
-                    `${encuentroCeldaActual.traicionTexto}` +
-                    (objetoRobado
-                        ? `<br>Has perdido: <b>${objetoRobado.nombre}</b>.`
-                        : "<br>Tu alforja estaba vacía, pero te deja malherido antes de huir.");
+                    `<b>Celda Abierta:</b> Has sacado de las rejas a <b>${encuentroCeldaActual.nombre}</b>. Algo en su actitud resulta inquietante...`;
                 mostrarDialogo(
                     encuentroCeldaActual.nombre,
-                    encuentroCeldaActual.avatar,
-                    "«¡Jajaja! ¿De verdad creías que un preso del Mundo Oscuro iba a ser tu amigo? ¡Gracias por la llave del paso!»"
+                    encuentroCeldaActual.imgPerfil,
+                    encuentroCeldaActual.respuestaVillanoLiberado
                 );
             }
         };
@@ -1526,16 +1735,16 @@
             img.style.opacity = "0.25";
             setTimeout(() => {
                 if (anguloInteriorAlternativo) {
-                    img.src = "img/moscuro/rincon-oscuro.jpg";
-                    img.alt = "Rincón oscuro con rejas de hierro y antorcha en la cabaña";
+                    if (!celdaLiberada && !encuentroCeldaActual) {
+                        sortearEncuentroCelda();
+                    }
+                    aplicarImagenCeldaActual();
+                    img.alt = `Rincón de rejas con ${encuentroCeldaActual?.nombre || "un prisionero"} en la cabaña`;
                     if (noteSpot) noteSpot.classList.add("is-hidden");
                     if (cellSpot) cellSpot.classList.remove("is-hidden");
                     if (btn) btn.textContent = "🕯️ Volver a la Mesa";
-                    if (!celdaResuelta && !encuentroCeldaActual) {
-                        sortearEncuentroCelda();
-                    }
                     document.getElementById("text-box").innerHTML =
-                        "<b>Rincón de Rejas y Antorcha:</b> Telarañas cubren la reja oxidada. Entre las sombras se mueve una silueta tras los barrotes. Haz clic sobre la celda para hablar.";
+                        `<b>Rincón de Rejas y Antorcha:</b> Tras los barrotes se encuentra <b>${encuentroCeldaActual?.nombre || "una figura"}</b>. Haz clic sobre la celda para interactuar.`;
                 } else {
                     img.src = "img/moscuro/interior-cabana.jpg";
                     img.alt = "Interior oscuro de la cabaña medieval";
@@ -2192,7 +2401,7 @@
             const btn = document.querySelector(".hotspot-btn[onclick='cambiarAnguloInterior()']");
 
             if (esHorrorInterior) {
-                if (!celdaResuelta) {
+                if (!celdaLiberada) {
                     sortearEncuentroCelda();
                 }
                 anguloInteriorAlternativo = false;
@@ -2282,6 +2491,12 @@
             }
 
             if (node.id === "minotaur-guard") {
+                if (traicionPendiente && !traicionEjecutada) {
+                    ejecutarTraicionVillanoSiAplica(
+                        `Justo frente a la guardia del minotauro, ${encuentroCeldaActual.nombre} te golpea por la espalda y se escabulle.`
+                    );
+                }
+
                 if (minotaurDefeated) {
                     textBox.innerHTML += "<p>El guardián yace vencido; el camino está despejado.</p>";
                     return;
@@ -2315,6 +2530,11 @@
             }
 
             if (node.id === "princess-sanctum") {
+                if (traicionPendiente && !traicionEjecutada) {
+                    ejecutarTraicionVillanoSiAplica(
+                        `Al llegar al santuario, ${encuentroCeldaActual.nombre} te traiciona y huye con parte de tu carga.`
+                    );
+                }
                 minotaurClueFound = true;
                 missionProgress.princessTrailFound = true;
                 reportMissionProgress();
@@ -2464,6 +2684,7 @@
             }
         });
 
+        actualizarHUDGrupo();
         prepararDiarioMision();
         prepararPergaminoAntiguo();
         reportMissionProgress();
