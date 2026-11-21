@@ -35,6 +35,11 @@
             height: 68vh;
             border-bottom: 4px solid #3a2e23;
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+            transition: box-shadow 0.6s ease;
+        }
+
+        #viewport.horror-interior {
+            box-shadow: inset 0 0 95px rgba(0, 0, 0, 0.98), inset 0 0 32px rgba(95, 14, 14, 0.42);
         }
 
         #renderCanvas {
@@ -117,6 +122,13 @@
             pointer-events: none;
             z-index: 6;
             border-radius: 3px;
+            transition: all 0.5s ease;
+        }
+
+        #location-banner.horror-banner {
+            background: linear-gradient(180deg, #281111 0%, #130808 100%);
+            border-color: #7c2727;
+            color: #dfa0a0;
         }
 
         #journal-toggle {
@@ -704,7 +716,7 @@
         <div id="hud-panel">
             <div id="text-box">
                 Has cruzado el antiguo portalón dimensional.<br>
-                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería. Algo destella junto al muro.
+                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería con una puerta entreabierta. Algo destella junto al muro.
             </div>
             <div id="inventory-box">
                 <div id="inventory-title">Alforja</div>
@@ -744,10 +756,12 @@
 
         let currentNodeIndex = 0;
         let camera;
+        let ambientLight, interiorLampLight;
         let inventario = [];
         let objetoSeleccionado = null;
         let llaveCogida = false;
         let puertaAbierta = false;
+        let notaCabanaLeida = false;
         let minotaurSprite = null;
         let minotaurCombatRequested = false;
         let animadoNPC;
@@ -768,14 +782,77 @@
             ? requestedCompanionPortrait
             : "🧭";
 
+        // Zumbido ambiental sutil para el interior misterioso de la cabaña
+        let interiorAudioCtx = null;
+        let interiorOsc1 = null;
+        let interiorOsc2 = null;
+        let interiorGain = null;
+
+        function actualizarAudioInteriorCabana(activar) {
+            try {
+                if (activar) {
+                    if (!interiorAudioCtx) {
+                        interiorAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (interiorAudioCtx.state === "suspended") {
+                        interiorAudioCtx.resume();
+                    }
+                    if (interiorOsc1) return;
+
+                    interiorGain = interiorAudioCtx.createGain();
+                    interiorGain.gain.setValueAtTime(0.0001, interiorAudioCtx.currentTime);
+                    interiorGain.gain.exponentialRampToValueAtTime(0.045, interiorAudioCtx.currentTime + 1.4);
+                    interiorGain.connect(interiorAudioCtx.destination);
+
+                    interiorOsc1 = interiorAudioCtx.createOscillator();
+                    interiorOsc1.type = "sawtooth";
+                    interiorOsc1.frequency.setValueAtTime(45, interiorAudioCtx.currentTime);
+
+                    interiorOsc2 = interiorAudioCtx.createOscillator();
+                    interiorOsc2.type = "sine";
+                    interiorOsc2.frequency.setValueAtTime(48.5, interiorAudioCtx.currentTime);
+
+                    const lowpass = interiorAudioCtx.createBiquadFilter();
+                    lowpass.type = "lowpass";
+                    lowpass.frequency.setValueAtTime(120, interiorAudioCtx.currentTime);
+
+                    interiorOsc1.connect(lowpass);
+                    interiorOsc2.connect(lowpass);
+                    lowpass.connect(interiorGain);
+
+                    interiorOsc1.start();
+                    interiorOsc2.start();
+                } else if (interiorOsc1 && interiorAudioCtx) {
+                    interiorGain.gain.exponentialRampToValueAtTime(0.0001, interiorAudioCtx.currentTime + 0.7);
+                    const oscA = interiorOsc1;
+                    const oscB = interiorOsc2;
+                    interiorOsc1 = null;
+                    interiorOsc2 = null;
+                    setTimeout(() => {
+                        try { oscA.stop(); oscA.disconnect(); } catch (e) {}
+                        try { oscB.stop(); oscB.disconnect(); } catch (e) {}
+                    }, 750);
+                }
+            } catch (e) { /* Ignorar si el navegador bloquea el audio */ }
+        }
+
         const nodes = [
             {
                 id: "cabin",
                 name: "La Cabaña de Piedra",
                 position: new BABYLON.Vector3(0, 1.6, 0),
                 target: new BABYLON.Vector3(0, 1.6, 10),
-                desc: "Ante ti se alza una construcción rústica de mampostería. Una llave de hierro descansa en el suelo.",
+                desc: "Ante ti se alza una construcción rústica de mampostería con una puerta de madera. Una llave de hierro descansa en el suelo.",
                 connections: { right: "elder-enclave" }
+            },
+            {
+                id: "cabin-interior",
+                name: "El Interior de la Cabaña",
+                position: new BABYLON.Vector3(-28, 1.6, 10),
+                target: new BABYLON.Vector3(-28, 1.4, 17),
+                desc: "El aire huele a humedad y ceniza. Una mesa rota y una nota rasgada yacen en la penumbra.",
+                horrorInterior: true,
+                connections: { left: "cabin" }
             },
             {
                 id: "elder-enclave",
@@ -942,7 +1019,6 @@
             journal.addEventListener("close", () => toggle.setAttribute("aria-expanded", "false"));
         }
 
-        // Función auxiliar para cambiar el cursor del canvas
         function setCanvasCursor(claseCursor) {
             canvas.className = claseCursor;
         }
@@ -1222,9 +1298,60 @@
             });
         }
 
-        let meshLlave, meshPuerta, meshCintaReal;
+        let meshLlave, meshPuerta, meshPuertaCabana, meshCintaReal, meshNotaCabana;
         let cintaRealRoot = null;
         let cintaRealGlow = null;
+
+        function irANodoPorId(targetId) {
+            const nextIndex = nodes.findIndex(node => node.id === targetId);
+            if (nextIndex === -1) return;
+
+            currentNodeIndex = nextIndex;
+            const targetNode = nodes[currentNodeIndex];
+            aplicarAtmosferaNodo(Boolean(targetNode.horrorInterior));
+
+            const startPosition = camera.position.clone();
+            const startRotation = camera.rotation.clone();
+            camera.position.copyFrom(targetNode.position);
+            const cameraTarget = targetNode.target.clone();
+            cameraTarget.y -= 0.75;
+            camera.setTarget(cameraTarget);
+            const targetRotation = camera.rotation.clone();
+            camera.position.copyFrom(startPosition);
+            camera.rotation.copyFrom(startRotation);
+
+            BABYLON.Animation.CreateAndStartAnimation(
+                "camMove", camera, "position", 30, 25,
+                camera.position, targetNode.position,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
+            BABYLON.Animation.CreateAndStartAnimation(
+                "camTurn", camera, "rotation", 30, 25,
+                startRotation, targetRotation,
+                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+            );
+
+            document.getElementById("location-banner").innerText = targetNode.name;
+            document.getElementById("text-box").innerHTML = `<b>${targetNode.name}:</b> ${targetNode.desc}`;
+            actualizarNavegacion(targetNode);
+            cerrarMenuNPC();
+            cerrarDialogo();
+            resolverEntradaNodo(targetNode);
+
+            if (targetNode.id === "elder-enclave") {
+                setTimeout(() => {
+                    if (nodes[currentNodeIndex].id === "elder-enclave") {
+                        mostrarDialogoCompanero("Mirad... hay un anciano a la izquierda del monolito. Quizás sabe algo; vamos a hablar con él.");
+                    }
+                }, 800);
+            } else if (targetNode.id === "cabin-interior") {
+                setTimeout(() => {
+                    if (nodes[currentNodeIndex].id === "cabin-interior") {
+                        mostrarDialogoCompanero("Aquí dentro hace un frío extraño... Mira esa nota sobre la mesa.");
+                    }
+                }, 700);
+            }
+        }
 
         const createScene = function () {
             const scene = new BABYLON.Scene(engine);
@@ -1248,10 +1375,15 @@
             skyMaterial.emissiveTexture = crearTexturaCielo(scene);
             skybox.material = skyMaterial;
 
-            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
-            light.intensity = 0.92;
-            light.diffuse = new BABYLON.Color3(0.72, 0.79, 1);
-            light.groundColor = new BABYLON.Color3(0.12, 0.16, 0.13);
+            ambientLight = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            ambientLight.intensity = 0.92;
+            ambientLight.diffuse = new BABYLON.Color3(0.72, 0.79, 1);
+            ambientLight.groundColor = new BABYLON.Color3(0.12, 0.16, 0.13);
+
+            interiorLampLight = new BABYLON.PointLight("interiorLampLight", new BABYLON.Vector3(-28, 1.8, 12), scene);
+            interiorLampLight.diffuse = new BABYLON.Color3(0.95, 0.82, 0.68);
+            interiorLampLight.range = 12;
+            interiorLampLight.intensity = 0;
 
             const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 140 }, scene);
             const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
@@ -1264,10 +1396,77 @@
             matPiedra.specularColor = new BABYLON.Color3(0.12, 0.14, 0.17);
             construirLaberinto(scene, matPiedra);
 
-            // --- NODO 1: Cabaña y Llave ---
+            const matMadera = crearTexturaMadera(scene);
+
+            // --- NODO 1: Cabaña, Puerta de Entrada y Llave ---
             const cabana = BABYLON.MeshBuilder.CreateBox("cabana", { width: 5, height: 4, depth: 6 }, scene);
             cabana.position = new BABYLON.Vector3(-3.5, 2, 10);
             cabana.material = matPiedra;
+
+            meshPuertaCabana = BABYLON.MeshBuilder.CreateBox("puertaCabana", { width: 1.2, height: 2.2, depth: 0.18 }, scene);
+            meshPuertaCabana.position = new BABYLON.Vector3(-1.0, 1.1, 8.2);
+            meshPuertaCabana.rotation.y = Math.PI / 2;
+            const matPuertaCabana = new BABYLON.StandardMaterial("matPuertaCabana", scene);
+            matPuertaCabana.diffuseTexture = matMadera;
+            meshPuertaCabana.material = matPuertaCabana;
+
+            meshPuertaCabana.actionManager = new BABYLON.ActionManager(scene);
+            meshPuertaCabana.actionManager.registerAction(
+                new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                    if (nodes[currentNodeIndex].id === "cabin") {
+                        irANodoPorId("cabin-interior");
+                    }
+                })
+            );
+
+            // --- NODO INTERIOR DE LA CABAÑA (TERROR Y MISTERIO) ---
+            const salaCabana = BABYLON.MeshBuilder.CreateBox("salaCabana", {
+                width: 9,
+                height: 5,
+                depth: 9,
+                sideOrientation: BABYLON.Mesh.BACKSIDE
+            }, scene);
+            salaCabana.position = new BABYLON.Vector3(-28, 2.5, 14);
+            const matSalaCabana = new BABYLON.StandardMaterial("matSalaCabana", scene);
+            matSalaCabana.diffuseTexture = crearTexturaPiedra(scene);
+            matSalaCabana.diffuseColor = new BABYLON.Color3(0.35, 0.32, 0.34);
+            salaCabana.material = matSalaCabana;
+
+            const mesaCabana = BABYLON.MeshBuilder.CreateBox("mesaCabana", { width: 2.2, height: 0.85, depth: 1.2 }, scene);
+            mesaCabana.position = new BABYLON.Vector3(-28, 0.43, 15.8);
+            const matMesa = new BABYLON.StandardMaterial("matMesa", scene);
+            matMesa.diffuseTexture = matMadera;
+            mesaCabana.material = matMesa;
+
+            meshNotaCabana = BABYLON.MeshBuilder.CreateBox("notaCabana", { width: 0.48, height: 0.03, depth: 0.34 }, scene);
+            meshNotaCabana.position = new BABYLON.Vector3(-27.8, 0.88, 15.7);
+            meshNotaCabana.rotation.y = 0.25;
+            const matNotaCabana = new BABYLON.StandardMaterial("matNotaCabana", scene);
+            matNotaCabana.diffuseColor = new BABYLON.Color3(0.78, 0.72, 0.6);
+            matNotaCabana.emissiveColor = new BABYLON.Color3(0.12, 0.06, 0.06);
+            meshNotaCabana.material = matNotaCabana;
+
+            meshNotaCabana.actionManager = new BABYLON.ActionManager(scene);
+            meshNotaCabana.actionManager.registerAction(
+                new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                    notaCabanaLeida = true;
+                    document.getElementById("text-box").innerHTML =
+                        "<b>Nota Rasgada en la Penumbra:</b> <i>«La princesa huyó hacia el monolito cuando las sombras cobraron voz aquí dentro... No te fíes de las pisadas que suenan detrás de ti.»</i>";
+                    mostrarDialogoCompanero("Esto explica por qué dejó su rastro hacia el laberinto. Salgamos con cuidado o sigamos adelante.");
+                })
+            );
+
+            const puertaSalidaCabana = BABYLON.MeshBuilder.CreateBox("puertaSalidaCabana", { width: 1.2, height: 2.2, depth: 0.18 }, scene);
+            puertaSalidaCabana.position = new BABYLON.Vector3(-28, 1.1, 9.7);
+            puertaSalidaCabana.material = matPuertaCabana;
+            puertaSalidaCabana.actionManager = new BABYLON.ActionManager(scene);
+            puertaSalidaCabana.actionManager.registerAction(
+                new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+                    if (nodes[currentNodeIndex].id === "cabin-interior") {
+                        irANodoPorId("cabin");
+                    }
+                })
+            );
 
             const keyRoot = new BABYLON.TransformNode("llave-antigua", scene);
             keyRoot.position = new BABYLON.Vector3(-0.8, 0.075, 6.5);
@@ -1349,7 +1548,7 @@
             meshPuerta = BABYLON.MeshBuilder.CreateBox("puerta", { width: 1.6, height: 2.6, depth: 0.25 }, scene);
             meshPuerta.position = new BABYLON.Vector3(15, 1.3, 22.8);
             const matPuerta = new BABYLON.StandardMaterial("matPuerta", scene);
-            matPuerta.diffuseTexture = crearTexturaMadera(scene);
+            matPuerta.diffuseTexture = matMadera;
             meshPuerta.material = matPuerta;
 
             meshPuerta.actionManager = new BABYLON.ActionManager(scene);
@@ -1481,45 +1680,54 @@
 
             // --- DETECCIÓN DINÁMICA DE CURSORES AL MOVER EL RATÓN ---
             scene.onPointerMove = function () {
-                // 1. Comprobar si estamos sobre el Anciano (Sprite)
                 const pickSprite = scene.pickSprite(scene.pointerX, scene.pointerY);
-                if (pickSprite && pickSprite.hit && pickSprite.pickedSprite === animadoNPC && currentNodeIndex === 1) {
+                if (pickSprite && pickSprite.hit && pickSprite.pickedSprite === animadoNPC && nodes[currentNodeIndex].id === "elder-enclave") {
                     setCanvasCursor("cursor-talk");
                     return;
                 }
 
-                // 2. Comprobar si estamos sobre mallas 3D (Llave o Puerta)
                 const pickMesh = scene.pick(scene.pointerX, scene.pointerY);
                 if (pickMesh && pickMesh.hit && pickMesh.pickedMesh) {
                     const nombre = pickMesh.pickedMesh.name;
-                    if (nombre === "llave" || pickMesh.pickedMesh.metadata?.isAncientKey) {
-                        setCanvasCursor("cursor-examine"); // Lupa sobre objetos
+                    if (nombre === "llave" || pickMesh.pickedMesh.metadata?.isAncientKey || nombre === "notaCabana") {
+                        setCanvasCursor("cursor-examine");
                         return;
                     }
                     if (pickMesh.pickedMesh.metadata?.isRoyalRibbon) {
                         setCanvasCursor("cursor-examine");
                         return;
                     }
+                    if (nombre === "puertaCabana" || nombre === "puertaSalidaCabana") {
+                        setCanvasCursor("cursor-hand");
+                        return;
+                    }
                     if (nombre === "puerta") {
-                        // Si tenemos la llave en la mano, muestra la llave; si no, muestra la mano
                         setCanvasCursor(objetoSeleccionado === "llave" ? "cursor-key" : "cursor-hand");
                         return;
                     }
                 }
 
-                // 3. Si no hay nada interactivo debajo, mostrar el objeto seleccionado o el puntero por defecto
                 setCanvasCursor(objetoSeleccionado === "llave" ? "cursor-key" : "cursor-default");
             };
 
-            // Clic sobre el Sprite del Anciano
             scene.onPointerDown = function () {
+                if (nodes[currentNodeIndex].horrorInterior) {
+                    actualizarAudioInteriorCabana(true);
+                }
                 const pickSprite = scene.pickSprite(scene.pointerX, scene.pointerY);
                 if (pickSprite && pickSprite.hit && pickSprite.pickedSprite === animadoNPC) {
-                    if (currentNodeIndex === 1) {
+                    if (nodes[currentNodeIndex].id === "elder-enclave") {
                         document.getElementById("npc-menu").style.display = "flex";
                     }
                 }
             };
+
+            scene.registerBeforeRender(function () {
+                if (nodes[currentNodeIndex].horrorInterior && interiorLampLight) {
+                    interiorLampLight.position.copyFrom(camera.position);
+                    interiorLampLight.intensity = 1.45 + Math.sin(performance.now() * 0.016) * 0.16;
+                }
+            });
 
             camera = new BABYLON.UniversalCamera("Cam", nodes[0].position, scene);
             const initialTarget = nodes[0].target.clone();
@@ -1544,6 +1752,31 @@
             minotaurSprite = null;
         } else if (minotaurDistracted && minotaurSprite) {
             minotaurSprite.isVisible = false;
+        }
+
+        function aplicarAtmosferaNodo(esHorrorInterior) {
+            const viewport = document.getElementById("viewport");
+            const banner = document.getElementById("location-banner");
+
+            if (esHorrorInterior) {
+                scene.clearColor = new BABYLON.Color3(0.06, 0.06, 0.07);
+                scene.fogDensity = 0.095;
+                scene.fogColor = new BABYLON.Color3(0.08, 0.08, 0.09);
+                ambientLight.intensity = 0.2;
+                interiorLampLight.intensity = 1.45;
+                viewport.classList.add("horror-interior");
+                banner.classList.add("horror-banner");
+                actualizarAudioInteriorCabana(true);
+            } else {
+                scene.clearColor = new BABYLON.Color3(0.03, 0.05, 0.09);
+                scene.fogDensity = 0.0035;
+                scene.fogColor = new BABYLON.Color3(0.09, 0.12, 0.18);
+                ambientLight.intensity = 0.92;
+                interiorLampLight.intensity = 0;
+                viewport.classList.remove("horror-interior");
+                banner.classList.remove("horror-banner");
+                actualizarAudioInteriorCabana(false);
+            }
         }
 
         function actualizarNavegacion(node) {
@@ -1585,6 +1818,11 @@
 
         function resolverEntradaNodo(node) {
             const textBox = document.getElementById("text-box");
+            if (node.id === "cabin-interior") {
+                textBox.innerHTML +=
+                    "<p>Haz clic en la <b>nota</b> sobre la mesa para leerla, o en la <b>puerta</b> para volver al exterior.</p>";
+            }
+
             if (node.id === "royal-clue") {
                 if (missionProgress.royalClueFound) {
                     textBox.innerHTML +=
@@ -1686,43 +1924,7 @@
                 return;
             }
 
-            currentNodeIndex = nodes.findIndex(node => node.id === targetId);
-            const targetNode = nodes[currentNodeIndex];
-            const startPosition = camera.position.clone();
-            const startRotation = camera.rotation.clone();
-            camera.position.copyFrom(targetNode.position);
-            const cameraTarget = targetNode.target.clone();
-            cameraTarget.y -= 0.75;
-            camera.setTarget(cameraTarget);
-            const targetRotation = camera.rotation.clone();
-            camera.position.copyFrom(startPosition);
-            camera.rotation.copyFrom(startRotation);
-
-            BABYLON.Animation.CreateAndStartAnimation(
-                "camMove", camera, "position", 30, 25,
-                camera.position, targetNode.position,
-                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-            );
-            BABYLON.Animation.CreateAndStartAnimation(
-                "camTurn", camera, "rotation", 30, 25,
-                startRotation, targetRotation,
-                BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
-            );
-
-            document.getElementById("location-banner").innerText = targetNode.name;
-            document.getElementById("text-box").innerHTML = `<b>${targetNode.name}:</b> ${targetNode.desc}`;
-            actualizarNavegacion(targetNode);
-            cerrarMenuNPC();
-            cerrarDialogo();
-            resolverEntradaNodo(targetNode);
-
-            if (targetNode.id === "elder-enclave") {
-                setTimeout(() => {
-                    if (nodes[currentNodeIndex].id === "elder-enclave") {
-                        mostrarDialogoCompanero("Mirad... hay un anciano a la izquierda del monolito. Quizás sabe algo; vamos a hablar con él.");
-                    }
-                }, 800);
-            }
+            irANodoPorId(targetId);
         };
 
         function crearIconoCintaMorada() {
@@ -1817,6 +2019,7 @@
         prepararDiarioMision();
         reportMissionProgress();
         actualizarNavegacion(nodes[currentNodeIndex]);
+        aplicarAtmosferaNodo(Boolean(nodes[currentNodeIndex].horrorInterior));
         engine.runRenderLoop(() => scene.render());
         window.addEventListener("resize", () => engine.resize());
     </script>
