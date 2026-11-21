@@ -565,11 +565,13 @@ export class TcgCombat {
         await this.chooseReward({ boss });
 
         if (defeated.returnToDarkWorld) {
+            this.game.saveGame?.();
             this.game.darkWorld.returnFromMinotaurCombat();
             return;
         }
 
         this.game.dungeonLevel++;
+        this.game.saveGame?.();
         await this.game.loadNextEvent();
     }
 

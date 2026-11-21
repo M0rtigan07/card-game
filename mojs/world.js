@@ -1,4 +1,4 @@
-import { sortearEncuentroCelda, state } from "./state.js";
+import { guardarEstadoMundoOscuro, sortearEncuentroCelda, state } from "./state.js";
 import {
     construirLaberinto,
     construirRuinasExteriores,
@@ -415,6 +415,10 @@ export function createWorldScene() {
     keyLight.diffuse = new BABYLON.Color3(0.92, 0.67, 0.3);
     keyLight.intensity = 0.35;
     keyLight.range = 7;
+    if (state.llaveCogida) {
+        keyRoot.dispose();
+        keyLight.dispose();
+    }
 
     const recogerLlave = () => {
         if (!state.llaveCogida) {
@@ -429,6 +433,7 @@ export function createWorldScene() {
             setTimeout(() => {
                 mostrarDialogoCompanero("¡Perfecto! Guarda eso bien. Apostaría a que abre la puerta del monolito al otro lado.");
             }, 500);
+            guardarEstadoMundoOscuro();
         }
     };
     keyParts.forEach(part => {
@@ -448,6 +453,11 @@ export function createWorldScene() {
     const matPuerta = new BABYLON.StandardMaterial("matPuerta", scene);
     matPuerta.diffuseTexture = matMadera;
     meshPuerta.material = matPuerta;
+    if (state.puertaAbierta) {
+        meshPuerta.rotation.y = Math.PI / 2.2;
+        meshPuerta.position.x -= 0.7;
+        meshPuerta.position.z -= 0.6;
+    }
 
     meshPuerta.actionManager = new BABYLON.ActionManager(scene);
     meshPuerta.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
@@ -466,6 +476,7 @@ export function createWorldScene() {
             setTimeout(() => {
                 mostrarDialogoCompanero("Las runas de la puerta se han apagado. El camino está abierto.");
             }, 600);
+            guardarEstadoMundoOscuro();
         } else {
             document.getElementById("text-box").innerHTML = "El portón de roble está cerrado herméticamente.";
             mostrarDialogoCompanero("Necesitamos encontrar una llave o un mecanismo para abrir este portón.");
@@ -677,6 +688,7 @@ export function initWorld() {
         cerrarMenuNPC();
         cerrarDialogo();
         resolverEntradaNodo(targetNode);
+        guardarEstadoMundoOscuro();
 
         if (targetNode.id === "elder-enclave") {
             setTimeout(() => {
@@ -738,11 +750,13 @@ export function initWorld() {
     });
 
     if (state.missionProgress.royalClueFound) {
-        state.inventario.push({
-            id: "cinta-real",
-            nombre: "Cinta morada con el sello real",
-            icono: "🎀"
-        });
+        if (!state.inventario.some(item => item.id === "cinta-real")) {
+            state.inventario.push({
+                id: "cinta-real",
+                nombre: "Cinta morada con el sello real",
+                icono: "🎀"
+            });
+        }
         actualizarInventario();
     }
     if (state.minotaurDefeated && minotaurSprite) {
@@ -758,6 +772,10 @@ export function initWorld() {
     reportMissionProgress();
     actualizarNavegacion(nodes[state.currentNodeIndex]);
     aplicarAtmosferaNodo(Boolean(nodes[state.currentNodeIndex].horrorInterior), scene);
+    if (state.currentNodeIndex > 0) {
+        window.irANodoPorId(nodes[state.currentNodeIndex].id);
+    }
+    guardarEstadoMundoOscuro();
     engine.runRenderLoop(() => scene.render());
     window.addEventListener("resize", () => engine.resize());
 }

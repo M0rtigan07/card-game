@@ -2,6 +2,7 @@ import {
     companionAvatar,
     companionName,
     guardarMemoriaVillanos,
+    guardarEstadoMundoOscuro,
     missionObjectives,
     obtenerVillanoParaAnciano,
     sortearEncuentroCelda,
@@ -298,6 +299,7 @@ export function actualizarDiarioMision() {
 }
 
 export function reportMissionProgress() {
+    guardarEstadoMundoOscuro();
     actualizarDiarioMision();
     if (window.parent === window) return;
 

@@ -24,6 +24,7 @@ import { DarkWorld } from './systems/DarkWorld.js';
 import { canUseItem, findEntry, getItem, removeOne } from './systems/Items.js';
 import { STARTER_DECKS } from './data/cardCatalog.js';
 import { HERO_IMAGES, PARTY } from './data/gameConfig.js';
+import { clearSavedGame, hasSavedGame, loadSavedGame, saveGame } from './systems/SaveManager.js';
 
 export class Game {
     constructor() {
@@ -61,6 +62,12 @@ export class Game {
         this.darkWorld = new DarkWorld(this);
 
         this.initEvents();
+        window.addEventListener('beforeunload', () => this.saveGame());
+        window.addEventListener('pagehide', () => this.saveGame());
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') this.saveGame();
+        });
+        this._saveTimer = window.setInterval(() => this.saveGame(), 5000);
     }
 
     // ───────────── ARRANQUE Y MENÚS ─────────────
@@ -68,6 +75,11 @@ export class Game {
     initEvents() {
         document.getElementById('btnPressStart').addEventListener('click', () => {
             this.audio.play('sega');
+
+            if (hasSavedGame()) {
+                this.resumeSavedGame();
+                return;
+            }
 
             const savedHeroName = localStorage.getItem('mazo_hero_name');
             if (savedHeroName) {
@@ -123,6 +135,33 @@ export class Game {
         this.ui.showScreen('titleScreen');
     }
 
+    saveGame() {
+        if (!this.player || !this.deck) return false;
+        return saveGame(this);
+    }
+
+    resumeSavedGame() {
+        if (!loadSavedGame(this)) {
+            this.ui.showScreen('nameEntryScreen');
+            this.nameEntry.open();
+            return;
+        }
+
+        this.ui.logEvent(`💾 Partida restaurada en la Planta ${this.dungeonLevel}.`);
+        if (this.player.storyState?.darkWorld?.active) {
+            document.body.classList.add('dark-world');
+            this.ui.setRealmMode(true, this.player.storyState.darkWorld.location ?? 0);
+            this.ui.showScreen('darkWorldScreen');
+            this.darkWorld.openParallelWorld();
+            return;
+        }
+
+        document.body.classList.remove('dark-world');
+        this.ui.setRealmMode(false, this.dungeonLevel);
+        this.ui.showScreen('gameScreen');
+        this.loadNextEvent();
+    }
+
     async selectCharacter(classKey) {
         this.audio.play('card');
         this.player = new Player(classKey);
@@ -146,6 +185,7 @@ export class Game {
     }
 
     async startMainGame() {
+        clearSavedGame();
         document.body.classList.remove('dark-world');
         this.ui.setRealmMode(false, 1);
         if (this.player.storyState?.darkWorld) {
@@ -154,6 +194,7 @@ export class Game {
         this.dungeonLevel = 1;
         this.ui.updateStats(this.player, this.dungeonLevel);
         this.ui.logEvent(`🐉 ¡${this.player.className} entra en la Planta ${this.dungeonLevel}!`);
+        this.saveGame();
         await this.loadNextEvent();
     }
 
@@ -624,7 +665,9 @@ ${recruitText}
         if (this.player.storyState?.darkWorld?.active) {
             return this.darkWorld.loadNext();
         }
-        return this.exploration.loadNext();
+        const result = this.exploration.loadNext();
+        this.saveGame();
+        return result;
     }
 
     showPartyView() {
@@ -656,6 +699,7 @@ ${recruitText}
 
         this.dungeonLevel++;
         this.ui.updateStats(this.player, this.dungeonLevel);
+        this.saveGame();
         setTimeout(() => this.loadNextEvent(), delay);
     }
 
@@ -675,6 +719,7 @@ ${recruitText}
 
         if (this.player.addXp(PARTY.RECRUIT_XP)) this.ui.logEvent(`🌟 ¡SUBIDA DE NIVEL! Ahora eres Nivel ${this.player.level}`);
         this.ui.updateStats(this.player, this.dungeonLevel);
+        this.saveGame();
         return result;
     }
 
@@ -685,6 +730,7 @@ ${recruitText}
 
         this.ui.logEvent(`👋 ${ally.name} deja tu grupo.`);
         this.ui.updateStats(this.player, this.dungeonLevel);
+        this.saveGame();
         return true;
     }
 
@@ -711,6 +757,7 @@ ${recruitText}
 
         removeOne(this.player, id);
         this.ui.updateStats(this.player, this.dungeonLevel);
+        this.saveGame();
         return true;
     }
 

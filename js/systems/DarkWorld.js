@@ -83,6 +83,7 @@ export class DarkWorld {
 
         document.body.classList.add('dark-world');
         this.game.ui.setRealmMode(true, REGIONS[0].label);
+        this.game.saveGame?.();
         this.game.loadNextEvent();
     }
 
@@ -139,6 +140,7 @@ export class DarkWorld {
     advanceAlongTracks() {
         this.game.player.storyState.darkWorld =
             advanceDarkWorldState(this.game.player.storyState.darkWorld);
+        this.game.saveGame?.();
         if (this.game.player.storyState.darkWorld.location === 2) {
             this.openParallelWorld();
             return;
@@ -176,6 +178,14 @@ export class DarkWorld {
             if (companion?.portrait) {
                 worldUrl.searchParams.set('companionPortrait', companion.portrait);
             }
+            const companionList = this.game.party.active
+                .filter(ally => ally.health > 0)
+                .map(ally => ({
+                    id: ally.id,
+                    name: ally.name,
+                    portrait: ally.portrait ?? ally.card ?? ''
+                }));
+            worldUrl.searchParams.set('companions', JSON.stringify(companionList));
             worldUrl.searchParams.set('missionPortalCrossed', mission.portalCrossed ? '1' : '0');
             worldUrl.searchParams.set('missionRoyalClueFound', mission.royalClueFound ? '1' : '0');
             worldUrl.searchParams.set('missionGuardianPassed', mission.guardianPassed ? '1' : '0');
@@ -218,6 +228,7 @@ export class DarkWorld {
                 guardianDefeated: progress.guardianDefeated,
                 princessTrailFound: progress.princessTrailFound
             };
+            this.game.saveGame?.();
             return;
         }
         if (event.data?.type !== 'dark-world:start-minotaur-combat') return;
@@ -259,6 +270,7 @@ export class DarkWorld {
         this.game.audio.play('portalReturn');
         const state = this.game.player.storyState.darkWorld;
         this.game.player.storyState.darkWorld = { ...state, active: false };
+        this.game.saveGame?.();
         document.body.classList.remove('dark-world');
         this.game.ui.setRealmMode(false, this.game.dungeonLevel);
         this.game.loadNextEvent();

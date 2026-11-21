@@ -1,12 +1,21 @@
 const VILLAIN_STORAGE_KEY = "mundo_oscuro_villains_v1";
 
 export const dialogueParams = new URLSearchParams(window.location.search);
+export const WORLD_SCENE_STORAGE_KEY = "mundo_oscuro_scene_v1";
 
 export const companionName = dialogueParams.get("companionName")?.trim() || "HÉROE";
 const requestedCompanionPortrait = dialogueParams.get("companionPortrait") || "";
 export const companionAvatar = /^img\/[A-Za-z0-9/_-]+\.(png|jpe?g|webp)$/i.test(requestedCompanionPortrait)
     ? requestedCompanionPortrait
     : "🧭";
+
+let companionsFromSave = [];
+try {
+    companionsFromSave = JSON.parse(dialogueParams.get("companions") || "[]");
+} catch (error) {
+    companionsFromSave = [];
+}
+if (!Array.isArray(companionsFromSave)) companionsFromSave = [];
 
 export function cargarMemoriaVillanos() {
     try {
@@ -87,35 +96,76 @@ export const missionObjectives = [
     }
 ];
 
+const savedScene = (() => {
+    try {
+        return JSON.parse(localStorage.getItem(WORLD_SCENE_STORAGE_KEY) || "null");
+    } catch (error) {
+        return null;
+    }
+})();
+
 export const state = {
-    currentNodeIndex: 0,
-    inventario: [],
-    objetoSeleccionado: null,
-    llaveCogida: false,
-    puertaAbierta: false,
+    currentNodeIndex: Number.isInteger(savedScene?.currentNodeIndex) ? savedScene.currentNodeIndex : 0,
+    inventario: Array.isArray(savedScene?.inventario) ? savedScene.inventario : [],
+    objetoSeleccionado: savedScene?.objetoSeleccionado || null,
+    llaveCogida: Boolean(savedScene?.llaveCogida),
+    puertaAbierta: Boolean(savedScene?.puertaAbierta),
     anguloInteriorAlternativo: false,
     minotaurCombatRequested: false,
     missionProgress: {
-        portalCrossed: dialogueParams.get("missionPortalCrossed") !== "0",
-        royalClueFound: dialogueParams.get("missionRoyalClueFound") === "1",
-        guardianPassed: dialogueParams.get("missionGuardianPassed") === "1",
-        guardianDefeated: dialogueParams.get("missionGuardianDefeated") === "1",
-        princessTrailFound: dialogueParams.get("missionPrincessTrailFound") === "1"
+        portalCrossed: savedScene?.missionProgress?.portalCrossed
+            ?? (dialogueParams.get("missionPortalCrossed") !== "0"),
+        royalClueFound: savedScene?.missionProgress?.royalClueFound
+            ?? (dialogueParams.get("missionRoyalClueFound") === "1"),
+        guardianPassed: savedScene?.missionProgress?.guardianPassed
+            ?? (dialogueParams.get("missionGuardianPassed") === "1"),
+        guardianDefeated: savedScene?.missionProgress?.guardianDefeated
+            ?? (dialogueParams.get("missionGuardianDefeated") === "1"),
+        princessTrailFound: savedScene?.missionProgress?.princessTrailFound
+            ?? (dialogueParams.get("missionPrincessTrailFound") === "1")
     },
     minotaurClueFound: false,
-    minotaurDistracted: false,
-    minotaurDefeated: false,
+    minotaurDistracted: Boolean(savedScene?.minotaurDistracted),
+    minotaurDefeated: Boolean(savedScene?.minotaurDefeated),
     villainMemory: cargarMemoriaVillanos(),
     encuentroCeldaActual: null,
     celdaLiberada: false,
-    aliadosGrupo: [],
+    aliadosGrupo: Array.isArray(savedScene?.aliadosGrupo)
+        ? savedScene.aliadosGrupo
+        : companionsFromSave,
     traicionPendiente: false,
     traicionEjecutada: false
 };
 
-state.minotaurClueFound = state.missionProgress.royalClueFound;
-state.minotaurDistracted = state.missionProgress.guardianPassed && !state.missionProgress.guardianDefeated;
-state.minotaurDefeated = state.missionProgress.guardianDefeated;
+state.minotaurClueFound = savedScene?.minotaurClueFound
+    ?? state.missionProgress.royalClueFound;
+state.minotaurDistracted = savedScene?.minotaurDistracted
+    ?? (state.missionProgress.guardianPassed && !state.missionProgress.guardianDefeated);
+state.minotaurDefeated = savedScene?.minotaurDefeated
+    ?? state.missionProgress.guardianDefeated;
+
+export function guardarEstadoMundoOscuro() {
+    try {
+        localStorage.setItem(WORLD_SCENE_STORAGE_KEY, JSON.stringify({
+            currentNodeIndex: state.currentNodeIndex,
+            inventario: state.inventario,
+            objetoSeleccionado: state.objetoSeleccionado,
+            llaveCogida: state.llaveCogida,
+            puertaAbierta: state.puertaAbierta,
+            anguloInteriorAlternativo: state.anguloInteriorAlternativo,
+            missionProgress: state.missionProgress,
+            minotaurClueFound: state.minotaurClueFound,
+            minotaurDistracted: state.minotaurDistracted,
+            minotaurDefeated: state.minotaurDefeated,
+            villainMemory: state.villainMemory,
+            encuentroCeldaActual: state.encuentroCeldaActual,
+            celdaLiberada: state.celdaLiberada,
+            aliadosGrupo: state.aliadosGrupo,
+            traicionPendiente: state.traicionPendiente,
+            traicionEjecutada: state.traicionEjecutada
+        }));
+    } catch (error) {}
+}
 
 export function sortearEncuentroCelda() {
     if (state.celdaLiberada) return;
