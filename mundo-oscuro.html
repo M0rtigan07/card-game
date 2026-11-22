@@ -5,10 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mundo Oscuro - Tras las huellas de la hija del rey</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <style>
-        html, body {
+        html,
+        body {
             overflow: hidden;
             width: 100%;
             height: 100%;
@@ -63,6 +66,17 @@
             background: rgba(22, 17, 13, 0.92);
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.78);
             max-width: min(320px, 52vw);
+        }
+
+        .party-member-chip {
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .party-member-chip:hover,
+        .party-member-chip:focus-visible {
+            border-color: #f3c65f;
+            outline: none;
         }
 
         .party-member-chip {
@@ -340,15 +354,19 @@
         .cursor-default {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'><path fill='%23f3c65f' stroke='%231a1510' stroke-width='1.5' d='M5 3l14 9-6 1.5L10 19z'/></svg>") 4 4, auto !important;
         }
+
         .cursor-talk {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%23f3c65f' stroke='%231a1510' stroke-width='1.5' d='M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'/><circle cx='8' cy='10' r='1.3' fill='%231a1510'/><circle cx='12' cy='10' r='1.3' fill='%231a1510'/><circle cx='16' cy='10' r='1.3' fill='%231a1510'/></svg>") 16 16, pointer !important;
         }
+
         .cursor-examine {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><circle cx='10.5' cy='10.5' r='6.5' fill='rgba(243,198,95,0.25)' stroke='%23f3c65f' stroke-width='2.2'/><path stroke='%23f3c65f' stroke-width='3' stroke-linecap='round' d='M15.5 15.5L21 21'/></svg>") 10 10, zoom-in !important;
         }
+
         .cursor-hand {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%23f3c65f' stroke='%231a1510' stroke-width='1.3' d='M18 8.5V6a1.5 1.5 0 0 0-3 0v2.5h-.5V4.5a1.5 1.5 0 0 0-3 0v4H11V5.5a1.5 1.5 0 0 0-3 0v5.5H7.5V8a1.5 1.5 0 0 0-3 0v7.5c0 3.3 2.7 6 6 6h2.5c3.3 0 6-2.7 6-6v-7a1.5 1.5 0 0 0-1.5-1.5z'/></svg>") 12 12, pointer !important;
         }
+
         .cursor-key {
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 24 24'><path fill='%23ffd700' stroke='%231a1510' stroke-width='1.3' d='M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/></svg>") 16 12, pointer !important;
         }
@@ -654,7 +672,10 @@
             transition: background 0.2s, color 0.2s;
         }
 
-        .npc-opt-btn:hover { background: #59442b; color: #fff; }
+        .npc-opt-btn:hover {
+            background: #59442b;
+            color: #fff;
+        }
 
         #dialogue-box {
             position: absolute;
@@ -723,7 +744,9 @@
             border-radius: 3px;
         }
 
-        #dialogue-close:hover { background: #59442b; }
+        #dialogue-close:hover {
+            background: #59442b;
+        }
 
         #hud-panel {
             width: 100%;
@@ -824,7 +847,9 @@
             transition: transform 0.15s, border-color 0.2s;
         }
 
-        .slot:hover { border-color: #a8844c; }
+        .slot:hover {
+            border-color: #a8844c;
+        }
 
         .slot.selected {
             border-color: #f3c65f;
@@ -833,40 +858,165 @@
         }
 
         @media (max-width: 700px) {
-            #game-container { border-width: 3px; height: 100dvh; }
-            #viewport { height: 58dvh; }
-            #party-hud { top: 8px; left: 8px; padding: 4px 6px; max-width: 44vw; }
-            .party-member-chip { font-size: 10px; padding: 2px 5px; }
-            #location-banner {
-                top: 8px; max-width: 90vw; padding: 5px 10px;
-                font-size: clamp(11px, 3.5vw, 15px); line-height: 1.2;
-                text-align: center; white-space: normal; overflow-wrap: anywhere;
+            #game-container {
+                border-width: 3px;
+                height: 100dvh;
             }
-            #journal-toggle { top: 48px; right: 8px; gap: 5px; padding: 5px 8px; font-size: 11px; }
-            .nav-zone { width: 15%; font-size: 1.8rem; }
-            #note-hotspot { left: 44%; top: 64%; width: 18%; height: 13%; }
-            #cell-hotspot { left: 18%; top: 22%; width: 24%; height: 58%; }
-            .static-hotspots { bottom: 56px; max-width: 92%; gap: 6px; }
-            .hotspot-btn { padding: 5px 10px; font-size: 11px; }
-            .mission-objective { grid-template-columns: 27px minmax(0, 1fr); gap: 8px; padding: 9px; }
-            .mission-objective-status { grid-column: 2; }
-            #hud-panel { height: 42dvh; min-height: 0; flex-direction: column; gap: 8px; padding: 8px; }
-            #text-box { flex: 1; min-height: 0; padding: 9px 11px; font-size: 15px; }
-            #inventory-box { flex: 0 0 auto; padding: 7px; }
-            #inventory-title { margin-bottom: 5px; padding-bottom: 3px; font-size: 12px; }
-            #inventory-slots { gap: 8px; }
-            .slot { width: 44px; height: 44px; font-size: 22px; }
-            #dialogue-box { bottom: 8px; width: 90%; gap: 9px; padding: 9px; }
-            #dialogue-avatar { width: 48px; height: 48px; font-size: 24px; }
-            #dialogue-text { font-size: 14px; }
-            #npc-menu { top: 50%; left: 50%; width: min(240px, 88%); min-width: 0; padding: 12px; }
-            .npc-opt-btn { font-size: 12px; }
+
+            #viewport {
+                height: 58dvh;
+            }
+
+            #party-hud {
+                top: 8px;
+                left: 8px;
+                padding: 4px 6px;
+                max-width: 44vw;
+            }
+
+            .party-member-chip {
+                font-size: 10px;
+                padding: 2px 5px;
+            }
+
+            #location-banner {
+                top: 8px;
+                max-width: 90vw;
+                padding: 5px 10px;
+                font-size: clamp(11px, 3.5vw, 15px);
+                line-height: 1.2;
+                text-align: center;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            #journal-toggle {
+                top: 48px;
+                right: 8px;
+                gap: 5px;
+                padding: 5px 8px;
+                font-size: 11px;
+            }
+
+            .nav-zone {
+                width: 15%;
+                font-size: 1.8rem;
+            }
+
+            #note-hotspot {
+                left: 44%;
+                top: 64%;
+                width: 18%;
+                height: 13%;
+            }
+
+            #cell-hotspot {
+                left: 18%;
+                top: 22%;
+                width: 24%;
+                height: 58%;
+            }
+
+            .static-hotspots {
+                bottom: 56px;
+                max-width: 92%;
+                gap: 6px;
+            }
+
+            .hotspot-btn {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .mission-objective {
+                grid-template-columns: 27px minmax(0, 1fr);
+                gap: 8px;
+                padding: 9px;
+            }
+
+            .mission-objective-status {
+                grid-column: 2;
+            }
+
+            #hud-panel {
+                height: 42dvh;
+                min-height: 0;
+                flex-direction: column;
+                gap: 8px;
+                padding: 8px;
+            }
+
+            #text-box {
+                flex: 1;
+                min-height: 0;
+                padding: 9px 11px;
+                font-size: 15px;
+            }
+
+            #inventory-box {
+                flex: 0 0 auto;
+                padding: 7px;
+            }
+
+            #inventory-title {
+                margin-bottom: 5px;
+                padding-bottom: 3px;
+                font-size: 12px;
+            }
+
+            #inventory-slots {
+                gap: 8px;
+            }
+
+            .slot {
+                width: 44px;
+                height: 44px;
+                font-size: 22px;
+            }
+
+            #dialogue-box {
+                bottom: 8px;
+                width: 90%;
+                gap: 9px;
+                padding: 9px;
+            }
+
+            #dialogue-avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+            }
+
+            #dialogue-text {
+                font-size: 14px;
+            }
+
+            #npc-menu {
+                top: 50%;
+                left: 50%;
+                width: min(240px, 88%);
+                min-width: 0;
+                padding: 12px;
+            }
+
+            .npc-opt-btn {
+                font-size: 12px;
+            }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
-            #viewport { height: 64dvh; }
-            #hud-panel { height: 36dvh; flex-direction: row; }
-            #text-box { font-size: 14px; }
+            #viewport {
+                height: 64dvh;
+            }
+
+            #hud-panel {
+                height: 36dvh;
+                flex-direction: row;
+            }
+
+            #text-box {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -887,17 +1037,21 @@
             <div id="nav-right" class="nav-zone" onclick="cambiarNodo(1)" title="Ir a la derecha">►</div>
 
             <div id="static-scene-layer" aria-hidden="true">
-                <img id="static-scene-image" src="img/moscuro/interior-cabana.jpg" alt="Interior oscuro de la cabaña medieval">
+                <img id="static-scene-image" src="img/moscuro/interior-cabana.jpg"
+                    alt="Interior oscuro de la cabaña medieval">
                 <div id="static-scene-vignette"></div>
                 <button id="note-hotspot" type="button" aria-label="Examinar pergamino antiguo sobre la mesa"
                     title="Examinar pergamino antiguo" onclick="abrirPergaminoAntiguo()"></button>
                 <button id="cell-hotspot" type="button" class="is-hidden"
-                    aria-label="Hablar con quien está tras las rejas"
-                    title="Hablar con quien está tras las rejas" onclick="interactuarPresoCelda()"></button>
+                    aria-label="Hablar con quien está tras las rejas" title="Hablar con quien está tras las rejas"
+                    onclick="interactuarPresoCelda()"></button>
                 <div class="static-hotspots">
-                    <button type="button" class="hotspot-btn" data-cursor="examine" onclick="abrirPergaminoAntiguo()">📜 Examinar Mesa y Nota</button>
-                    <button type="button" class="hotspot-btn" onclick="cambiarAnguloInterior()">🕯️ Mirar Rincón de Rejas</button>
-                    <button type="button" class="hotspot-btn" onclick="irANodoPorId('cabin')">🚪 Salir al Exterior</button>
+                    <button type="button" class="hotspot-btn" data-cursor="examine" onclick="abrirPergaminoAntiguo()">📜
+                        Examinar Mesa y Nota</button>
+                    <button type="button" class="hotspot-btn" onclick="cambiarAnguloInterior()">🕯️ Mirar Rincón de
+                        Rejas</button>
+                    <button type="button" class="hotspot-btn" onclick="irANodoPorId('cabin')">🚪 Salir al
+                        Exterior</button>
                 </div>
             </div>
 
@@ -926,7 +1080,8 @@
         <div id="hud-panel">
             <div id="text-box">
                 Has cruzado el antiguo portalón dimensional.<br>
-                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería con una puerta de madera. Algo destella junto al muro.
+                <b>La Cabaña de Piedra:</b> Ante ti se alza una construcción rústica de mampostería con una puerta de
+                madera. Algo destella junto al muro.
             </div>
             <div id="inventory-box">
                 <div id="inventory-title">Alforja</div>
@@ -949,9 +1104,12 @@
                 <button id="scroll-close" type="button" aria-label="Cerrar pergamino">×</button>
             </header>
             <div class="scroll-body">
-                <p>Antes de que las murallas del reino fueran alzadas, el Mundo Oscuro era una tierra de cielos fracturados donde la bruma guardaba memoria de cada paso.</p>
-                <p>Los constructores del monolito tallaron la piedra para contener las fisuras entre planos, levantando laberintos de vigilancia que responden al eco y al hierro antiguo.</p>
-                <p>Quienes habitan estos dominios olvidados no son simples espectros: son guardianes atados a un juramento anterior al tiempo, vigilando los umbrales que jamás debieron reabrirse.</p>
+                <p>Antes de que las murallas del reino fueran alzadas, el Mundo Oscuro era una tierra de cielos
+                    fracturados donde la bruma guardaba memoria de cada paso.</p>
+                <p>Los constructores del monolito tallaron la piedra para contener las fisuras entre planos, levantando
+                    laberintos de vigilancia que responden al eco y al hierro antiguo.</p>
+                <p>Quienes habitan estos dominios olvidados no son simples espectros: son guardianes atados a un
+                    juramento anterior al tiempo, vigilando los umbrales que jamás debieron reabrirse.</p>
             </div>
         </div>
     </dialog>
@@ -966,14 +1124,15 @@
                 <button id="journal-close" type="button" aria-label="Cerrar diario">×</button>
             </header>
             <p id="mission-summary"></p>
-            <div id="mission-progress-track" role="progressbar" aria-label="Progreso de la misión"
-                aria-valuemin="0" aria-valuemax="4" aria-valuenow="1">
+            <div id="mission-progress-track" role="progressbar" aria-label="Progreso de la misión" aria-valuemin="0"
+                aria-valuemax="4" aria-valuenow="1">
                 <span id="mission-progress-bar"></span>
             </div>
             <p id="mission-progress-count"></p>
             <ol id="mission-objectives"></ol>
             <p id="mission-next"></p>
-            <p class="journal-future-note">Tu avance se conserva para retomarlo cuando regreses a esta aventura desde las mazmorras.</p>
+            <p class="journal-future-note">Tu avance se conserva para retomarlo cuando regreses a esta aventura desde
+                las mazmorras.</p>
         </div>
     </dialog>
 

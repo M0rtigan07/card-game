@@ -1,3 +1,4 @@
+
 import {
     companionAvatar,
     companionName,
@@ -32,6 +33,50 @@ function sincronizarVistaCelda(esVistaCelda) {
     const layer = document.getElementById("static-scene-layer");
     if (!layer) return;
     layer.classList.toggle("is-cell-view", Boolean(esVistaCelda));
+}
+
+function obtenerNombreRolAliado(aliado) {
+    if (aliado.nombreRol) return aliado.nombreRol;
+    if (aliado.rol === "prisionera" || aliado.nombre.toLowerCase().includes("prisionera")) {
+        return "Lyra";
+    }
+    if (aliado.rol === "prisionero" || aliado.nombre.toLowerCase().includes("prisionero")) {
+        return "Kaelen";
+    }
+    return aliado.nombre;
+}
+
+function generarInteraccionAliado(aliado) {
+    const nombreRol = obtenerNombreRolAliado(aliado);
+    const esPrisionera = aliado.rol === "prisionera"
+        || aliado.nombre.toLowerCase().includes("prisionera")
+        || nombreRol === "Lyra";
+
+    if (esPrisionera) {
+        const dialogosLyra = [
+            `«Me llamo <b>${nombreRol}</b>... aunque los nombres cambian cuando el eco tiene dientes. ¿Has notado cómo las sombras imitan el paso del que duda?»`,
+            `«Soy <b>${nombreRol}</b>. Mira esas piedras: ¿dirías que señalan un camino o que esperan a ver quién se atreve a equivocarse primero?»`
+        ];
+        const idx = (aliado.interaccionIdx || 0) % dialogosLyra.length;
+        aliado.interaccionIdx = idx + 1;
+        return {
+            nombreDialogo: `${nombreRol} — La Prisionera`,
+            textoDialogo: dialogosLyra[idx],
+            comentarioGrupo: `«Hablas con <b>${nombreRol}</b> y le sigues el juego de acertijos mientras avanzáis por el Mundo Oscuro.»`
+        };
+    }
+
+    const dialogosKaelen = [
+        `«Mi nombre es <b>${nombreRol}</b>. Conocí el peso de estas cadenas mucho antes de oír vuestros pasos... mantengamos la vista en las sombras.»`,
+        `«Llámeme <b>${nombreRol}</b>. Este lugar guarda ecos de antiguos juramentos; no te apartes del rastro y vigila los ángulos muertos.»`
+    ];
+    const idx = (aliado.interaccionIdx || 0) % dialogosKaelen.length;
+    aliado.interaccionIdx = idx + 1;
+    return {
+        nombreDialogo: `${nombreRol} — El Prisionero`,
+        textoDialogo: dialogosKaelen[idx],
+        comentarioGrupo: `«Te diriges a <b>${nombreRol}</b> en voz baja; su calma contrasta con la tensión del camino.»`
+    };
 }
 
 export function setCanvasCursor(claseCursor, canvas) {
@@ -91,9 +136,10 @@ export function actualizarHUDGrupo() {
     if (!hud) return;
 
     const chips = [];
-    const principalChip = document.createElement("div");
+    const principalChip = document.createElement("button");
+    principalChip.type = "button";
     principalChip.className = "party-member-chip";
-    principalChip.title = `Compañero principal: ${companionName}`;
+    principalChip.title = `Hablar con ${companionName}`;
     if (companionAvatar.startsWith("img/")) {
         const img = document.createElement("img");
         img.className = "party-member-avatar";
@@ -110,24 +156,47 @@ export function actualizarHUDGrupo() {
     const nameSpan = document.createElement("span");
     nameSpan.textContent = companionName;
     principalChip.appendChild(nameSpan);
+    principalChip.addEventListener("click", () => {
+        const nombresAliados = state.aliadosGrupo.map(a => a.nombreRevelado || obtenerNombreRolAliado(a));
+        const frase = nombresAliados.length > 0
+            ? `«Mantengamos la atención, ${nombresAliados.join(" y ")}. Cada rincón de este lugar esconde una trampa o una pista.»`
+            : "«Sigamos avanzando con cautela. Este lugar no perdona los descuidos.»";
+        mostrarDialogo(companionName, companionAvatar, frase, "🧭");
+    });
     chips.push(principalChip);
 
     state.aliadosGrupo.forEach(aliado => {
-        const chip = document.createElement("div");
+        const chip = document.createElement("button");
+        chip.type = "button";
         chip.className = "party-member-chip is-ally";
-        chip.title = `${aliado.nombre} (Aliado en el Mundo Oscuro)`;
+        const etiquetaActual = aliado.nombreRevelado || aliado.nombre;
+        chip.title = `Hablar con ${etiquetaActual}`;
 
         if (aliado.imgPerfil) {
             const img = document.createElement("img");
             img.className = "party-member-avatar";
             img.src = aliado.imgPerfil;
-            img.alt = aliado.nombre;
+            img.alt = etiquetaActual;
             img.onerror = () => img.remove();
             chip.appendChild(img);
         }
         const label = document.createElement("span");
-        label.textContent = aliado.nombre;
+        label.textContent = etiquetaActual;
         chip.appendChild(label);
+
+        chip.addEventListener("click", () => {
+            const interaccion = generarInteraccionAliado(aliado);
+            const nombreRol = obtenerNombreRolAliado(aliado);
+            aliado.nombreRol = nombreRol;
+            aliado.nombreRevelado = nombreRol;
+            guardarEstadoMundoOscuro();
+            actualizarHUDGrupo();
+
+            mostrarDialogo(interaccion.nombreDialogo, aliado.imgPerfil, interaccion.textoDialogo, "🛡️");
+            document.getElementById("text-box").innerHTML =
+                `<b>Charla con ${nombreRol}:</b> ${interaccion.comentarioGrupo}`;
+        });
+
         chips.push(chip);
     });
 
@@ -384,6 +453,7 @@ export function ejecutarTraicionVillanoSiAplica(motivoTexto, canvas) {
         "«¡Qué fácil engaña la desesperación! Gracias por abrirme el paso... nos veremos entre las sombras.»",
         "🗡️"
     );
+    guardarEstadoMundoOscuro();
     return true;
 }
 
@@ -482,19 +552,24 @@ export function registrarUIHandlers(canvas) {
         if (img) img.src = state.encuentroCeldaActual.imgLibre;
 
         if (state.encuentroCeldaActual.alineacion === "heroe") {
+            const nombreRol = state.encuentroCeldaActual.nombreRol || obtenerNombreRolAliado(state.encuentroCeldaActual);
             const nuevoAliado = {
                 id: `${state.encuentroCeldaActual.rol}-aliado`,
+                rol: state.encuentroCeldaActual.rol,
                 nombre: state.encuentroCeldaActual.nombre,
+                nombreRol,
+                nombreRevelado: nombreRol,
                 imgPerfil: state.encuentroCeldaActual.imgPerfil
             };
             state.aliadosGrupo.push(nuevoAliado);
+            guardarEstadoMundoOscuro();
             actualizarHUDGrupo();
             notificarAliadoAlPadre(nuevoAliado);
 
             document.getElementById("text-box").innerHTML =
-                `<b>¡Nuevo Aliado!</b> Has liberado a <b>${state.encuentroCeldaActual.nombre}</b> y resulta ser de confianza: se une a tu grupo en el HUD.`;
+                `<b>¡Nuevo Aliado!</b> Has liberado a <b>${state.encuentroCeldaActual.nombre}</b>, que se presenta como <b>${nombreRol}</b> y se une a tu grupo.`;
             mostrarDialogo(
-                state.encuentroCeldaActual.nombre,
+                `${nombreRol} — ${state.encuentroCeldaActual.nombre}`,
                 state.encuentroCeldaActual.imgPerfil,
                 state.encuentroCeldaActual.respuestaAliado,
                 "🛡️"
@@ -504,6 +579,7 @@ export function registrarUIHandlers(canvas) {
             state.villainMemory[state.encuentroCeldaActual.rol] = true;
             state.villainMemory.lastVillainRole = state.encuentroCeldaActual.rol;
             guardarMemoriaVillanos(state.villainMemory);
+            guardarEstadoMundoOscuro();
 
             document.getElementById("text-box").innerHTML =
                 `<b>Celda Abierta:</b> Has sacado de las rejas a <b>${state.encuentroCeldaActual.nombre}</b>. Algo en su actitud resulta inquietante... Quizás el Anciano sepa quién es en realidad.`;
@@ -527,13 +603,14 @@ export function registrarUIHandlers(canvas) {
         const img = document.getElementById("static-scene-image");
 
         if (state.celdaLiberada && state.encuentroCeldaActual.alineacion === "heroe") {
+            const nombreRol = state.encuentroCeldaActual.nombreRol || obtenerNombreRolAliado(state.encuentroCeldaActual);
             if (img) img.src = state.encuentroCeldaActual.imgLibre;
             mostrarDialogo(
-                state.encuentroCeldaActual.nombre,
+                `${nombreRol} — ${state.encuentroCeldaActual.nombre}`,
                 state.encuentroCeldaActual.imgPerfil,
                 state.encuentroCeldaActual.rol === "prisionera"
-                    ? "«¿Ya estás listo para correr, o te vas a quedar mirando la puerta abierta?»"
-                    : "«Mantente firme. Conozco los ecos de este lugar y no te daré la espalda.»",
+                    ? `«Soy <b>${nombreRol}</b>... ¿ya estás listo para correr, o te vas a quedar mirando la puerta abierta?»`
+                    : `«Soy <b>${nombreRol}</b>. Mantente firme; conozco los ecos de este lugar y no te daré la espalda.»`,
                 "🛡️"
             );
             return;

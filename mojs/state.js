@@ -41,6 +41,7 @@ export const personajesCelda = {
     prisionera: {
         rol: "prisionera",
         nombre: "La Prisionera",
+        nombreRol: "Lyra",
         imgCelda: "img/moscuro/prisionera_celda.jpg",
         imgHabla: "img/moscuro/prisionera_habla.jpg",
         imgLibre: "img/moscuro/prisionera_libre.jpg",
@@ -51,7 +52,7 @@ export const personajesCelda = {
             "«¿Por qué todos buscan salidas en un lugar que respira? ¿Has oído alguna vez latir los barrotes cuando se apaga la vela?»"
         ],
         peticionSalida: "«¿Me vas a dejar aquí riéndome con las sombras? ¡Abre este cerrojo y dime... qué harás cuando veas de qué lado estoy?»",
-        respuestaAliado: "«¡Ja! ¡Salió el cerrojo! ¿Ves qué fácil era confiar en la loca? ¡Vamos, muévete antes de que la oscuridad nos alcance!»",
+        respuestaAliado: "«¡Ja! ¡Salió el cerrojo! Me llamo Lyra... aunque los nombres aquí son solo cascabeles en la niebla. ¡Vamos, muévete antes de que la oscuridad nos alcance!»",
         respuestaVillanoLiberado: "«¡Qué inocencia la tuya! ¿De verdad creías que una sonrisa tras estas rejas era inocente? ¡Pronto verás el precio de abrirme!»",
         historiaAnciano: "«¡Cuidado con esa mujer! Hace inviernos jugaba con las mentes de los viajeros junto a las fisuras: finge locura y devuelve preguntas para confundir a su presa antes de saquearla. No creas que ha desaparecido para siempre... en el Mundo Oscuro los embaucadores siempre vuelven a acechar.»",
         reencuentroAdvertido: "«¡Mira quién vuelve a tropezar! Ya sabes lo que soy... ¿y aun así creías que esta vez tendrías el control?»"
@@ -59,6 +60,7 @@ export const personajesCelda = {
     prisionero: {
         rol: "prisionero",
         nombre: "El Prisionero",
+        nombreRol: "Kaelen",
         imgCelda: "img/moscuro/prisionero_celda.jpg",
         imgHabla: "img/moscuro/prisionero_habla.jpg",
         imgMisterio: "img/moscuro/prisionero_habla_misterio.jpg",
@@ -66,7 +68,7 @@ export const personajesCelda = {
         imgPerfil: "img/moscuro/prisionero_perfil.jpg",
         loreSerio: "«Este dominio existió antes que los mapas del reino. Las piedras guardan antiguos juramentos y los ecos despiertan a quienes no saben guardar silencio.»",
         peticionSalida: "«El hierro me retiene, pero mis ojos han leído estos muros más tiempo del que imaginas. Libérame... y sabrás si mi paso es tu escudo o tu ruina.»",
-        respuestaAliado: "«El cerrojo ha cedido. A partir de este instante, mi filo camina contigo hasta que las sombras caigan.»",
+        respuestaAliado: "«El cerrojo ha cedido. Mi nombre es Kaelen. A partir de este instante, mi filo camina contigo hasta que las sombras caigan.»",
         respuestaVillanoLiberado: "«Has cometido un error antiguo, forastero. Algunos encerrados aquí no fueron víctimas... sino quienes abrieron las grietas.»",
         historiaAnciano: "«Ese hombre no fue encerrado por error. Antaño sirvió a los señores de la grieta y robó llaves y reliquias para abrir los umbrales prohibidos. Si te ha traicionado, mantén los ojos abiertos: estos dominios retuercen los caminos y volveréis a cruzaros.»",
         reencuentroAdvertido: "«Ya conoces mi filo y mi silencio, forastero. Esta vez vienes advertido... pero la sombra sigue siendo mía.»"
