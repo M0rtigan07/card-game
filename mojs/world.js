@@ -367,7 +367,9 @@ export function createWorldScene() {
     );
 
     const keyRoot = new BABYLON.TransformNode("llave-antigua", scene);
-    keyRoot.position = new BABYLON.Vector3(-0.8, 0.075, 6.5);
+    keyRoot.position = new BABYLON.Vector3(-0.8, 0.16, 6.5);
+    keyRoot.rotation.y = -0.38;
+    keyRoot.scaling.setAll(1.55);
     const keyParts = [];
     const matLlave = new BABYLON.StandardMaterial("matLlave", scene);
     matLlave.diffuseColor = new BABYLON.Color3(0.62, 0.39, 0.12);
@@ -376,33 +378,33 @@ export function createWorldScene() {
 
     const meshLlave = BABYLON.MeshBuilder.CreateBox(
         "llave",
-        { width: 0.56, height: 0.055, depth: 0.09 },
+        { width: 1.05, height: 0.065, depth: 0.11 },
         scene
     );
     meshLlave.parent = keyRoot;
-    meshLlave.position.x = 0.1;
+    meshLlave.position.x = 0.25;
     meshLlave.material = matLlave;
     keyParts.push(meshLlave);
 
     const keyRing = BABYLON.MeshBuilder.CreateTorus(
         "llave-anilla",
-        { diameter: 0.38, thickness: 0.055, tessellation: 28 },
+        { diameter: 0.52, thickness: 0.075, tessellation: 32 },
         scene
     );
     keyRing.parent = keyRoot;
-    keyRing.position.x = -0.22;
-    keyRing.rotation.x = Math.PI / 2;
+    keyRing.position.x = -0.45;
+    keyRing.position.y = 0.02;
     keyRing.material = matLlave;
     keyParts.push(keyRing);
 
-    for (const toothX of [0.26, 0.4]) {
+    for (const [toothX, toothZ] of [[0.58, -0.11], [0.78, 0.11], [0.96, -0.11]]) {
         const tooth = BABYLON.MeshBuilder.CreateBox(
             "llave-diente",
-            { width: 0.07, height: 0.055, depth: 0.13 },
+            { width: 0.12, height: 0.065, depth: 0.18 },
             scene
         );
         tooth.parent = keyRoot;
-        tooth.position.set(toothX, 0, -0.055);
+        tooth.position.set(toothX, 0, toothZ);
         tooth.material = matLlave;
         keyParts.push(tooth);
     }

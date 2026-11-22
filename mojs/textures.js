@@ -26,7 +26,13 @@ export function limpiarFondoSprite(urlImagen, callback) {
         }
 
         ctx.putImageData(imgData, 0, 0);
-        callback(tempCanvas.toDataURL("image/png"), img.width / 4, img.height);
+        const columns = 6;
+        const rows = 3;
+        callback(
+            tempCanvas.toDataURL("image/png"),
+            Math.floor(img.width / columns),
+            Math.floor(img.height / rows)
+        );
     };
     img.src = urlImagen;
 }
