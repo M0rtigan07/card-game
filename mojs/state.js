@@ -172,12 +172,12 @@ export function sortearEncuentroCelda() {
     const elegirPrisionera = Math.random() < 0.5;
     const base = elegirPrisionera ? personajesCelda.prisionera : personajesCelda.prisionero;
     const yaAdvertidoDeEsteVillano = Boolean(state.villainMemory[base.rol]);
-    const esHeroe = yaAdvertidoDeEsteVillano ? false : (Math.random() < 0.5);
+    const esHeroe = Math.random() < 0.5;
 
     state.encuentroCeldaActual = {
         ...base,
         alineacion: esHeroe ? "heroe" : "villano",
-        yaAdvertido: yaAdvertidoDeEsteVillano,
+        yaAdvertido: !esHeroe && yaAdvertidoDeEsteVillano,
         preguntaIdx: 0
     };
 }
