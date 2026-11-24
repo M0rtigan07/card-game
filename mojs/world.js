@@ -1,3 +1,4 @@
+
 import { guardarEstadoMundoOscuro, sortearEncuentroCelda, state } from "./state.js";
 import {
     construirLaberinto,
@@ -341,17 +342,6 @@ function resolverEntradaNodo(node) {
         }
         textBox.innerHTML +=
             "<p>El broche confirma que la hija del rey cruzó el laberinto. Una puerta de madera marca la salida hacia el sendero.</p>";
-        mostrarOpcionesLaberinto([
-            {
-                label: "🚪 Abrir la puerta de madera y salir al sendero",
-                action: () => {
-                    state.salidaLaberintoAbierta = true;
-                    if (puertaSalidaLaberinto) puertaSalidaLaberinto.rotation.y = Math.PI / 2;
-                    guardarEstadoMundoOscuro();
-                    window.irANodoPorId("asturian-trail");
-                }
-            }
-        ]);
     }
 
     if (node.id === "asturian-trail") {
@@ -452,15 +442,26 @@ export function createWorldScene() {
 
     puertaSalidaLaberinto = BABYLON.MeshBuilder.CreateBox(
         "puertaSalidaLaberinto",
-        { width: 1.8, height: 2.7, depth: 0.28 },
+        { width: 1.65, height: 2.65, depth: 0.24 },
         scene
     );
-    puertaSalidaLaberinto.position = new BABYLON.Vector3(43, 1.35, 56.5);
-    puertaSalidaLaberinto.rotation.y = state.salidaLaberintoAbierta ? Math.PI / 2 : 0;
-    puertaSalidaLaberinto.isPickable = true;
+    puertaSalidaLaberinto.position = new BABYLON.Vector3(45.2, 1.325, 52);
+    puertaSalidaLaberinto.rotation.y = state.salidaLaberintoAbierta ? Math.PI : Math.PI / 2;
     const matPuertaSalida = new BABYLON.StandardMaterial("matPuertaSalida", scene);
     matPuertaSalida.diffuseTexture = matMadera;
     puertaSalidaLaberinto.material = matPuertaSalida;
+
+    puertaSalidaLaberinto.actionManager = new BABYLON.ActionManager(scene);
+    puertaSalidaLaberinto.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+            if (nodes[state.currentNodeIndex].id === "princess-sanctum") {
+                state.salidaLaberintoAbierta = true;
+                puertaSalidaLaberinto.rotation.y = Math.PI;
+                guardarEstadoMundoOscuro();
+                window.irANodoPorId("asturian-trail");
+            }
+        })
+    );
 
     const keyRoot = new BABYLON.TransformNode("llave-antigua", scene);
     keyRoot.position = new BABYLON.Vector3(-0.8, 0.16, 6.5);
@@ -743,21 +744,8 @@ export function createWorldScene() {
         if (pickSprite && pickSprite.hit) {
             if (pickSprite.pickedSprite === animadoNPC && nodes[state.currentNodeIndex].id === "elder-enclave") {
                 document.getElementById("npc-menu").style.display = "flex";
-                return;
-            }
-            if (pickSprite.pickedSprite === centauroSprite && nodes[state.currentNodeIndex].id === "asturian-bridge") {
+            } else if (pickSprite.pickedSprite === centauroSprite && nodes[state.currentNodeIndex].id === "asturian-bridge") {
                 abrirDialogoCentauro();
-                return;
-            }
-        }
-
-        const pickMesh = scene.pick(scene.pointerX, scene.pointerY, mesh => mesh === puertaSalidaLaberinto);
-        if (pickMesh && pickMesh.hit && pickMesh.pickedMesh === puertaSalidaLaberinto) {
-            if (nodes[state.currentNodeIndex].id === "princess-sanctum") {
-                state.salidaLaberintoAbierta = true;
-                puertaSalidaLaberinto.rotation.y = Math.PI / 2;
-                guardarEstadoMundoOscuro();
-                window.irANodoPorId("asturian-trail");
             }
         }
     };
