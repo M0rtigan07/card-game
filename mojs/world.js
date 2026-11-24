@@ -1,3 +1,4 @@
+
 import { guardarEstadoMundoOscuro, sortearEncuentroCelda, state } from "./state.js";
 import {
     construirLaberinto,
@@ -9,6 +10,8 @@ import {
     limpiarFondoSprite
 } from "./textures.js";
 import {
+    abrirCharlaSendero,
+    abrirDialogoCentauro,
     actualizarAudioInteriorCabana,
     actualizarHUDGrupo,
     actualizarInventario,
@@ -26,7 +29,7 @@ import {
 } from "./ui.js";
 
 const canvas = document.getElementById("renderCanvas");
-const engine = new BABYLON.Engine(canvas, true);
+const engine = new BABYLON.Engine(canvas, true, { alpha: true, antialias: true });
 
 const nodes = [
     {
@@ -99,24 +102,49 @@ const nodes = [
         name: "El Rastro de la Princesa",
         position: new BABYLON.Vector3(43, 1.6, 52),
         target: new BABYLON.Vector3(43, 1.6, 62),
-        desc: "Un broche real yace junto a una puerta entreabierta. La hija del rey ha pasado por aquí y se adentró en las ruinas.",
-        connections: { left: "echo-gallery" }
+        desc: "Un broche real yace junto a una puerta de madera al final del laberinto. Al abrirla se abre un sendero hacia la montaña.",
+        connections: { left: "echo-gallery", right: "asturian-trail" }
+    },
+    {
+        id: "asturian-trail",
+        name: "El Sendero de la Niebla",
+        position: new BABYLON.Vector3(56, 1.6, 52),
+        target: new BABYLON.Vector3(66, 1.6, 52),
+        desc: "Un sendero de piedra bordeado de viejos postes de madera avanza entre la arboleda y la bruma hacia el puente.",
+        asturianTrail: true,
+        connections: { left: "princess-sanctum", right: "asturian-bridge" }
+    },
+    {
+        id: "asturian-bridge",
+        name: "El Puente de Argul",
+        position: new BABYLON.Vector3(74, 1.6, 52),
+        target: new BABYLON.Vector3(84, 1.6, 52),
+        desc: "El camino desemboca frente a un puente de piedra sobre el río y la cueva brumosa. Un centauro del norte aguarda en el paso.",
+        asturianBridge: true,
+        connections: { left: "asturian-trail" }
     }
 ];
 
 let camera;
 let ambientLight, interiorLampLight, riftLight;
 let minotaurSprite = null;
+let centauroSprite = null;
 let animadoNPC;
 let cintaRealRoot = null;
 let cintaRealGlow = null;
+let puertaSalidaLaberinto = null;
 
 function actualizarNavegacion(node) {
     document.getElementById("nav-left").hidden = !node.connections.left;
     document.getElementById("nav-right").hidden = !node.connections.right;
 }
 
-function aplicarAtmosferaNodo(esHorrorInterior, scene) {
+function aplicarAtmosferaNodo(node, scene) {
+    const esHorrorInterior = Boolean(node.horrorInterior);
+    const esSenderoAsturiano = Boolean(node.asturianTrail);
+    const esPuenteAsturiano = Boolean(node.asturianBridge);
+    const esTramoAsturiano = esSenderoAsturiano || esPuenteAsturiano;
+
     const viewport = document.getElementById("viewport");
     const banner = document.getElementById("location-banner");
     const staticLayer = document.getElementById("static-scene-layer");
@@ -124,6 +152,13 @@ function aplicarAtmosferaNodo(esHorrorInterior, scene) {
     const noteSpot = document.getElementById("note-hotspot");
     const cellSpot = document.getElementById("cell-hotspot");
     const btn = document.querySelector(".hotspot-btn[onclick='cambiarAnguloInterior()']");
+
+    viewport.classList.toggle("is-asturian-trail", esSenderoAsturiano);
+    viewport.classList.toggle("is-asturian-bridge", esPuenteAsturiano);
+
+    if (centauroSprite) {
+        centauroSprite.isVisible = esPuenteAsturiano;
+    }
 
     if (esHorrorInterior) {
         if (!state.celdaLiberada) {
@@ -137,7 +172,8 @@ function aplicarAtmosferaNodo(esHorrorInterior, scene) {
         if (btn) btn.textContent = "🕯️ Mirar Rincón de Rejas";
         staticLayer.classList.add("is-active");
         staticLayer.setAttribute("aria-hidden", "false");
-        scene.clearColor = new BABYLON.Color3(0.06, 0.06, 0.07);
+        scene.clearColor = new BABYLON.Color4(0.06, 0.06, 0.07, 1);
+        scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
         scene.fogDensity = 0.095;
         scene.fogColor = new BABYLON.Color3(0.08, 0.08, 0.09);
         ambientLight.intensity = 0.2;
@@ -146,12 +182,26 @@ function aplicarAtmosferaNodo(esHorrorInterior, scene) {
         viewport.classList.add("horror-interior");
         banner.classList.add("horror-banner");
         actualizarAudioInteriorCabana(true);
+    } else if (esTramoAsturiano) {
+        staticLayer.classList.remove("is-active");
+        staticLayer.setAttribute("aria-hidden", "true");
+        if (noteSpot) noteSpot.classList.add("is-hidden");
+        if (cellSpot) cellSpot.classList.add("is-hidden");
+        scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+        scene.fogMode = BABYLON.Scene.FOGMODE_NONE;
+        ambientLight.intensity = 0.95;
+        if (riftLight) riftLight.intensity = 0;
+        interiorLampLight.intensity = 0;
+        viewport.classList.remove("horror-interior");
+        banner.classList.remove("horror-banner");
+        actualizarAudioInteriorCabana(false);
     } else {
         staticLayer.classList.remove("is-active");
         staticLayer.setAttribute("aria-hidden", "true");
         if (noteSpot) noteSpot.classList.add("is-hidden");
         if (cellSpot) cellSpot.classList.add("is-hidden");
-        scene.clearColor = new BABYLON.Color3(0.04, 0.04, 0.09);
+        scene.clearColor = new BABYLON.Color4(0.04, 0.04, 0.09, 1);
+        scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
         scene.fogDensity = 0.0065;
         scene.fogColor = new BABYLON.Color3(0.11, 0.1, 0.18);
         ambientLight.intensity = 0.88;
@@ -291,13 +341,37 @@ function resolverEntradaNodo(node) {
             actualizarInventario();
         }
         textBox.innerHTML +=
-            "<p>El broche confirma que la hija del rey cruzó el laberinto. Sus huellas continúan hacia las ruinas.</p>";
+            "<p>El broche confirma que la hija del rey cruzó el laberinto. Una puerta de madera marca la salida hacia el sendero.</p>";
+    }
+
+    if (node.id === "asturian-trail") {
+        mostrarOpcionesLaberinto([
+            {
+                label: "💬 Conversar en el sendero con el grupo",
+                action: abrirCharlaSendero
+            },
+            {
+                label: "🌉 Seguir el sendero hasta el puente de Argul",
+                action: () => window.irANodoPorId("asturian-bridge")
+            }
+        ]);
+    }
+
+    if (node.id === "asturian-bridge") {
+        textBox.innerHTML +=
+            "<p>Haz clic sobre el centauro del norte para dialogar con él sobre el Cuélebre Ancestral y el pueblo de Argul.</p>";
+        mostrarOpcionesLaberinto([
+            {
+                label: "🏹 Dialogar con el centauro sobre Argul y el Cuélebre",
+                action: abrirDialogoCentauro
+            }
+        ]);
     }
 }
 
 export function createWorldScene() {
     const scene = new BABYLON.Scene(engine);
-    scene.clearColor = new BABYLON.Color3(0.04, 0.04, 0.09);
+    scene.clearColor = new BABYLON.Color4(0.04, 0.04, 0.09, 1);
     scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
     scene.fogDensity = 0.0065;
     scene.fogColor = new BABYLON.Color3(0.11, 0.1, 0.18);
@@ -332,7 +406,7 @@ export function createWorldScene() {
     interiorLampLight.range = 12;
     interiorLampLight.intensity = 0;
 
-    const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 80, height: 140 }, scene);
+    const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 160, height: 140 }, scene);
     const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
     groundMat.diffuseTexture = crearTexturaHierba(scene);
     groundMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.07);
@@ -362,6 +436,29 @@ export function createWorldScene() {
         new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
             if (nodes[state.currentNodeIndex].id === "cabin") {
                 window.irANodoPorId("cabin-interior");
+            }
+        })
+    );
+
+    puertaSalidaLaberinto = BABYLON.MeshBuilder.CreateBox(
+        "puertaSalidaLaberinto",
+        { width: 1.65, height: 2.65, depth: 0.24 },
+        scene
+    );
+    puertaSalidaLaberinto.position = new BABYLON.Vector3(45.2, 1.325, 52);
+    puertaSalidaLaberinto.rotation.y = state.salidaLaberintoAbierta ? Math.PI : Math.PI / 2;
+    const matPuertaSalida = new BABYLON.StandardMaterial("matPuertaSalida", scene);
+    matPuertaSalida.diffuseTexture = matMadera;
+    puertaSalidaLaberinto.material = matPuertaSalida;
+
+    puertaSalidaLaberinto.actionManager = new BABYLON.ActionManager(scene);
+    puertaSalidaLaberinto.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+            if (nodes[state.currentNodeIndex].id === "princess-sanctum") {
+                state.salidaLaberintoAbierta = true;
+                puertaSalidaLaberinto.rotation.y = Math.PI;
+                guardarEstadoMundoOscuro();
+                window.irANodoPorId("asturian-trail");
             }
         })
     );
@@ -577,6 +674,20 @@ export function createWorldScene() {
     minotaurSprite.size = 4.5;
     minotaurSprite.playAnimation(0, 17, true, 110);
 
+    const centauroManager = new BABYLON.SpriteManager(
+        "centauroManager",
+        "img/moscuro/centauro.png",
+        1,
+        { width: 128, height: 128 },
+        scene
+    );
+    centauroSprite = new BABYLON.Sprite("centauroNorte", centauroManager);
+    centauroSprite.position = new BABYLON.Vector3(81.5, 1.9, 52);
+    centauroSprite.size = 3.6;
+    centauroSprite.isPickable = true;
+    centauroSprite.isVisible = false;
+    centauroSprite.playAnimation(0, 3, true, 550);
+
     limpiarFondoSprite("img/moscuro/anciano.png", function (imagenLimpiaBase64, cellW, cellH) {
         const spriteManagerAnim = new BABYLON.SpriteManager("spriteAnim", imagenLimpiaBase64, 1, { width: cellW, height: cellH }, scene);
         spriteManagerAnim.isPickable = true;
@@ -590,9 +701,15 @@ export function createWorldScene() {
 
     scene.onPointerMove = function () {
         const pickSprite = scene.pickSprite(scene.pointerX, scene.pointerY);
-        if (pickSprite && pickSprite.hit && pickSprite.pickedSprite === animadoNPC && nodes[state.currentNodeIndex].id === "elder-enclave") {
-            setCanvasCursor("cursor-talk", canvas);
-            return;
+        if (pickSprite && pickSprite.hit) {
+            if (pickSprite.pickedSprite === animadoNPC && nodes[state.currentNodeIndex].id === "elder-enclave") {
+                setCanvasCursor("cursor-talk", canvas);
+                return;
+            }
+            if (pickSprite.pickedSprite === centauroSprite && nodes[state.currentNodeIndex].id === "asturian-bridge") {
+                setCanvasCursor("cursor-talk", canvas);
+                return;
+            }
         }
 
         const pickMesh = scene.pick(scene.pointerX, scene.pointerY);
@@ -606,7 +723,7 @@ export function createWorldScene() {
                 setCanvasCursor("cursor-examine", canvas);
                 return;
             }
-            if (nombre === "puertaCabana") {
+            if (nombre === "puertaCabana" || nombre === "puertaSalidaLaberinto") {
                 setCanvasCursor("cursor-hand", canvas);
                 return;
             }
@@ -624,16 +741,18 @@ export function createWorldScene() {
             actualizarAudioInteriorCabana(true);
         }
         const pickSprite = scene.pickSprite(scene.pointerX, scene.pointerY);
-        if (pickSprite && pickSprite.hit && pickSprite.pickedSprite === animadoNPC) {
-            if (nodes[state.currentNodeIndex].id === "elder-enclave") {
+        if (pickSprite && pickSprite.hit) {
+            if (pickSprite.pickedSprite === animadoNPC && nodes[state.currentNodeIndex].id === "elder-enclave") {
                 document.getElementById("npc-menu").style.display = "flex";
+            } else if (pickSprite.pickedSprite === centauroSprite && nodes[state.currentNodeIndex].id === "asturian-bridge") {
+                abrirDialogoCentauro();
             }
         }
     };
 
     scene.registerBeforeRender(function () {
         const t = performance.now() * 0.0025;
-        if (riftLight && !nodes[state.currentNodeIndex].horrorInterior) {
+        if (riftLight && !nodes[state.currentNodeIndex].horrorInterior && !nodes[state.currentNodeIndex].asturianTrail && !nodes[state.currentNodeIndex].asturianBridge) {
             riftLight.intensity = 0.52 + Math.sin(t) * 0.14;
         }
         if (nodes[state.currentNodeIndex].horrorInterior && interiorLampLight) {
@@ -661,7 +780,7 @@ export function initWorld() {
 
         state.currentNodeIndex = nextIndex;
         const targetNode = nodes[state.currentNodeIndex];
-        aplicarAtmosferaNodo(Boolean(targetNode.horrorInterior), scene);
+        aplicarAtmosferaNodo(targetNode, scene);
 
         const startPosition = camera.position.clone();
         const startRotation = camera.rotation.clone();
@@ -702,6 +821,12 @@ export function initWorld() {
             setTimeout(() => {
                 if (nodes[state.currentNodeIndex].id === "cabin-interior") {
                     mostrarDialogoCompanero("Aquí dentro hace un frío extraño... Mira esa nota sobre la mesa.");
+                }
+            }, 700);
+        } else if (targetNode.id === "asturian-trail") {
+            setTimeout(() => {
+                if (nodes[state.currentNodeIndex].id === "asturian-trail") {
+                    mostrarDialogoCompanero("Dejamos atrás el laberinto. Sigamos este sendero entre la niebla hacia el puente.");
                 }
             }, 700);
         }
@@ -773,7 +898,7 @@ export function initWorld() {
     prepararPergaminoAntiguo();
     reportMissionProgress();
     actualizarNavegacion(nodes[state.currentNodeIndex]);
-    aplicarAtmosferaNodo(Boolean(nodes[state.currentNodeIndex].horrorInterior), scene);
+    aplicarAtmosferaNodo(nodes[state.currentNodeIndex], scene);
     if (state.currentNodeIndex > 0) {
         window.irANodoPorId(nodes[state.currentNodeIndex].id);
     }

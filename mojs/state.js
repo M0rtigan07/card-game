@@ -34,7 +34,7 @@ export function cargarMemoriaVillanos() {
 export function guardarMemoriaVillanos(state) {
     try {
         localStorage.setItem(VILLAIN_STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {}
+    } catch (e) { }
 }
 
 export const personajesCelda = {
@@ -136,7 +136,10 @@ export const state = {
         ? savedScene.aliadosGrupo
         : companionsFromSave,
     traicionPendiente: false,
-    traicionEjecutada: false
+    traicionEjecutada: false,
+    salidaLaberintoAbierta: Boolean(savedScene?.salidaLaberintoAbierta),
+    confianzaCentauro: Number(savedScene?.confianzaCentauro) || 0,
+    centauroReclutado: Boolean(savedScene?.centauroReclutado)
 };
 
 state.minotaurClueFound = savedScene?.minotaurClueFound
@@ -164,9 +167,12 @@ export function guardarEstadoMundoOscuro() {
             celdaLiberada: state.celdaLiberada,
             aliadosGrupo: state.aliadosGrupo,
             traicionPendiente: state.traicionPendiente,
-            traicionEjecutada: state.traicionEjecutada
+            traicionEjecutada: state.traicionEjecutada,
+            salidaLaberintoAbierta: state.salidaLaberintoAbierta,
+            confianzaCentauro: state.confianzaCentauro,
+            centauroReclutado: state.centauroReclutado
         }));
-    } catch (error) {}
+    } catch (error) { }
 }
 
 export function sortearEncuentroCelda() {
@@ -195,3 +201,13 @@ export function obtenerVillanoParaAnciano() {
     if (state.villainMemory.prisionera) return personajesCelda.prisionera;
     return null;
 }
+
+
+
+
+
+
+
+
+
+

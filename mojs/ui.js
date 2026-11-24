@@ -1,4 +1,3 @@
-
 import {
     companionAvatar,
     companionName,
@@ -11,6 +10,7 @@ import {
 } from "./state.js";
 
 const RETRATO_ANCIANO = "img/moscuro/anciano_perfil.jpg";
+const RETRATO_CENTAURO = "img/moscuro/centauro_perfil.png";
 
 let interiorAudioCtx = null;
 let interiorOsc1 = null;
@@ -62,7 +62,22 @@ function generarInteraccionAliado(aliado) {
         return {
             nombreDialogo: `${nombreRol} — La Prisionera`,
             textoDialogo: dialogosLyra[idx],
-            comentarioGrupo: `«Hablas con <b>${nombreRol}</b> y le sigues el juego de acertijos mientras avanzáis por el Mundo Oscuro.»`
+            comentarioGrupo: `«Hablas con <b>${nombreRol}</b> y le sigues el juego de acertijos mientras avanzáis.»`
+        };
+    }
+
+    const esCentauro = aliado.id === "centauro-norte" || nombreRol === "Bran";
+    if (esCentauro) {
+        const dialogosBran = [
+            `«Soy <b>${nombreRol}</b>. El Cuélebre Ancestral lleva demasiado tiempo sembrando el terror en Argul; mantengamos el paso firme.»`,
+            `«Llámeme <b>${nombreRol}</b>. Conozco cada recodo de este puente y de las peñas que miran hacia Argul.»`
+        ];
+        const idx = (aliado.interaccionIdx || 0) % dialogosBran.length;
+        aliado.interaccionIdx = idx + 1;
+        return {
+            nombreDialogo: `${nombreRol} — Centauro del Norte`,
+            textoDialogo: dialogosBran[idx],
+            comentarioGrupo: `«Intercambias palabras con <b>${nombreRol}</b> sobre la amenaza que pesa sobre el pueblo de Argul.»`
         };
     }
 
@@ -258,6 +273,99 @@ export function mostrarOpcionesLaberinto(options) {
         list.appendChild(button);
     });
     document.getElementById("text-box").appendChild(list);
+}
+
+export function abrirCharlaSendero() {
+    const nombresAliados = state.aliadosGrupo.map(a => a.nombreRevelado || obtenerNombreRolAliado(a));
+    if (nombresAliados.length > 0) {
+        const primero = state.aliadosGrupo[0];
+        const nombrePrimero = primero.nombreRevelado || obtenerNombreRolAliado(primero);
+        const esLyra = primero.rol === "prisionera" || nombrePrimero === "Lyra";
+        mostrarDialogo(
+            nombrePrimero,
+            primero.imgPerfil || companionAvatar,
+            esLyra
+                ? `«¡Mira cuánta bruma entre los postes de madera, ${companionName}! ¿Crees que el sendero lleva a Argul o que Argul está escondido en la niebla?»`
+                : `«Este camino de piedra huele a lluvia de montaña y a bosque antiguo, ${companionName}. Mantengamos la guardia mientras nos acercamos al puente.»`,
+            "🛡️"
+        );
+        document.getElementById("text-box").innerHTML =
+            `<b>Charla en el Sendero:</b> Comentáis el paisaje con <b>${nombrePrimero}</b> mientras avanzáis hacia el puente.`;
+    } else {
+        mostrarDialogoCompanero(
+            "El aire aquí es más húmedo y frío, pero huele a monte y a piedra viva. Más adelante se intuye un puente."
+        );
+        document.getElementById("text-box").innerHTML =
+            "<b>Charla en el Sendero:</b> Hablas con tu compañero mientras seguís el camino empedrado entre los postes.";
+    }
+}
+
+export function abrirDialogoCentauro() {
+    const nombreCentauro = "Bran — Centauro del Norte";
+
+    if (state.centauroReclutado) {
+        mostrarDialogo(
+            nombreCentauro,
+            RETRATO_CENTAURO,
+            "«Ya tienes mi palabra y mi lanza, viajeros. El Cuélebre Ancestral sigue atemorizando al pueblo de Argul desde las aguas y las peñas... mantengámonos listos.»",
+            "🏹"
+        );
+        document.getElementById("text-box").innerHTML =
+            `<b>Bran (Aliado):</b> El centauro vigila el puente de Argul y recuerda la amenaza del Cuélebre Ancestral.`;
+        return;
+    }
+
+    mostrarDialogo(
+        nombreCentauro,
+        RETRATO_CENTAURO,
+        "«¡Alto en el camino! Soy <b>Bran</b>. Un <b>Cuélebre Ancestral</b> atemoriza al <b>pueblo de Argul</b>, rondando este puente y las cuevas del río. ¿Venís con ánimo firme?»",
+        "🏹"
+    );
+
+    document.getElementById("text-box").innerHTML =
+        `<b>El Puente de Argul:</b> Bran te habla de un Cuélebre Ancestral que atemoriza al pueblo de Argul.`;
+
+    mostrarOpcionesLaberinto([
+        {
+            label: "🤝 Ofrecer ayuda para proteger el pueblo de Argul (Ganar confianza)",
+            action: () => {
+                state.confianzaCentauro += 1;
+                state.centauroReclutado = true;
+                if (!state.aliadosGrupo.some(a => a.id === "centauro-norte")) {
+                    state.aliadosGrupo.push({
+                        id: "centauro-norte",
+                        nombre: "El Centauro",
+                        nombreRol: "Bran",
+                        nombreRevelado: "Bran",
+                        imgPerfil: RETRATO_CENTAURO
+                    });
+                }
+                guardarEstadoMundoOscuro();
+                actualizarHUDGrupo();
+                mostrarDialogo(
+                    nombreCentauro,
+                    RETRATO_CENTAURO,
+                    "«¡Por Argul y por estas montañas, tienes mi confianza! Me uno a vuestro paso; de momento aguardemos aquí y preparémonos.»",
+                    "🏹"
+                );
+                document.getElementById("text-box").innerHTML =
+                    `<b>¡Bran se une a tu grupo!</b> Has ganado la confianza del centauro del norte en el camino del puente de Argul.`;
+            }
+        },
+        {
+            label: "❓ Preguntar qué ocurre en el pueblo de Argul",
+            action: () => {
+                state.confianzaCentauro += 1;
+                guardarEstadoMundoOscuro();
+                mostrarDialogo(
+                    nombreCentauro,
+                    RETRATO_CENTAURO,
+                    "«Los vecinos de Argul apenas se atreven a salir al caer la bruma. Dicen que el Cuélebre Ancestral guarda un tesoro antiguo y vigila cada cruce.»",
+                    "🏹"
+                );
+            }
+        }
+    ]);
 }
 
 function crearIconoCintaMorada() {
@@ -732,4 +840,5 @@ export function registrarUIHandlers(canvas) {
             }
         }
     };
+
 }
